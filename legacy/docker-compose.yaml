@@ -1,0 +1,34 @@
+services:
+  oracle:
+    image: shkim4u/oracle:11.2.0.2-xe
+    shm_size: "2GB"
+    environment:
+      ORACLE_PWD: welcome
+    ports:
+      - "1521:1521"
+    volumes:
+      - $PWD/database/oracle/11.2.0.2-xe/setup:/u01/app/oracle/scripts/setup
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'SELECT 1 FROM DUAL' | sqlplus -s travelbuddy/welcome@//localhost:1521/xe"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  app:
+    build: applications/TravelBuddy/build
+    image: legacy/travelbuddy
+    mem_limit: 1g
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+#      - SPRING_CONFIG_LOCATION=file:/config-repo/application.yml,file:/config-repo/travelbuddy.yml
+      - JDBC_CONNECTION_STRING=jdbc:oracle:thin:@oracle:1521:xe
+      - JDBC_UID=travelbuddy
+      - JDBC_PWD=welcome
+      - TZ=Asia/Seoul
+    ports:
+      - "8080:8080"
+    depends_on:
+      - oracle
+
+# Run docker compose command:
+# docker compose -p travelbuddy up -d
+# docker compose -p travelbuddy down --remove-orphans

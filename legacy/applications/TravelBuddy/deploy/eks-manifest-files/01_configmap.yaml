@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: travelbuddy-configmap
+  namespace: travelbuddy
+data:
+  environment: dev

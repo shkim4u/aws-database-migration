@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "travelbuddy-ingress"
+  namespace: travelbuddy
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    # AWS Certificate Manager certificate's ARN
+    alb.ingress.kubernetes.io/certificate-arn: <ACM Certificate ARN here>
+    # open ports 80 and 443
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/group.name: travelbuddy
+    alb.ingress.kubernetes.io/group.order: '1'
+    alb.ingress.kubernetes.io/healthcheck-path: "/travelbuddy/health"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /travelbuddy
+            pathType: Prefix
+            backend:
+              service:
+                name: "travelbuddy-service"
+                port:
+                  number: 80

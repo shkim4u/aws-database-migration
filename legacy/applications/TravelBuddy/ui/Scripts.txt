@@ -1,0 +1,298 @@
+import {createSlice, nanoid, PayloadAction} from "@reduxjs/toolkit";
+
+// {
+//     hotelSpecials: {
+//         byId: {
+//             1: {
+//                 id: 1,
+//                 name: 'Sommerset Hotel',
+//                 description: 'Minimum stay 3 nights',
+//                 location: 'Sydney',
+//                 cost: 909,
+//                 expiryDate: 1694342371600
+//             },
+//         },
+//         allIds: [1, 2],
+//     },
+// }
+
+interface HotelSpecial {
+    // [id: number]: number;
+    id: number;
+    name: string;
+    description: string;
+    location: string;
+    cost: number;
+    expiryDate: Date;
+};
+
+const initialStateReserved = {
+    hotelSpecials: {
+        byId: {},
+        allIds: []
+    }
+};
+
+const initialState = {
+    hotelSpecials: []
+};
+
+// HotlSpecials Slice.
+const sliceBak = createSlice({
+    name: 'hotelspecials',
+    initialState: initialState,
+    // initialState: {
+    //     hotelSpecials: []
+    // },
+    reducers: {
+        // 액션 타입은 슬라이스 이름을 접두어로 사용하여 자동 생성된다. -> hotelspecials/addHotelSpecial
+        // 이에 상응하는 액션 타입을 가진 액션이 Dispatch되면 Reducer가 실행된다.
+        getAllHotelSpecials: (state, action) => {
+            state.hotelSpecials = action.payload
+        },
+        // addHotelSpecial: {
+        //     reducer: (state, action: PayloadAction<HotelSpecial>) => {
+        //     // reducer: (state, action) => {
+        //         state.hotelSpecials.byId[action.payload.id] = action.payload;
+        //         state.allIds.push(action.payload.id);
+        //     },
+        //     // Reducer가 실행되기 전에 액션의 내용을 편집.
+        //     prepare: (text: string) => {
+        //         const id = nanoid();
+        //         return {payload: {id, text}}
+        //     }
+        // }
+    }
+});
+
+// Reducer
+
+const {actions, reducer} = sliceBak;
+export const {getAllHotelSpecials} = actions;
+export default reducer;
+
+
+import hotelspecialsReducer from '../features/hotelspecials/slice-bak'
+
+const rootReducer = {
+    hotelspecials: hotelspecialsReducer
+}
+
+export default rootReducer;
+
+
+// HotelSpecialsSaga
+// Generator function.
+import {PayloadAction} from "@reduxjs/toolkit";
+import axios, { AxiosResponse } from "axios";
+import {put, takeLatest } from "redux-saga/effects";
+
+function* getHotelSpecialSaga({payload: id}: PayloadAction<string>) {
+    try {
+        // You can also export the axios call as a function.
+        const response: AxiosResponse<HotelSpecialType> = yield axios.get(`your-server-url:port/api/users/${id}`);
+        yield put(getHotelSpecialSuccessAction(response.data));
+    } catch (error) {
+        yield put(getHotelSpecialErrorAction(error));
+    }
+}
+
+// Generator function
+export function* watchGetHotelSpecial() {
+    yield takeLatest(GET_HOTELSPECIAL_BY_ID, getHotelSpecialSaga);
+}
+
+
+### rootSaga.tsx
+import { all, fork, spawn, call } from "redux-saga/effects";
+import {watchGetHotelSpecial} from "./hotelspecialsSaga";
+import {getHotelSpecialsSaga} from "../features/hotelspecials/hotelSpecialsSaga";
+
+// const rootSaga = function* () {
+//     yield all([
+//         fork(watchGetHotelSpecial),
+//     ]);
+// };
+//
+// export default rootSaga;
+
+const rootSaga = function* () {
+    const sagas = [
+        getHotelSpecialsSaga
+    ];
+
+    yield all(
+        sagas.map((saga: any) =>
+            spawn(function* () {
+                while (true) {
+                    try {
+                        yield call(saga);
+                        break;
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            })
+        )
+    );
+}
+
+### Root.tsx
+import React from "react";
+import {BrowserRouter as Router, Route} from "react-router-dom";
+import App from "./App";
+import Header from "./components/layout/header/Header";
+import {Provider} from "react-redux";
+import createSagaMiddleware from "redux-saga";
+import logger from 'redux-logger'
+import {configureStore} from "@reduxjs/toolkit";
+// And use redux-batched-subscribe as an example of adding enhancers
+import { batchedSubscribe } from 'redux-batched-subscribe'
+import {debounce} from "lodash";
+import rootReducer from "./reducers/rootReducer";
+// import rootSaga from "./sagas/rootSaga"
+import createStore from "./store";
+
+
+/**
+ * Redux Store 설정 - 로컬 및 배포 분리
+ */
+// const store = (() =>
+//     {
+//         /*
+//          * Redux DevTools를 통해 State 변화를 추적할 수 있도록 설정.
+//          * 운영에서는 보안을 고려하여 비활성화.
+//          */
+//         // See: https://freestrokes.tistory.com/161
+//         return configureStore({
+//             reducer: rootReducer,
+//             middleware : (getDefaultMiddleware) => getDefaultMiddleware().concat(logger).concat(sagaMiddleware),
+//             devTools: process.env.NODE_ENV !== 'production',
+//             enhancers: [batchedSubscribe(debounceNotify)],
+//         });
+//     }
+// )();
+const store = createStore();
+
+// Run Saga middleware.
+// sagaMiddleware.run(rootSaga);
+
+const Root = () => {
+    return (
+        <Router>
+            <Provider store={store}>
+                <Header />
+                <App />
+            </Provider>
+        </Router>
+    )
+}
+
+export default Root;
+
+### hotelSpecialTypes.tsx
+// Define the hotel special type.
+export type HotelSpeicalType = {
+    id: number;
+    name: string;
+    description: string;
+    location: string;
+    cost: number;
+    expiryDate: Date;
+}
+
+// This type will represent the sub-state for getting a single hotel by ID.
+export type IHotelSpecialState = {
+    data: HotelSpeicalType | null;
+    isLoading: boolean;
+    errors: string;
+}
+
+// The hotel special global state.
+export type HotelSpecialStateType = {
+    hotelSpecial
+}
+
+### Backup for hotelspecials slice.tsx
+import {createSelector, createSlice, nanoid, PayloadAction} from "@reduxjs/toolkit";
+import {HotelSpecialState} from "./types";
+import {state} from "../../utils/TypeUtils";
+
+// export const initialState = {
+//     isLoading: false,
+//     hotelSpecials: [],
+//     error: null,
+//     page: 0,
+// }
+
+export const initialState: HotelSpecialState = {
+    hotelSpecials: state.initial()
+}
+
+const reducers = {
+    load: (state: HotelSpecialState) => {
+        state.hotelSpecials.isLoading = true;
+    },
+    loadMore: (state: HotelSpecialState) => {
+        return state;
+    },
+    // loadSuccess: (state: { isLoading: boolean; hotelSpecials: any; page: any; }, {payload: {hotelSpecials, nextPage}}: any) => {
+    loadSuccess: (state: { isLoading: boolean; hotelSpecials: any; page: any; }, {payload: {hotelSpecials, nextPage}}: any) => {
+        state.isLoading = false;
+        state.hotelSpecials = hotelSpecials;
+        console.log(`[loadSuccess] hotelSpecials: ${hotelSpecials}`);
+        state.page = nextPage;
+    },
+    // loadFail: (state: { isLoading: boolean; error: any; }, {payload: error}: any) => {
+    loadFail: (state: { isLoading: boolean; error: any; }, {payload: error}: any) => {
+        state.isLoading = false;
+        state.error = error;
+    }
+}
+
+const slice = createSlice({
+    name: 'HotelSpecials',
+    initialState: initialState,
+    reducers: reducers
+});
+
+const selectLoadingState = createSelector(
+    (state: { isLoading: any; }) => state.isLoading,
+    (isLoading) => isLoading
+);
+
+const selectHotelSpecials = createSelector(
+    (state: { hotelSpecials: any; }) => state.hotelSpecials,
+    (hotelSpecials) => hotelSpecials
+);
+
+const selectError = createSelector(
+    (state: { error: any; }) => state.error,
+    (error) => error
+);
+
+const selectPage = createSelector(
+    (state: { page: any; }) => state.page,
+    (page) => page
+)
+
+const selectAllState = createSelector(
+    selectLoadingState,
+    selectHotelSpecials,
+    selectError,
+    (isLoading, hotelSpecials, error) => {
+        return {isLoading, hotelSpecials, error};
+    }
+)
+
+export const hotelSpecialsSelector = {
+    isLoading: (state: { [x: string]: { isLoading: any; }; }) => selectLoadingState(state[HOTELSPECIALS]),
+    hotelSpecials: (state: { [x: string]: { hotelSpecials: any; }; }) => selectHotelSpecials(state[HOTELSPECIALS]),
+    error: (state: { [x: string]: { error: any; }; }) => selectError(state[HOTELSPECIALS]),
+    all: (state: { [x: string]: { isLoading: any; } & { hotelSpecials: any; } & { error: any; }; }) => selectAllState(state[HOTELSPECIALS]),
+    page: (state: { [x: string]: { page: any; }; }) => selectPage(state[HOTELSPECIALS]),
+}
+
+export const HOTELSPECIALS = slice.name;
+export const hotelSpecialsReducer = slice.reducer;
+export const hotelSpecialsAction = slice.actions;

@@ -1,0 +1,111 @@
+version: 0.2
+
+###################################################################################################################
+# 이 파일은 모놀리스/마이크로서비스 어플리케이션의 소스 코드가 리포지터리로 Push 되어 빌드 및 전달 파이프라인이   #
+# 수행되어 ECR에 컨테이너 이미지로 Push되면 실행되는 배포 파이프라인에서 참조하는 파일이다.                       #
+# 인프라스트럭처 레벨에서 정의된 배포 파이프라인이 생성될 때 아래의 환경 변수가 설정되어 있으며                   #
+# 이 파일은 이 환경 변수를 이용하여 쿠버네테스 클러스터에 배포하기 위힌 Manifest 파일들을 적절히 수정한 후에      #
+# 이들을 쿠버네테스 클러스터에 적용한다.                                                                          #
+#                                                                                                                 #
+# * 설정된 환경 변수                                                                                              #
+#   - CLUSTER_NAME: deployProps.eksCluster.clusterName                                                            #
+#	- ECR_REPO_URI: deployProps.ecrRepository.repositoryUri                                                       #
+#   - ASSUME_ROLE_ARN: 이 빌드 컨테이너가 EKS를 조작하기 필요한 권한을 가진 Role ARN (Assume하여 사용)            #
+###################################################################################################################
+
+env:
+  shell: bash
+  git-credential-helper: yes
+  variables:
+    AWS_REGION: "ap-northeast-2"
+    IMAGE_TAG_KEY: "/application/travelbuddy/container/image/main/tag"
+phases:
+  install:
+    commands:
+      - env
+      - aws eks update-kubeconfig --name $CLUSTER_NAME
+#        if [[ -n ${EKS_ROLE_ARN} ]]; then
+#        echo "[INFO] got EKS_ROLE_ARN=${EKS_ROLE_ARN}, updating kubeconfig with this role"
+#        aws eks update-kubeconfig --name $CLUSTER_NAME --kubeconfig $KUBECONFIG --role-arn "${EKS_ROLE_ARN}"
+#        else
+#        aws eks update-kubeconfig --name $CLUSTER_NAME --kubeconfig $KUBECONFIG
+#        fi
+  pre_build:
+    commands:
+      - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output=text) && echo $AWS_ACCOUNT_ID
+      - export EKS_MANIFEST_FILES_DIR=eks-manifest-files
+      - export REPO_IMAGE_TAG=`aws ssm get-parameter --name "/application/travelbuddy/container/image/main/tag" --query "Parameter.Value"`
+      - export IMAGE_TAG=`echo $REPO_IMAGE_TAG | tr -d '"'`
+      - export CREDENTIALS=$(aws sts assume-role --role-arn $ASSUME_ROLE_ARN --role-session-name codebuild-deploy-eks-role)
+      - echo $CREDENTIALS
+      - export AWS_ACCESS_KEY_ID=$(echo "${CREDENTIALS}" | jq -r '.Credentials.AccessKeyId')
+      - export AWS_SECRET_ACCESS_KEY=$(echo "${CREDENTIALS}" | jq -r '.Credentials.SecretAccessKey')
+      - export AWS_SESSION_TOKEN=$(echo "${CREDENTIALS}" | jq -r '.Credentials.SessionToken')
+      - export AWS_EXPIRATION=$(echo "${CREDENTIALS}" | jq -r '.Credentials.Expiration')
+      - ls -altr
+      - pwd
+      - echo "Preparing 02_deployment.yaml file..."
+      - sed -i 's@CONTAINER_IMAGE@'"$ECR_REPO_URI:$IMAGE_TAG"'@' $EKS_MANIFEST_FILES_DIR/02_deployment.yaml
+      - export LEGACY_RDS_ENDPOINT=`aws cloudformation describe-stacks --region $AWS_REGION --query "Stacks[?StackName=='M2M-RdsLegacyStack'][].Outputs[?OutputKey=='RDSEndpoint'].OutputValue" --output text`
+      - sed -i 's@RDS_ENDPOINT@'"$LEGACY_RDS_ENDPOINT"'@' $EKS_MANIFEST_FILES_DIR/02_deployment.yaml
+      - env
+  build:
+    commands:
+      - echo "Step 0 - Creating k8s namespace travelbuddy."
+      - kubectl apply -f $EKS_MANIFEST_FILES_DIR/00_namespace.yaml
+      - echo "Step 0 - Configuring service account to access AWS services. This is required to do before applying deployment yaml file, 02_deployment.yaml file."
+      - export OIDC_PROVIDER=$(aws eks describe-cluster --name $CLUSTER_NAME --query "cluster.identity.oidc.issuer" --output text | sed -e "s/^https:\/\///")
+      - echo $OIDC_PROVIDER
+      - export ISSUER_URL=https://$OIDC_PROVIDER
+      - echo $ISSUER_URL
+      - export ISSUER_HOSTPATH=$OIDC_PROVIDER
+      - echo $ISSUER_HOSTPATH
+      - export PROVIDER_ARN="arn:aws:iam::$AWS_ACCOUNT_ID:oidc-provider/$ISSUER_HOSTPATH"
+      - echo $PROVIDER_ARN
+      - echo "******************************************* Start of Service Account for Pod *******************************************"
+      - echo "************ TravelBuddy Pod Service Account Role Trust Policy ************"
+      - chmod +x create_travelbuddy_pod_service_account_role_trust_policy.sh
+      - ./create_travelbuddy_pod_service_account_role_trust_policy.sh
+      - export TRAVELBUDDY_POD_ROLE_NAME=TravelBuddyPodEksRole && echo $TRAVELBUDDY_POD_ROLE_NAME
+      - echo "************ End of TravelBuddy Pod Service Account Role Trust Policy ************"
+      - echo
+      - echo "************ TravelBuddy Pod Role (if it does not exist.) ************"
+      - chmod +x create_travelbuddy_pod_role_if_not_exists.sh
+      - ./create_travelbuddy_pod_role_if_not_exists.sh
+      - export TRAVELBUDDY_POD_ROLE_ARN=$(aws iam get-role --role-name $TRAVELBUDDY_POD_ROLE_NAME --query Role.Arn --output text) && echo $TRAVELBUDDY_POD_ROLE_ARN
+      - echo "************ End of TravelBuddy Pod Role ************"
+      - echo
+      - echo "************ TravelBuddy Pod Kubernetes Service Account (if it does not exist.) ************"
+      - chmod +x create_k8s_travelbuddy_pod_service_account_if_not_exists.sh
+      - ./create_k8s_travelbuddy_pod_service_account_if_not_exists.sh
+      - echo "************ End of TravelBuddy Pod Kubernetes Service Account (if it does not exist.) ************"
+      - echo "******************************************* End of Service Account for Pod *******************************************"
+      - echo "Step 1 - Setting ConfigMap that will be used inside the application, such as Spring Profile or some more."
+      - kubectl apply -f $EKS_MANIFEST_FILES_DIR/01_configmap.yaml
+      - echo "Step 2 - Applying application deployment manifest file."
+      - kubectl apply -f $EKS_MANIFEST_FILES_DIR/02_deployment.yaml
+      - echo "Step 3 - Applying service (Node Port) manifest file."
+      - kubectl apply -f $EKS_MANIFEST_FILES_DIR/03_service.yaml
+      - echo "Step 4 - Applying service (Ingress Controller) manifest file."
+      - kubectl apply -f $EKS_MANIFEST_FILES_DIR/04_ingress.yaml
+      - echo "Step 99 - Applying ConfigMap for logging."
+      - kubectl apply -f $EKS_MANIFEST_FILES_DIR/99_aws_logging_cloudwatch_configmap.yaml
+      - echo "Final Step - Finally restart deployment to reflect latest container image."
+      - kubectl rollout restart deployment travelbuddy -n travelbuddy | true
+
+  post_build:
+    commands:
+      - echo "post_build - Showing some information about EKS Fargate cluster."
+      - kubectl get namespaces
+      - kubectl get nodes -n travelbuddy -o wide
+      - kubectl get pods -n travelbuddy -o wide
+      - kubectl get services -n travelbuddy
+      - kubectl get ingresses -n travelbuddy
+#      - echo
+#      - cd $CDK_DEPLOYMENT_DIR
+#      - pwd
+#      - npm install
+#      - npm run build
+#      - cdk synth
+#      - cdk deploy --all --require-approval never
+

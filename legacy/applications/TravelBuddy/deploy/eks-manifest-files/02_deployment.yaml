@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: travelbuddy
+  namespace: travelbuddy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: travelbuddy
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: travelbuddy
+    spec:
+      serviceAccountName: travelbuddy-pod-service-account
+      # Added for X-Ray configuration.
+      volumes:
+        - name: config-volume
+          configMap:
+            name: "xray-config"
+      containers:
+        - name: travelbuddy
+          image: CONTAINER_IMAGE
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          env:
+            - name: JDBC_CONNECTION_STRING
+              value: "jdbc:mysql://RDS_ENDPOINT:3306/travelbuddy?useSSL=false&autoReconnect=true"
+            - name: JDBC_UID
+              value: "root"
+            - name: JDBC_PWD
+              value: "labpassword"
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: travelbuddy-configmap
+                  key: environment
+            - name: TZ
+              value: Asia/Seoul
+        #          readinessProbe:
+        #            failureThreshold: 3
+        #            successThreshold: 1
+        #            httpGet:
+        #              path: /index.html
+        #              port: 80
+        #              scheme: HTTP
+        #            initialDelaySeconds: 120
+        #            periodSeconds: 5
+        # The error log from "kubectl logs" can be safely ignored: [Error] Get instance id metadata failed: RequestError: send request failed
+        # Reference: https://github.com/aws/aws-app-mesh-examples/issues/141
+        - name: xray-daemon
+          image: amazon/aws-xray-daemon:latest
+          imagePullPolicy: IfNotPresent
+          #          command: ["/usr/bin/xray", "-c", "/aws/xray/config.yaml"]
+          ports:
+            # Try to fix: an error in Spring Boot app: Encountered error polling GetSamplingRule: com.amazonaws.xray.internal.XrayClientException: Could not read response code.
+            # Related to the following error from X-Ray daemon: [
+            # Warn] Delaying sending of additional batches by 30 seconds
+            #2021-07-17T12:08:10Z [Error] Sending segment batch failed with: RequestError: send request failed
+            #caused by: Post "https://xray.ap-northeast-2.amazonaws.com/TraceSegments": net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+            - name: xray-ingest
+              containerPort: 2000
+              #              hostPort: 2000
+              protocol: UDP
+            - name: xray-tcp
+              containerPort: 2000
+              #              hostPort: 2000
+              protocol: TCP
+          #            - containerPort: 2000
+          ##              hostPort: 0
+          #              protocol: UDP
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          # Volume mount for X-Ray Configuration.
+          volumeMounts:
+            - name: config-volume
+              mountPath: /aws/xray
+              readOnly: true
+      securityContext:
+        fsGroup: 65534
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
+status: {}
+---
+# Configuration for AWS X-Ray daemon.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: xray-config
+  namespace: travelbuddy
+data:
+  config.yaml: |-
+    TotalBufferSizeMB: 24
+    Socket:
+      UDPAddress: "0.0.0.0:2000"
+      TCPAddress: "0.0.0.0:2000"
+    LocalMode: true
+    Version: 2
+    Logging:
+      LogLevel: "debug"
+#      LogPath: "/var/log/xray-daemon.log"

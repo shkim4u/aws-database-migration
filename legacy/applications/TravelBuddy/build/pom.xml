@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>devax</groupId>
+	<artifactId>travelbuddy</artifactId>
+	<name>travelbuddy</name>
+	<packaging>war</packaging>
+	<version>1.0.0</version>
+	<properties>
+		<java-version>1.8</java-version>
+		<org.springframework-version>5.3.14</org.springframework-version>
+		<org.aspectj-version>1.9.7</org.aspectj-version>
+		<hibernate.version>5.6.3.Final</hibernate.version>
+		<jackson.version>1.9.10</jackson.version>
+		<log4j.version>2.16.0</log4j.version>
+		<aws.xray-version>2.10.0</aws.xray-version>
+	</properties>
+	<dependencies>
+		<!--  Logging -->
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-api</artifactId>
+		    <version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-core</artifactId>
+		    <version>${log4j.version}</version>
+		    </dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-slf4j-impl</artifactId>
+		    <version>${log4j.version}</version>
+		</dependency>
+
+		<!--  QR Code Generation -->
+		<dependency>
+			<groupId>net.glxn.qrgen</groupId>
+			<artifactId>javase</artifactId>
+			<version>2.0</version>
+		</dependency>
+
+		<!-- Spring -->
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-core</artifactId>
+		    <version>${org.springframework-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-orm -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-orm</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-context</artifactId>
+		    <version>${org.springframework-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-webmvc</artifactId>
+		    <version>${org.springframework-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-tx -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-tx</artifactId>
+		    <version>${org.springframework-version}</version>
+		</dependency>
+
+
+
+		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>8.0.27</version>
+		</dependency>
+		<!-- [2024-08-19] Oracle JDBC -->
+		<dependency>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ojdbc8</artifactId>
+			<version>12.2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle.database.nls</groupId>
+			<artifactId>orai18n</artifactId>
+			<version>12.2.0.1</version>
+		</dependency>
+		<!-- Hibernate -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-jdbc -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>9.0.0.M21</version>
+		</dependency>
+
+		<!-- AspectJ -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>
+
+
+		<!-- @Inject -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+		<!-- Servlet -->
+		<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+		<dependency>
+		    <groupId>javax.servlet</groupId>
+		    <artifactId>javax.servlet-api</artifactId>
+		    <version>4.0.1</version>
+		    <scope>provided</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api -->
+		<dependency>
+		    <groupId>javax.servlet.jsp</groupId>
+		    <artifactId>javax.servlet.jsp-api</artifactId>
+		    <version>2.3.3</version>
+		    <scope>provided</scope>
+		</dependency>
+
+		<dependency>
+		    <groupId>javax.servlet</groupId>
+		    <artifactId>jstl</artifactId>
+		    <version>1.2</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.glassfish.web</groupId>
+		    <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+		    <version>1.2.6</version>
+		</dependency>
+
+		<!-- Jackson JSON Mapper -->
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>2.13.0</version>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-xray-recorder-sdk-core -->
+		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-xray-recorder-sdk-core</artifactId>
+		    <version>${aws.xray-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-xray-recorder-sdk-apache-http -->
+		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-xray-recorder-sdk-apache-http</artifactId>
+		    <version>${aws.xray-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-xray-recorder-sdk-aws-sdk -->
+		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-xray-recorder-sdk-aws-sdk</artifactId>
+		    <version>${aws.xray-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-xray-recorder-sdk-aws-sdk-instrumentor -->
+		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-xray-recorder-sdk-aws-sdk-instrumentor</artifactId>
+		    <version>${aws.xray-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-xray-recorder-sdk-sql -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-xray-recorder-sdk-sql</artifactId>
+			<version>${aws.xray-version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-xray-recorder-sdk-sql-mysql -->
+		<dependency>
+		    <groupId>com.amazonaws</groupId>
+		    <artifactId>aws-xray-recorder-sdk-sql-mysql</artifactId>
+		    <version>${aws.xray-version}</version>
+		</dependency>
+
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-actuator</artifactId>-->
+<!--			<version>2.7.14</version>-->
+<!--		</dependency>-->
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<additionalProjectnatures>
+						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+					</additionalProjectnatures>
+					<additionalBuildcommands>
+						<buildcommand>org.springframework.ide.eclipse.core.springbuilder</buildcommand>
+					</additionalBuildcommands>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<showWarnings>true</showWarnings>
+					<showDeprecation>true</showDeprecation>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<mainClass>org.test.int1.Main</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+		<finalName>travelbuddy</finalName>
+	</build>
+</project>

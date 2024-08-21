@@ -1,0 +1,7 @@
+* Oracle 컨테이너 이미지 다운로드 경로
+- https://application-migration-with-aws-workshop-ap-northeast-2.s3.ap-northeast-2.amazonaws.com/container/oracle-11.2.0.2-xe.tar.gz
+
+* Oracle Timezone, Date, 및 Number
+- https://oracledb101.wordpress.com/2019/01/16/convert-oracle-timestamp-to-epoch/
+- https://bit1010.tistory.com/183
+- https://currentmillis.com/
