@@ -1,0 +1,15 @@
+# 목차
+
+* [Amazon Bedrock 보안 및 세이프가드 워크샵 소개](README.md)
+* [사전 준비](prerequisites/3-Prerequisites-Owned-Account.md)
+  * [Amazon Bedrock 구성](prerequisites/3-Prerequisites-Owned-Account-1-Amazon-Bedrock-Setup.md)
+  * [AWS Cloud9 구성](prerequisites/3-Prerequisites-Owned-Account-2-Cloud9-Setup.md)
+  * [실습 환경 설정](prerequisites/3-Prerequisites-Owned-Account-3-Lab-Setup.md)
+* [Amazon Bedrock 가드레일 실습](amazon-bedrock-guardrails/8-Amazon-Bedrock-Guardrails.md)
+  * [Lab S-1: AWS 콘솔에서 가드레일 생성](amazon-bedrock-guardrails/8-Amazon-Bedrock-Guardrails-1-Create-Guardrails-Console.md)
+  * [Lab S-2: 프로그램을 통해 가드레일 생성](amazon-bedrock-guardrails/8-Amazon-Bedrock-Guardrails-2-Create-Guardrails-API.md)
+  * [Lab S-3: 가드레일과 함께 모델 호출](amazon-bedrock-guardrails/8-Amazon-Bedrock-Guardrails-3-Invoking-Guardrails.md)
+  * [Lab S-4: 콘텐츠 차단](amazon-bedrock-guardrails/8-Amazon-Bedrock-Guardrails-4-Contents-Blocking.md)
+  * [Lab S-5: PII 마스킹](amazon-bedrock-guardrails/8-Amazon-Bedrock-Guardrails-5-PII-Masking.md)
+  * [Lab S-6: 프롬프트 공격 차단](amazon-bedrock-guardrails/8-Amazon-Bedrock-Guardrails-6-Prompt-Attack-Blocking.md)
+* [Clean-Up](clean-up/B-Clean-Up.md)

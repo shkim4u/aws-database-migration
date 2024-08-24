@@ -1,0 +1,776 @@
+# AWS Database Migration Workshop CloudFormation Template
+# Resources for source environment
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation Template for AWS Database Migration Workshop - Target Environment Resources.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Amazon EC2 Configuration"
+        Parameters:
+          - EC2ServerInstanceType
+          - KeyName
+      -
+        Label:
+          default: "Target Amazon RDS Database Configuration"
+        Parameters:
+          - RDSInstanceType
+      -
+        Label:
+          default: "Network Configuration"
+        Parameters:
+          - VpcCIDR
+
+Mappings:
+  RegionMap: # 20 Regions
+    us-east-1: # Virginia
+      "EC2AMI" : "ami-05c7e027926270b28"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:us-east-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-us-east-1"
+    us-east-2: # Ohio
+      "EC2AMI" : "ami-0feb7489cd0671ae9"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:us-east-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-us-east-2"
+    us-west-2: # Oregon
+#      "EC2AMI" : "ami-03693ba72dc02b388"  # Updated  snapshot April 2024
+      "EC2AMI" : "ami-0f891d8112f2b69f8" # Updated  snapshot April 25, 2024
+#      "OracleSnapshotId" : "arn:aws:rds:us-west-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-us-west-2"
+      "OracleSnapshotId" : "arn:aws:rds:us-west-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-us-west-2"
+    af-south-1: # Cape Town [NO AMD]
+      "EC2AMI" : "ami-076fd4bb2c70c0f8a"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:af-south-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-af-south-1"
+    ap-east-1: # Hong Kong [NO AMD]
+      "EC2AMI" : "ami-0caaa383a929e8e83"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-east-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-east-1"
+    ap-south-1: # Mumbai
+      "EC2AMI" : "ami-0f4d23ee70633e7b1"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-south-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-south-1"
+    ap-northeast-3: # Osaka [NO AMD]
+      "EC2AMI" : "ami-0f5469d02859abc0d"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-northeast-3:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-northeast-3"
+    ap-northeast-2: # Seoul
+      "EC2AMI" : "ami-0acae7e1f6204f88b"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-northeast-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-northeast-2"
+    ap-southeast-1: # Singapore
+      "EC2AMI" : "ami-03b40a10225f0fa4f"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-southeast-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-southeast-1"
+    ap-southeast-2: # Sydney
+      "EC2AMI" : "ami-028486e78d59f1cbb"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-southeast-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-southeast-2"
+    ap-northeast-1: # Tokyo
+      "EC2AMI" : "ami-0fe8c88e6c92f0f6b"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-northeast-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-northeast-1"
+    ca-central-1: # Canada
+      "EC2AMI" : "ami-03650ae43232ea56d"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ca-central-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ca-central-1"
+    eu-central-1: # Frankfurt
+      "EC2AMI" : "ami-03d01da28e46b8677"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-central-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-central-1"
+    eu-west-1: # Ireland
+      "EC2AMI" : "ami-0b54dca34556382f5"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-west-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-west-1"
+    eu-west-2: # London
+      "EC2AMI" : "ami-0d80ab827f0c66b5c"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-west-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-west-2"
+    eu-south-1: # Milan
+      "EC2AMI" : "ami-097d8ca9ffa518b1f"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-south-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-south-1"
+    eu-west-3: # Paris
+      "EC2AMI" : "ami-00fc2a27f0b75c852"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-west-3:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-west-3"
+    eu-north-1: # Stockholm [NO AMD]
+      "EC2AMI" : "ami-0046876ed1329a90c" # Updated snapshot June 10, 2022 ec2 from Feb 2020
+      "OracleSnapshotId" : "arn:aws:rds:eu-north-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-north-1"
+    me-south-1: # Bahrain [NO AMD]
+      "EC2AMI" : "ami-0991282466c2be4a4" # Updated snapshot June 10, 2022 ec2 from Feb 2020
+      "OracleSnapshotId" : "arn:aws:rds:me-south-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-me-south-1"
+    sa-east-1: # Sao Paulo
+      "EC2AMI" : "ami-02f9ac54c10fced6d" # Updated snapshot June 10, 2022 ec2 from Feb 2020
+      "OracleSnapshotId" : "arn:aws:rds:sa-east-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-sa-east-1"
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable RDP access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+
+  VpcCIDR:
+    Description: Enter the VPC CIDR range in the form x.x.x.x/16.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid CIDR range in the form x.x.x.x/16.
+    Default: 10.20.0.0/16
+  IAMRoleDmsVpcExist:
+    Description: Does your AWS account already have dms-vpc-role(goto IAM>roles & search for "dms-vpc" to check) if this role is not there template will fail-rollback unless you change default Y to N?
+    Type: String
+    Default: N
+    AllowedValues:
+      - Y
+      - N
+  EC2ServerInstanceType:
+    Description: Amazon EC2 Instance Type
+    Type: String
+    Default: m5.2xlarge
+    AllowedValues:
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5a.large
+      - m5a.xlarge
+      - m5a.2xlarge
+      - m5a.4xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+  RDSInstanceType:
+    Description: Amazon RDS Aurora Instance Type
+    Type: String
+    Default: db.r5.xlarge
+    AllowedValues:
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+    ConstraintDescription: Must be a valid Amazon RDS instance type.
+
+Conditions:
+  IAMRoleDmsVpcExist: !Equals [!Ref IAMRoleDmsVpcExist, 'N']
+
+Resources:
+  DmsVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      CidrBlock:
+        Ref: VpcCIDR
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DmsVpc
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DmsVpc
+      CidrBlock: !Select [ 0, !Cidr [ !GetAtt DmsVpc.CidrBlock, 3, 8 ]]
+      AvailabilityZone: !Select [0, !GetAZs ]
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Subnet1
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DmsVpc
+      CidrBlock: !Select [ 1, !Cidr [ !GetAtt DmsVpc.CidrBlock, 3, 8 ]]
+      AvailabilityZone: !Select [1, !GetAZs ]
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Subnet2
+  Subnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DmsVpc
+      CidrBlock: !Select [ 2, !Cidr [ !GetAtt DmsVpc.CidrBlock, 3, 8 ]]
+      AvailabilityZone: !Select [2, !GetAZs ]
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Subnet3
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnets available for the DMS Lab
+      SubnetIds:
+      - Ref: Subnet1
+      - Ref: Subnet2
+      - Ref: Subnet3
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - InternetGateway
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref DmsVpc
+      InternetGatewayId: !Ref InternetGateway
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref DmsVpc
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - RouteTable
+  Route:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  Subnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet1
+      RouteTableId: !Ref RouteTable
+  Subnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet2
+      RouteTableId: !Ref RouteTable
+  Subnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet3
+      RouteTableId: !Ref RouteTable
+  S3GatewayEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+              - 's3:PutObject'
+              - 's3:DeleteObject'
+              - 's3:PutObjectTagging'
+              - 's3:ListBucket'
+            Resource:
+              - 'arn:aws:s3:::*'
+            Condition:
+              StringEquals:
+                aws:sourceVpc: !Ref DmsVpc
+
+      RouteTableIds:
+        - !Ref RouteTable
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      VpcId: !Ref DmsVpc
+
+  DMSVpcRole:
+    Type: AWS::IAM::Role
+    Condition: IAMRoleDmsVpcExist
+    Properties:
+      RoleName: dms-vpc-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - dms.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole
+      Path: "/"
+
+  AllInstanceIdsAssociation:
+    Type: AWS::SSM::Association
+    Properties:
+      AssociationName: UpdateSSMAgent
+      Name: AWS-UpdateSSMAgent
+      ScheduleExpression: cron(0 2 ? * SUN *)
+      MaxErrors: 15
+      Targets:
+      - Key: InstanceIds
+        Values:
+        - !Ref EC2Instance
+      WaitForSuccessTimeoutSeconds: 900
+    DependsOn:
+      - EC2Instance
+      - Ec2SsmInstanceProfile
+      - Ec2SsmIamRole
+
+  Ec2SsmIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ec2.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      RoleName:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - EC2smIAMRole
+
+
+  Ec2SsmInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: [!Ref Ec2SsmIamRole]
+
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref EC2ServerInstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref Ec2SsmInstanceProfile
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - EC2Instance
+      BlockDeviceMappings:
+      - DeviceName: "/dev/sda1"
+        Ebs:
+          DeleteOnTermination: 'true'
+          VolumeSize: '250'
+          VolumeType: gp3
+      ImageId:
+        Fn::FindInMap:
+        - RegionMap
+        - !Ref AWS::Region
+        - EC2AMI
+      NetworkInterfaces:
+      - AssociatePublicIpAddress: 'true'
+        DeleteOnTermination: 'true'
+        DeviceIndex: 0
+        SubnetId: !Ref Subnet2
+        GroupSet:
+        - Ref: InstanceSecurityGroup
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - InstanceSecurityGroup
+      GroupDescription: Enable RDP access via port 3389
+      VpcId: !Ref DmsVpc
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '3389'
+        ToPort: '3389'
+        CidrIp: 127.0.0.1/32
+        Description: Allows RDP access to EC2 Instance
+      - IpProtocol: tcp
+        FromPort: '1521'
+        ToPort: '1521'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Amazon RDS Oracle Access
+      - IpProtocol: tcp
+        FromPort: '5432'
+        ToPort: '5432'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Amazon RDS Aurora (PostgreSQL) Access
+      - IpProtocol: tcp
+        FromPort: '1433'
+        ToPort: '1433'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows SQL Server Access
+      - IpProtocol: tcp
+        FromPort: '3306'
+        ToPort: '3306'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Amazon RDS Aurora (MySQL) Access
+
+  ReplicationInstanceSubnetGroup:
+    Type: AWS::DMS::ReplicationSubnetGroup
+    Properties:
+      ReplicationSubnetGroupDescription: !Sub '${AWS::StackName} DMS Subnet Group'
+      ReplicationSubnetGroupIdentifier: !Sub '${AWS::StackName}-dms-subnet-group'
+      SubnetIds:
+        - !Ref Subnet1
+        - !Ref Subnet2
+        - !Ref Subnet2
+      Tags:
+          - Key: Name
+            Value: !Sub '${AWS::StackName}-dms-subnet-group'
+
+
+  ReplicationInstance:
+    Type: "AWS::DMS::ReplicationInstance"
+    Properties:
+      ReplicationInstanceClass: dms.c5.xlarge
+      AllocatedStorage: 100
+      EngineVersion: 3.5.3
+      MultiAZ: false
+      PubliclyAccessible: false
+      ReplicationInstanceIdentifier:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DMSRepl
+      ResourceIdentifier:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DMSRepl
+      VpcSecurityGroupIds:
+        - Fn::GetAtt:
+          - RDSSecurityGroup
+          - GroupId
+      ReplicationSubnetGroupIdentifier: !Ref ReplicationInstanceSubnetGroup
+
+  DMSDBSecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DMSDBSecret
+      Description: This secret has a hardcoded password in SecretString
+      SecretString: '{"usernamemostDBs":"dbadmin","password":"dbadmin123","SQLServerSourceusername":"awssct","SQLServerSourcepassword":"Password1","OracleSourceusername":"dbmaster","OracleSourcepassword":"dbadmin123"}'
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DMSDBSecret
+
+  MyRDSSecrets:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: 'This is the secret for my RDS instance'
+#      GenerateSecretString:
+#        SecretStringTemplate: '{"username": "dbadmin"}'
+#        GenerateStringKey: 'password'
+#        PasswordLength: 16
+#        ExcludeCharacters: '"@/\'
+      SecretString: '{"username":"dbadmin","password":"dbadmin123"}'
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DMSDBSecret
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - RDSSecurityGroup
+      VpcId: !Ref DmsVpc
+      GroupDescription: Amazon Aurora RDS Security Group.
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '5432'
+        ToPort: '5432'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Amazon RDS Aurora (PostgreSQL) Access
+      - IpProtocol: tcp
+        FromPort: '3306'
+        ToPort: '3306'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Amazon RDS Aurora (MySQL) Access
+      - IpProtocol: tcp
+        FromPort: '1433'
+        ToPort: '1433'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Microsoft SQL Server Access
+      - IpProtocol: tcp
+        FromPort: '1521'
+        ToPort: '1521'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Oracle Access
+
+  AuPGClusterParametergroup:
+    Type: AWS::RDS::DBClusterParameterGroup
+    Properties:
+      Description: "Aurora Postgresql Custom parameter group"
+      Family: "aurora-postgresql15"
+      Parameters:
+         rds.babelfish_status: 'on'
+         babelfishpg_tsql.migration_mode: 'multi-db'
+         shared_preload_libraries: 'pg_stat_statements,pg_hint_plan'
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - AuPGClusterParams
+## Create parameter groups for cluster nodes
+  AuPGNodeParams:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: "Aurora Postgresql Custom paramater group"
+      Family: "aurora-postgresql15"
+      Parameters:
+        log_rotation_age: '1440'
+        log_rotation_size: '102400'
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - AuPGNodeParams
+
+  AuroraPostgresqlCluster:
+    Type: AWS::RDS::DBCluster
+    DeletionPolicy: Delete
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - AuroraPostgresqlCluster
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      VpcSecurityGroupIds:
+      - Fn::GetAtt:
+        - RDSSecurityGroup
+        - GroupId
+      DatabaseName: 'AuroraDB'
+      Engine: aurora-postgresql
+#      EngineMode: serverless
+      EngineVersion: '15.6'
+      #DBClusterParameterGroupName: default.aurora-postgresql13
+      DBClusterParameterGroupName: !Ref AuPGClusterParametergroup
+      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:username}}' ]]
+      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:password}}' ]]
+      Port: '5432'
+      BackupRetentionPeriod: '1'
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 1
+        MaxCapacity: 32
+    DependsOn: RDSSecurityGroup
+  AuroraPostgresqlInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - AuroraPostgresqlInstance
+      DBClusterIdentifier:
+        Ref: AuroraPostgresqlCluster
+      DBInstanceIdentifier:
+        Fn::Join:
+        - "-"
+        - - Ref: AWS::StackName
+          - aupg-instance
+      Engine: aurora-postgresql
+      EngineVersion: '15.6'
+      DBParameterGroupName: !Ref AuPGNodeParams
+      #DBParameterGroupName: default.aurora-postgresql14
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      AutoMinorVersionUpgrade: 'true'
+      CopyTagsToSnapshot: 'true'
+      #DBInstanceClass: !Ref RDSInstanceType
+      DBInstanceClass: db.serverless
+      PubliclyAccessible: 'false'
+    DependsOn: AuPGNodeParams
+  AuroraMySQLCluster:
+    Type: AWS::RDS::DBCluster
+    DeletionPolicy: Delete
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - AuroraMySQLCluster
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      VpcSecurityGroupIds:
+      - Fn::GetAtt:
+        - RDSSecurityGroup
+        - GroupId
+      DatabaseName: AuroraMySQL
+      Engine: aurora-mysql
+      EngineVersion: 8.0.mysql_aurora.3.06.1
+      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:username}}' ]]
+      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:password}}' ]]
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 1
+        MaxCapacity: 32
+
+    DependsOn: RDSSecurityGroup
+  AuroraMySQLInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - AuroraMySQLInstance
+      DBClusterIdentifier:
+        Ref: AuroraMySQLCluster
+      DBInstanceIdentifier:
+        Fn::Join:
+        - "-"
+        - - Ref: AWS::StackName
+          - AuroraMySQLInstance
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+#      DBInstanceClass: !Ref RDSInstanceType
+      DBInstanceClass: db.serverless
+      Engine: aurora-mysql
+      EngineVersion: 8.0.mysql_aurora.3.06.1
+      LicenseModel: general-public-license
+      PubliclyAccessible: 'false'
+  TargetSQLServer:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - TargetSQLServerInstance
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      VPCSecurityGroups:
+      - Fn::GetAtt:
+        - RDSSecurityGroup
+        - GroupId
+      DBInstanceIdentifier:
+        Fn::Join:
+        - "-"
+        - - Ref: AWS::StackName
+          - TargetSQLServer
+      LicenseModel: license-included
+      Engine: sqlserver-se
+      EngineVersion: 16.00.4125.3.v1
+      DBInstanceClass: !Ref RDSInstanceType
+      StorageType: gp3
+      AllocatedStorage: '100'
+      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:username}}' ]]
+      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:password}}' ]]
+      PubliclyAccessible: 'false'
+      BackupRetentionPeriod: '0'
+    DependsOn: RDSSecurityGroup
+  TargetOracleDB:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - TargetOracleDB
+      DBName: 'TargetDB'
+      AllocatedStorage: '400'
+      StorageType: gp3
+      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:username}}' ]]
+      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:password}}' ]]
+      DBInstanceClass: !Ref RDSInstanceType
+      AutoMinorVersionUpgrade: false
+      Engine: oracle-ee
+      EngineVersion: '19.0.0.0.ru-2024-01.rur-2024-01.r1'
+      LicenseModel: bring-your-own-license
+      PubliclyAccessible: false
+      AvailabilityZone:
+        Fn::GetAtt:
+          - Subnet2
+          - AvailabilityZone
+      MultiAZ: false
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      VPCSecurityGroups:
+        - Fn::GetAtt:
+          - RDSSecurityGroup
+          - GroupId
+      DBInstanceIdentifier:
+        Fn::Join:
+        - "-"
+        - - Ref: AWS::StackName
+          - TargetOracleDB
+
+Outputs:
+
+  1DMSDBSecretU:
+    Description:  DBUsernameMostDBs
+    Value: dbadmin
+  2DMSDBSecretP:
+    Description:  DBPwdMostDBs
+    Value: dbadmin123
+  3DMSDBSecretUSQLSERVERsourceonly:
+    Description:  DB Username SQL Server Source
+    Value: awssct
+  4DMSDBSecretPSQLSERVERsourceonly:
+    Description:  DB Pwd SQL Server Source
+    Value: Password1
+  5DMSDBSecretUOraclesourceonly:
+    Description:  DB Username Oracle Source
+    Value: dbmaster
+  6DMSDBSecretPwdOraclesourceonly:
+    Description:  DB Pwd Oracle Source
+    Value: dbadmin123
+  TargetAuroraPostgreSQLEndpoint:
+    Description: Target Aurora (PostgreSQL) Database Endpoint
+    Value:
+      Fn::GetAtt:
+      - AuroraPostgresqlCluster
+      - Endpoint.Address
+  TargetAuroraMySQLEndpoint:
+    Description: Target Aurora (MySQL) Database Endpoint
+    Value:
+      Fn::GetAtt:
+      - AuroraMySQLInstance
+      - Endpoint.Address
+  TargetSQLServerEndpoint:
+    Description: Target MS SQL Server RDS Endpoint
+    Value:
+      Fn::GetAtt:
+      - TargetSQLServer
+      - Endpoint.Address
+  TargetOracleEndpoint:
+    Description: Target Oracle RDS Instance Endpoint
+    Value:
+      Fn::GetAtt:
+      - TargetOracleDB
+      - Endpoint.Address

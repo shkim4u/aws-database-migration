@@ -1,0 +1,893 @@
+# AWS Database Migration Workshop CloudFormation Template
+# Resources for source environment
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation Template for AWS Database Migration Workshop - Source Environment Resources.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Database Migration Workshop Lab Environment"
+        Parameters:
+          - LabType
+      -
+        Label:
+          default: "Amazon EC2 Configuration"
+        Parameters:
+          - EC2ServerInstanceType
+          - KeyName
+      -
+        Label:
+          default: "Source Database Configuration"
+        Parameters:
+          - RDSInstanceType
+      -
+        Label:
+          default: "Network Configuration"
+        Parameters:
+          - VpcCIDR
+
+Mappings:
+
+  RegionMap: # 20 Regions
+    us-east-1: # Virginia
+      "EC2AMI" : "ami-05c7e027926270b28"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:us-east-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-us-east-1"
+    us-east-2: # Ohio
+      "EC2AMI" : "ami-0feb7489cd0671ae9"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:us-east-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-us-east-2"
+    us-west-2: # Oregon
+#      "EC2AMI" : "ami-03693ba72dc02b388"  # Updated  snapshot April 2024
+      "EC2AMI" : "ami-0f891d8112f2b69f8" # Updated  snapshot April 25, 2024
+#      "OracleSnapshotId" : "arn:aws:rds:us-west-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-us-west-2"
+      "OracleSnapshotId" : "arn:aws:rds:us-west-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-us-west-2"
+    af-south-1: # Cape Town [NO AMD]
+      "EC2AMI" : "ami-076fd4bb2c70c0f8a"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:af-south-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-af-south-1"
+    ap-east-1: # Hong Kong [NO AMD]
+      "EC2AMI" : "ami-0caaa383a929e8e83"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-east-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-east-1"
+    ap-south-1: # Mumbai
+      "EC2AMI" : "ami-0f4d23ee70633e7b1"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-south-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-south-1"
+    ap-northeast-3: # Osaka [NO AMD]
+      "EC2AMI" : "ami-0f5469d02859abc0d"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-northeast-3:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-northeast-3"
+    ap-northeast-2: # Seoul
+      "EC2AMI" : "ami-0acae7e1f6204f88b"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-northeast-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-northeast-2"
+    ap-southeast-1: # Singapore
+      "EC2AMI" : "ami-03b40a10225f0fa4f"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-southeast-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-southeast-1"
+    ap-southeast-2: # Sydney
+      "EC2AMI" : "ami-028486e78d59f1cbb"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-southeast-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-southeast-2"
+    ap-northeast-1: # Tokyo
+      "EC2AMI" : "ami-0fe8c88e6c92f0f6b"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ap-northeast-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ap-northeast-1"
+    ca-central-1: # Canada
+      "EC2AMI" : "ami-03650ae43232ea56d"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:ca-central-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-ca-central-1"
+    eu-central-1: # Frankfurt
+      "EC2AMI" : "ami-03d01da28e46b8677"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-central-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-central-1"
+    eu-west-1: # Ireland
+      "EC2AMI" : "ami-0b54dca34556382f5"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-west-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-west-1"
+    eu-west-2: # London
+      "EC2AMI" : "ami-0d80ab827f0c66b5c"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-west-2:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-west-2"
+    eu-south-1: # Milan
+      "EC2AMI" : "ami-097d8ca9ffa518b1f"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-south-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-south-1"
+    eu-west-3: # Paris
+      "EC2AMI" : "ami-00fc2a27f0b75c852"  # Updated  snapshot April 2024
+      "OracleSnapshotId" : "arn:aws:rds:eu-west-3:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-west-3"
+    eu-north-1: # Stockholm [NO AMD]
+      "EC2AMI" : "ami-0046876ed1329a90c" # Updated snapshot June 10, 2022 ec2 from Feb 2020
+      "OracleSnapshotId" : "arn:aws:rds:eu-north-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-eu-north-1"
+    me-south-1: # Bahrain [NO AMD]
+      "EC2AMI" : "ami-0991282466c2be4a4" # Updated snapshot June 10, 2022 ec2 from Feb 2020
+      "OracleSnapshotId" : "arn:aws:rds:me-south-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-me-south-1"
+    sa-east-1: # Sao Paulo
+      "EC2AMI" : "ami-02f9ac54c10fced6d" # Updated snapshot June 10, 2022 ec2 from Feb 2020
+      "OracleSnapshotId" : "arn:aws:rds:sa-east-1:833997227572:snapshot:dms-lab-oracle-source-mar2024-sa-east-1"
+
+Parameters:
+  LabType:
+    Description: 'Select your Database Migration lab:'
+    Type: String
+    Default: 'Oracle Source'
+    AllowedValues:
+      - 'Oracle Source'
+      - 'SQLServer Source'
+    ConstraintDescription: Must select a lab environment from the options.
+
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable RDP access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+
+  VpcCIDR:
+    Description: Enter the VPC CIDR range in the form x.x.x.x/16.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: Must be a valid CIDR range in the form x.x.x.x/16.
+    Default: 10.10.0.0/16
+  IAMRoleDmsVpcExist:
+    Description: Does your AWS account already have dms-vpc-role(goto IAM>roles & search for "dms-vpc" to check) if this role is not there template will fail-rollback unless you change default Y to N?
+    Type: String
+    Default: N
+    AllowedValues:
+      - Y
+      - N
+  EC2ServerInstanceType:
+    Description: Amazon EC2 Instance Type
+    Type: String
+    Default: m5.2xlarge
+    AllowedValues:
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5a.large
+      - m5a.xlarge
+      - m5a.2xlarge
+      - m5a.4xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+  RDSInstanceType:
+    Description: Source Database Instance Type
+    Type: String
+    Default: db.r5.xlarge
+    AllowedValues:
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+    ConstraintDescription: Must be a valid Amazon RDS instance type.
+
+  LatestAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+
+Conditions:
+  IAMRoleDmsVpcExist: !Equals [!Ref IAMRoleDmsVpcExist, 'N']
+  Oracle-Source: !Equals [ !Ref LabType, 'Oracle Source' ]
+  SQLServer-Source: !Equals [ !Ref LabType, 'SQLServer Source' ]
+
+Resources:
+  DmsVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      CidrBlock:
+        Ref: VpcCIDR
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DmsVpc
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DmsVpc
+      CidrBlock: !Select [ 0, !Cidr [ !GetAtt DmsVpc.CidrBlock, 3, 8 ]]
+      AvailabilityZone: !Select [0, !GetAZs ]
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Subnet1
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DmsVpc
+      CidrBlock: !Select [ 1, !Cidr [ !GetAtt DmsVpc.CidrBlock, 3, 8 ]]
+      AvailabilityZone: !Select [1, !GetAZs ]
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Subnet2
+  Subnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DmsVpc
+      CidrBlock: !Select [ 2, !Cidr [ !GetAtt DmsVpc.CidrBlock, 3, 8 ]]
+      AvailabilityZone: !Select [2, !GetAZs ]
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Subnet3
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnets available for the DMS Lab
+      SubnetIds:
+      - Ref: Subnet1
+      - Ref: Subnet2
+      - Ref: Subnet3
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - InternetGateway
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref DmsVpc
+      InternetGatewayId: !Ref InternetGateway
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref DmsVpc
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - RouteTable
+  Route:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  Subnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet1
+      RouteTableId: !Ref RouteTable
+  Subnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet2
+      RouteTableId: !Ref RouteTable
+  Subnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet3
+      RouteTableId: !Ref RouteTable
+  S3GatewayEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+              - 's3:PutObject'
+              - 's3:DeleteObject'
+              - 's3:PutObjectTagging'
+              - 's3:ListBucket'
+            Resource:
+              - 'arn:aws:s3:::*'
+            Condition:
+              StringEquals:
+                aws:sourceVpc: !Ref DmsVpc
+
+      RouteTableIds:
+        - !Ref RouteTable
+#        - !Ref routetableB
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+      VpcId: !Ref DmsVpc
+
+  DMSVpcRole:
+    Type: AWS::IAM::Role
+    Condition: IAMRoleDmsVpcExist
+    Properties:
+      RoleName: dms-vpc-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - dms.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole
+      Path: "/"
+
+  AllInstanceIdsAssociation:
+    Type: AWS::SSM::Association
+    Properties:
+      AssociationName: UpdateSSMAgent
+      Name: AWS-UpdateSSMAgent
+      ScheduleExpression: cron(0 2 ? * SUN *)
+      MaxErrors: 15
+      Targets:
+      - Key: InstanceIds
+        Values:
+        - !Ref EC2Instance
+      WaitForSuccessTimeoutSeconds: 900
+    DependsOn:
+      - EC2Instance
+      - Ec2SsmInstanceProfile
+      - Ec2SsmIamRole
+
+  Ec2SsmIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ec2.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      RoleName:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - EC2smIAMRole
+
+
+  Ec2SsmInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: [!Ref Ec2SsmIamRole]
+
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref EC2ServerInstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref Ec2SsmInstanceProfile
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - EC2Instance
+      BlockDeviceMappings:
+      - DeviceName: "/dev/sda1"
+        Ebs:
+          DeleteOnTermination: 'true'
+#          Iops: '2000'
+          VolumeSize: '250'
+          VolumeType: gp3
+      ImageId:
+        Fn::FindInMap:
+        - RegionMap
+        - !Ref AWS::Region
+        - EC2AMI
+      NetworkInterfaces:
+      - AssociatePublicIpAddress: 'true'
+        DeleteOnTermination: 'true'
+        DeviceIndex: 0
+        SubnetId: !Ref Subnet2
+        GroupSet:
+        - Ref: InstanceSecurityGroup
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - InstanceSecurityGroup
+      GroupDescription: Enable RDP access via port 3389
+      VpcId: !Ref DmsVpc
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '3389'
+        ToPort: '3389'
+        CidrIp: 127.0.0.1/32
+        Description: Allows RDP access to EC2 Instance
+      - IpProtocol: tcp
+        FromPort: '1521'
+        ToPort: '1521'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Amazon RDS Oracle Access
+      - IpProtocol: tcp
+        FromPort: '5432'
+        ToPort: '5432'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Amazon RDS Aurora (PostgreSQL) Access
+      - IpProtocol: tcp
+        FromPort: '1433'
+        ToPort: '1433'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows SQL Server Access
+      - IpProtocol: tcp
+        FromPort: '3306'
+        ToPort: '3306'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Amazon RDS Aurora (MySQL) Access
+
+
+  DMSDBSecret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DMSDBSecret
+      Description: This secret has a hardcoded password in SecretString
+      SecretString: '{"usernamemostDBs":"dbadmin","password":"dbadmin123","SQLServerSourceusername":"awssct","SQLServerSourcepassword":"Password1","OracleSourceusername":"dbmaster","OracleSourcepassword":"dbadmin123"}'
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DMSDBSecret
+
+  MyRDSSecrets:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: 'This is the secret for my RDS instance'
+#      GenerateSecretString:
+#        SecretStringTemplate: '{"username": "dbadmin"}'
+#        GenerateStringKey: 'password'
+#        PasswordLength: 16
+#        ExcludeCharacters: '"@/\'
+      SecretString: '{"username":"dbadmin","password":"dbadmin123"}'
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - DMSDBSecret
+
+  SourceOracleDB:
+    Condition: Oracle-Source
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - SourceOracleDB
+      DBName: 'OracleDB'
+      AllocatedStorage: '400'
+      StorageType: gp3
+      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:username}}' ]]
+      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref MyRDSSecrets, ':SecretString:password}}' ]]
+      DBInstanceClass: !Ref RDSInstanceType
+      Engine: oracle-ee
+      EngineVersion: '19.0.0.0.ru-2024-01.rur-2024-01.r1'  #'19.0.0.0.ru-2022-04.rur-2022-04.r1' #'19.0.0.0.ru-2024-01.rur-2024-01.r1'
+      AutoMinorVersionUpgrade: false
+      LicenseModel: bring-your-own-license
+      PubliclyAccessible: false
+      AvailabilityZone:
+        Fn::GetAtt:
+          - Subnet2
+          - AvailabilityZone
+      MultiAZ: false
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      VPCSecurityGroups:
+        - Fn::GetAtt:
+          - OracleSourceSecurityGroup
+          - GroupId
+      DBSnapshotIdentifier:
+        Fn::FindInMap:
+          - RegionMap
+          - !Ref AWS::Region
+          - OracleSnapshotId
+      DBInstanceIdentifier:
+        Fn::Join:
+        - "-"
+        - - Ref: AWS::StackName
+          - SourceOracleDB
+  OracleSourceSecurityGroup:
+    Condition: Oracle-Source
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - OracleSourceSecurityGroup
+      GroupDescription: Security group for Source Oracle Instance.
+      VpcId: !Ref DmsVpc
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '1521'
+        ToPort: '1521'
+        CidrIp: !Ref VpcCIDR
+        Description: Allows Amazon RDS Oracle Access
+
+# Additional instance: AppServer, DnsServer, Bastion
+  AppServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for app server
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref BastionSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "OnPremAppServerSecurityGroup-${AWS::StackName}"
+      VpcId:
+        !Ref DmsVpc
+
+  DnsServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for DNS server
+      SecurityGroupIngress:
+        - IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref BastionSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "OnPremDnsServerSecurityGroup-${AWS::StackName}"
+      VpcId:
+        !Ref DmsVpc
+
+  BastionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Bastion instances
+      Tags:
+        - Key: Name
+          Value: !Sub "OnPremBastionSecurityGroup-${AWS::StackName}"
+      VpcId:
+        !Ref DmsVpc
+
+  DhcpOptions:
+    Type: AWS::EC2::DHCPOptions
+    DependsOn: DnsServer
+    Properties:
+      DomainName: "example.corp"
+      DomainNameServers:
+      - !GetAtt DnsServer.PrivateIp
+      Tags:
+        - Key: Name
+          Value: !Sub "DhcpOptions-${AWS::StackName}"
+
+  AttachDhcpOptions:
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Properties:
+      DhcpOptionsId: !Ref DhcpOptions
+      VpcId: !Ref DmsVpc
+
+  DCServerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+        - "-"
+        - - Ref: AWS::StackName
+          - "SSMRole"
+          - Ref: AWS::Region
+      Path: "/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+  DCInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref DCServerRole
+
+  AppServer:
+    Type: AWS::EC2::Instance
+    DependsOn: Route
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: !Ref EC2ServerInstanceType
+      IamInstanceProfile:
+        Ref: DCInstanceProfile
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: 'true'
+          DeleteOnTermination: 'true'
+          DeviceIndex: 0
+          SubnetId: !Ref Subnet1
+          GroupSet:
+            - Ref: AppServerSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          # install updates
+          yum update -y
+
+          # configure AWS CLI for ec2-user
+          mkdir /home/ec2-user/.aws
+          cat > /home/ec2-user/.aws/config<< EOF
+          [default]
+          region = ${AWS::Region}
+          EOF
+
+          chown -r ec2-user:ec2-user /home/ec2-user/.aws
+
+          # set up web server
+          yum install -y httpd
+          echo "Hello, world." > /var/www/html/index.html
+          systemctl enable httpd.service
+          systemctl start httpd.service
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'OnPremAppServer-', !Ref 'AWS::StackName' ] ]
+
+  DnsServer:
+    Type: AWS::EC2::Instance
+    DependsOn: AppServer
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: "PT30M"
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: !Ref EC2ServerInstanceType
+      IamInstanceProfile:
+        Ref: DCInstanceProfile
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: 'true'
+          DeleteOnTermination: 'true'
+          DeviceIndex: 0
+          SubnetId: !Ref Subnet1
+          GroupSet:
+            - Ref: DnsServerSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          # install updates
+          yum update -y
+
+          # configure AWS CLI for ec2-user
+          mkdir /home/ec2-user/.aws
+          cat > /home/ec2-user/.aws/config<< EOF
+          [default]
+          region = ${AWS::Region}
+          EOF
+
+          chown -r ec2-user:ec2-user /home/ec2-user/.aws
+
+          # set up DNS server
+          yum install -y bind
+
+          # replace named.conf
+          cat > /etc/named.conf<< EOF
+          options {
+            directory       "/var/named";
+            dump-file       "/var/named/data/cache_dump.db";
+            statistics-file "/var/named/data/named_stats.txt";
+            memstatistics-file "/var/named/data/named_mem_stats.txt";
+            recursing-file  "/var/named/data/named.recursing";
+            secroots-file   "/var/named/data/named.secroots";
+
+            recursion yes;
+
+            allow-query { any; };
+
+            dnssec-enable no;
+            dnssec-validation no;
+
+            bindkeys-file "/etc/named.root.key";
+
+            managed-keys-directory "/var/named/dynamic";
+
+            pid-file "/run/named/named.pid";
+            session-keyfile "/run/named/session.key";
+
+            forwarders {
+                    169.254.169.253;
+            };
+            forward first;
+          };
+
+          logging {
+            channel default_debug {
+                  file "data/named.run";
+                  severity dynamic;
+            };
+          };
+
+
+          zone "." IN {
+                  type hint;
+                  file "named.ca";
+          };
+
+          zone "example.corp" IN {
+                  type master;
+                  file "/etc/named/example.corp";
+                  allow-update { none; };
+          };
+
+          include "/etc/named.rfc1912.zones";
+          include "/etc/named.root.key";
+
+          EOF
+
+          # build zone file with my IP address and AppSercer IP.
+          ORIGIN='$ORIGIN'
+          APPIP='${AppServer.PrivateIp}'
+          MYIP=$( curl -s http://169.254.169.254/latest/meta-data/local-ipv4 )
+
+          cat > /etc/named/example.corp<< EOF
+          $ORIGIN example.corp.
+          @                      3600 SOA   ns.example.corp. (
+                                        zone-admin.example.com.     ; address of responsible party
+                                        2020050701                 ; serial number
+                                        3600                       ; refresh period
+                                        600                        ; retry period
+                                        604800                     ; expire time
+                                        1800                     ) ; minimum ttl
+                                86400 NS    ns1.example.corp.
+          myapp                    60 IN A  $APPIP
+          ns1                      60 IN A  $MYIP
+          EOF
+
+          # activate DNS server
+          systemctl enable named.service
+          systemctl start named.service
+
+          # set up as local DNS resolver
+          cat > /etc/resolv.conf<< EOF
+          search example.corp
+          nameserver $MYIP
+          EOF
+
+          # signal CFN that we are ready. We want our DNS server to be up before launching the next instance.
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource DnsServer --region ${AWS::Region}
+
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'OnPremDnsServer-', !Ref 'AWS::StackName' ] ]
+
+  BastionHost:
+    Type: AWS::EC2::Instance
+    DependsOn:
+    - Route
+    - AttachDhcpOptions
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: !Ref EC2ServerInstanceType
+      IamInstanceProfile:
+        Ref: DCInstanceProfile
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: 'true'
+          DeleteOnTermination: 'true'
+          DeviceIndex: 0
+          SubnetId: !Ref Subnet1
+          GroupSet:
+            - Ref: BastionSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          # install updates
+          yum update -y
+
+          # install OpenSWNA
+          yum install -y openswan
+
+          # configure AWS CLI for ec2-user
+          mkdir /home/ec2-user/.aws
+          cat > /home/ec2-user/.aws/config<< EOF
+          [default]
+          region = ${AWS::Region}
+          EOF
+
+          chown -r ec2-user:ec2-user /home/ec2-user/.aws
+      Tags:
+        - Key: Name
+          Value: !Join [ '', [ 'OnPremBastion-', !Ref 'AWS::StackName' ] ]
+
+Outputs:
+
+  Vpc:
+    Value: !Ref DmsVpc
+  VpcCIDR:
+    Value: !Ref VpcCIDR
+  Subnet1:
+    Value: !Ref Subnet1
+  Subnet2:
+    Value: !Ref Subnet1
+  Subnet3:
+    Value: !Ref Subnet3
+
+  BastionSecurityGroup:
+    Value: !Ref BastionSecurityGroup
+  BastionPublicIp:
+    Value: !GetAtt BastionHost.PublicIp
+  AppServerPrivateIp:
+    Value: !GetAtt AppServer.PrivateIp
+  DnsServerPrivateIp:
+    Value: !GetAtt DnsServer.PrivateIp
+
+  1DMSDBSecretU:
+    Description:  DBUsernameMostDBs
+    Value: dbadmin
+  2DMSDBSecretP:
+    Description:  DBPwdMostDBs
+    Value: dbadmin123
+  3DMSDBSecretUSQLSERVERsourceonly:
+    Description:  DB Username SQL Server Source
+    Value: awssct
+  4DMSDBSecretPSQLSERVERsourceonly:
+    Description:  DB Pwd SQL Server Source
+    Value: Password1
+  5DMSDBSecretUOraclesourceonly:
+    Description:  DB Username Oracle Source
+    Value: dbmaster
+  6DMSDBSecretPwdOraclesourceonly:
+    Description:  DB Pwd Oracle Source
+    Value: dbadmin123
+
+  SourceEC2PublicDNS:
+    Description: Public DNS enpoint for the EC2 instance
+    Value:
+      Fn::GetAtt:
+      - EC2Instance
+      - PublicDnsName
+  SourceEC2PrivateDNS:
+    Description: Private DNS endpoint for the EC2 instance
+    Value:
+      Fn::GetAtt:
+      - EC2Instance
+      - PrivateDnsName
+  SourceOracleEndpoint:
+    Condition: Oracle-Source
+    Description: Source Oracle RDS Endpoint
+    Value:
+      Fn::GetAtt:
+      - SourceOracleDB
+      - Endpoint.Address
