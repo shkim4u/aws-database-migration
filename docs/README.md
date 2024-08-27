@@ -15,8 +15,8 @@
 ## 목차
 
 * [AWS 데이터베이스 마이그레이션 소개 (현재 페이지)](README.md)
-  * [스키마 전환](Schema-Conversion.md)
-  * [데이터 마이그레이션](Data-Migration.md)
+  * [스키마 전환](../docs-hidden/Schema-Conversion.md)
+  * [데이터 마이그레이션](../docs-hidden/Data-Migration.md)
 * [환경 설정](setup-environment/Setup-Environment-README.md)
   * [Amazon Bedrock 구성](prerequisites/3-Prerequisites-Owned-Account-1-Amazon-Bedrock-Setup.md)
   * [AWS Cloud9 구성](prerequisites/3-Prerequisites-Owned-Account-2-Cloud9-Setup.md)
