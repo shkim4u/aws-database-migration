@@ -84,10 +84,12 @@
 
 ### 4. 타겟 -> 소스 통신을 위한 라우팅 테이블 구성
 
-1. ```VPC > Transit Gateway > Transit Gateway 라우팅 테이블```로 이동하여 위에서 생성한 Transit Gateway `DMS-TGW`의 기본 경로 테이블이 선택되어 있는지 확인한 다음 하단 창에서 ```경로 (Routes)``` 탭을 선택합니다.<br>
+1. ```VPC > Transit Gateway > Transit Gateway 라우팅 테이블```로 이동하여 위에서 생성한 Transit Gateway `DMS-TGW`의 기본 경로 테이블이 선택되어 있는지 확인한 다음 하단 창에서 ```경로 (Routes)``` 탭을 선택합니다.
+
    ![Transit Gateway Route Tables](../../images/transit-gateway-route-tables.png)
 
-2. 우리는 앞서 VPN 연결에 정적 라우팅을 설정하였습니다. 따라서 소스 환경 네트워크에 대한 경로를 수동으로 생성해야 합니다. ```정적 경로 생성 (Create static route)```를 클릭하여 새 정적 경로를 추가합니다.<br>
+2. 우리는 앞서 VPN 연결에 정적 라우팅을 설정하였습니다. 따라서 소스 환경 네트워크에 대한 경로를 수동으로 생성해야 합니다. ```정적 경로 생성 (Create static route)```를 클릭하여 새 정적 경로를 추가합니다.
+
    ![Transit Gateway 정적 경로 생성](../../images/create-transit-gateway-static-route.png)
 
 3. 소스 환경으로 라우팅될 수 있도록 아래와 같이 정보를 입력하고 ```정적 경로 생성 (Create static route)```를 클릭합니다.
@@ -126,7 +128,7 @@
 
 7. 다음 정보를 사용하여 라우팅을 추가합니다.
    - **대상**: ```10.0.0.0/12```
-   - **대상 (Via)**: ```Transit Gateway``` 선택 > ```Transit Gateway ID (DMS-TGW)```<br>
+   - **대상 (Via)**: ```Transit Gateway``` 선택 > ```Transit Gateway ID (DMS-TGW)```
 
    ![타겟 VPC 라우팅 테이블 라우팅 추가](../../images/add-route-to-target-vpc-route-table.png)
 
@@ -135,10 +137,12 @@
 ### 5. VPN 구성 정보 다운로드
 앞서 ```Customer Gateway```를 생성하게 되면 고객 측 VPN 장비와 연결할 수 있는 Site-to-Site VPN 터널도 함께 구성되며, 이에 대한 구성 정보를 다운로드할 수 있습니다.
 
-1. ```VPC > Site-to-Site VPN 연결```로 이동하여 생성한 VPN 연결을 선택합니다.<br>
+1. ```VPC > Site-to-Site VPN 연결```로 이동하여 생성한 VPN 연결을 선택합니다.
+
    ![Site-to-Site VPN 연결 선택](../../images/select-site-to-site-vpn-connection.png)
 
-2. ```Download configuration```을 클릭합니다.<br>
+2. ```Download configuration```을 클릭합니다.
+
    ![VPN 연결 구성 정보 다운로드](../../images/download-vpn-connection-configuration.png)
 
 3. ```Vendor``` 콤보박스에서 ```Openswan```을 선택하고 ```Download``` 버튼을 클릭하여 파일을 저장합니다. 이 파일은 소스 환경의 VPN 장비에서 VPN 구성을 수행할 때 필요합니다.
@@ -261,7 +265,8 @@
    - ```leftsubnet=``` 라인의 ```<LOCAL NETWORK>``` 부분을 소스 온프레미스 CIDR 블록인 ```10.10.0.0/16```으로 변경
    - ```rightsubnet=``` 라인의 ```<REMOTE NETWORK>``` 부분을 타겟 AWS 클라우드의 CIDR 블록인 ```10.16.0.0/12```으로 변경
 
-8. 최종적인 모습은 다음과 유사하며 저장 후 종료합니다.<br>
+8. 최종적인 모습은 다음과 유사하며 저장 후 종료합니다.
+
    ![](../../images/source-vpn-configuration-file-conn-tunnel1-final.png)
 
 9. ```/etc/ipsec.d``` 디렉토리 내에 ```aws.secrets``` 파일을 생성하면서 바로 편집합니다.<br>
@@ -269,7 +274,8 @@
     sudo vi /etc/ipsec.d/aws.secrets
     ```
 
-10. 구성 파일 내의 ```(5) Create a new file ...``` 로 시작되는 부분의 아래 라인을 복사하여 붙여 넣습니다.<br>
+10. 구성 파일 내의 ```(5) Create a new file ...``` 로 시작되는 부분의 아래 라인을 복사하여 붙여 넣습니다.
+
     ![](../../images/source-vpn-aws-secrets.png)
     ![](../../images/source-vpn-aws-secrets-value.png)
 
@@ -292,10 +298,12 @@
 
 마지막으로 타겟 한겨에서 소스 데이터베이스로 접속됨을 확인합니다.
 
-1. 타겟 환경에서 ```EC2 > 인스턴스 (Instances)```로 이동하여 ```DMSWorkshop-Target-EC2Instance`` 인스턴스 (혹은 자원 생성 시 CloudFormation 스택명에 따른 인스턴스)를 선택하고 ```연결``` 버튼을 클릭합니다.<br>
+1. 타겟 환경에서 ```EC2 > 인스턴스 (Instances)```로 이동하여 ```DMSWorkshop-Target-EC2Instance`` 인스턴스 (혹은 자원 생성 시 CloudFormation 스택명에 따른 인스턴스)를 선택하고 ```연결``` 버튼을 클릭합니다.
+
    ![타겟 환경 EC2 인스턴스 선택](../../images/select-target-ec2-instance.png)
 
-2. 연결 방법으로 ```RDP 클라이언트 > Fleet Manager를 사용하여 연결```을 ```Fleet Manager 원격 데스크톱``` 버튼을 클릭합니다.<br>
+2. 연결 방법으로 ```RDP 클라이언트 > Fleet Manager를 사용하여 연결```을 ```Fleet Manager 원격 데스크톱``` 버튼을 클릭합니다.
+
    ![Fleet Manager 원격 데스크톱 연결](../../images/connect-to-target-ec2-instance.png)
 
 3. ```Fleet Manager 원격 데스크톱```이 새 탭에서 열리는데, 다음과 같이 선택합니다.<br>
@@ -305,6 +313,7 @@
    - **키 페어 콘텐츠**: ```로컬 시스템을 탐색하여 키 페어 파일을 선택합니다.```
    - **파일 선택** 버튼을 누른 후 앞서 공통 환경 설정 과정에서 다운로드 받은 키 페어 파일 선택<br>
    - **연결** 버튼을 클릭합니다.
+
       ![Fleet Manager 원격 데스크톱 연결](../../images/target-fleet-manager-remote-desktop-connect.png)
 
 4. 원격 데스크톱 연결이 성공하면 브라우저 윈도우 화면이 표시됩니다.
