@@ -30,7 +30,7 @@
    ![Transit Gateway 생성](../../images/create-transit-gateway.png)
 
 2. 아래 정보를 사용하여 ```Transit Gateway```를 생성합니다.
-   - **이름 태그**: ```DMW-TGW```
+   - **이름 태그**: ```DMS-TGW```
    - **Transit Gatewway** 구성: 기본 선택 값 적용
      - 그외 사항 모두 기본 선택 값 적용
 
@@ -46,7 +46,7 @@
    ![타겟 VPC Transit Gateway Attachment 생성](../../images/create-target-vpc-transit-gateway-attachment.png)
 
 2. 아래 정보를 사용하여 ```Transit Gateway Attachment```를 생성합니다.
-   - **Transit Gateway ID**: 앞서 생성한 ```DMW-TGW```
+   - **Transit Gateway ID**: 앞서 생성한 ```DMS-TGW```
    - **연결 유형**: ```VPC```
    - **DNS 지원**: ```활성화```
    - **VPC ID**: ```DMSWorkshop-Target-DmsVpc```
@@ -65,7 +65,7 @@
 
 2. 아래 정보를 사용하여 ```Transit Gateway Attachment```를 생성합니다.
    - **연결 유형**: ```VPN```
-   - **Transit Gateway ID**: 앞서 생성한 ```DMW-TGW```
+   - **Transit Gateway ID**: 앞서 생성한 ```DMS-TGW```
    - **고객 게이트웨이**: ```신규```
    - **(중요) IP 주소**: 소스 환경에서 생성된 Bastion 호스트의 Public IP 주소
       - ```⚠️ 소스 환경을 맡으신 분께 문의합니다. 이는 소스 환경의 CloudFormation 출력 탭에서 찾을 수 있습니다.``` 
@@ -120,7 +120,7 @@
 
 7. 다음 정보를 사용하여 라우팅을 추가합니다.
    - **대상**: ```10.0.0.0/12```
-   - **대상 (Via)**: ```Transit Gateway``` 선택 > ```Transit Gateway ID (DMW-TGW)```<br>
+   - **대상 (Via)**: ```Transit Gateway``` 선택 > ```Transit Gateway ID (DMS-TGW)```<br>
 
    ![타겟 VPC 라우팅 테이블 라우팅 추가](../../images/add-route-to-target-vpc-route-table.png)
 

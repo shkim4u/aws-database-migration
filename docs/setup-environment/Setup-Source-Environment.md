@@ -34,7 +34,7 @@
 | **입력 파라미터**              | **값**                                                               |
 |--------------------------|---------------------------------------------------------------------|
 | **스택 이름**                | ```DMSWorkshop-Source```                                            |
-| **LabType**              | ```Oracle```                                                        |
+| **LabType**              | ```Oracle Source```                                                 |
 | **EC2ServerInstanceType** | ```m5.2xlarge```                                                    |
 | **KeyName**              | ```DMSKeyPair``` (혹은 실제 생성한 키 페어 이름)                                |
 | **RDSInstanceType**      | ```db.r5.xlarge```                                                  |
