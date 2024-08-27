@@ -26,7 +26,8 @@
 5. VPN 구성 정보 다운로드
 
 ### 1. Transit Gateway 생성
-1. ```VPC > Transite Gateway > Transit Gateway 생성```으로 이동합니다.<br>
+1. ```VPC > Transite Gateway > Transit Gateway 생성```으로 이동합니다.
+
    ![Transit Gateway 생성](../../images/create-transit-gateway.png)
 
 2. 아래 정보를 사용하여 ```Transit Gateway```를 생성합니다.
