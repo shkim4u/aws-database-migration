@@ -46,6 +46,7 @@
    ![타겟 VPC Transit Gateway Attachment 생성](../../images/create-target-vpc-transit-gateway-attachment.png)
 
 2. 아래 정보를 사용하여 ```Transit Gateway Attachment```를 생성합니다.
+   - **이름 태그**: ```DMS-TGW-VPC-Attachment```
    - **Transit Gateway ID**: 앞서 생성한 ```DMS-TGW```
    - **연결 유형**: ```VPC```
    - **DNS 지원**: ```활성화```
@@ -60,7 +61,7 @@
 
 ### 3. Customer Gateway 및 VPN Attachment 생성
 
-1. ```VPC > Transit Gateway > Transit Gateway 연결```로 이동하여 ```Create Transit Gateway 생성 (Create Transit Gateway Attachment)```을 클릭합니다.<br>
+1. ```VPC > Transit Gateway > Transit Gateway 연결```로 이동하여 ```Transit Gateway 생성 (Create Transit Gateway Attachment)```을 클릭합니다.<br>
    ![Transit Gateway Attachment](../../images/create-transit-gateway-attachment-for-vpn.png)
 
 2. 아래 정보를 사용하여 ```Transit Gateway Attachment```를 생성합니다.
