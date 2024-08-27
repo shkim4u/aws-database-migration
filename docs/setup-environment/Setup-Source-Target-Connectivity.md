@@ -43,7 +43,8 @@
 
 ### 2. 타겟 VPC Attachment 생성
 
-1. ```VPC > Transite Gateway > Transit Gateway 연결```로 이동하여 ```Create Transit Gateway 생성 (Create Transit Gateway Attachment)```을 클릭합니다.<br>
+1. ```VPC > Transite Gateway > Transit Gateway 연결```로 이동하여 ```Create Transit Gateway 생성 (Create Transit Gateway Attachment)```을 클릭합니다.
+
    ![타겟 VPC Transit Gateway Attachment 생성](../../images/create-target-vpc-transit-gateway-attachment.png)
 
 2. 아래 정보를 사용하여 ```Transit Gateway Attachment```를 생성합니다.
@@ -62,7 +63,8 @@
 
 ### 3. Customer Gateway 및 VPN Attachment 생성
 
-1. ```VPC > Transit Gateway > Transit Gateway 연결```로 이동하여 ```Transit Gateway 생성 (Create Transit Gateway Attachment)```을 클릭합니다.<br>
+1. ```VPC > Transit Gateway > Transit Gateway 연결```로 이동하여 ```Transit Gateway 생성 (Create Transit Gateway Attachment)```을 클릭합니다.
+
    ![Transit Gateway Attachment](../../images/create-transit-gateway-attachment-for-vpn.png)
 
 2. 아래 정보를 사용하여 ```Transit Gateway Attachment```를 생성합니다.
@@ -114,10 +116,12 @@
 
 4. 위에서 타겟 환경이 소스 환경으로 거쳐가기 위한 Transit Gateway VPN 연결의 라우팅 경로를 설정하였습니다. 이번에는 타겟 환경의 VPC 내부에서 소스 환경으로 향하는 패킷이 거쳐가는 (Via) 경로를 Transit Gateway로 설정해 보겠습니다.
 
-5. ```VPC > 라우팅 테이블```로 이동하여 타겟 VPC `DMSWorkshop-Target-RouteTable` 의 라우팅 테이블을 선택합니다.<br>
+5. ```VPC > 라우팅 테이블```로 이동하여 타겟 VPC `DMSWorkshop-Target-RouteTable` 의 라우팅 테이블을 선택합니다.
+
    ![타겟 VPC 라우팅 테이블 선택](../../images/select-target-vpc-route-table.png)
 
-6. 라우팅 테이블의 ```라우팅``` 탭을 선택하고 ```라우팅 편집```을 클릭합니다.<br>
+6. 라우팅 테이블의 ```라우팅``` 탭을 선택하고 ```라우팅 편집```을 클릭합니다.
+
    ![타겟 VPC 라우팅 테이블 라우팅 편집](../../images/edit-route-to-target-vpc-route-table.png)
 
 7. 다음 정보를 사용하여 라우팅을 추가합니다.
