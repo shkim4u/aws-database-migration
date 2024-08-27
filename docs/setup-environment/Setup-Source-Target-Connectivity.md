@@ -86,7 +86,7 @@
 
 1. ```VPC > Transit Gateway > Transit Gateway 라우팅 테이블```로 이동하여 위에서 생성한 Transit Gateway `DMS-TGW`의 기본 경로 테이블이 선택되어 있는지 확인한 다음 하단 창에서 ```경로 (Routes)``` 탭을 선택합니다.
 
-   ![Transit Gateway Route Tables](../../images/transit-gateway-route-tables.png)
+   ![Transit Gateway 라우팅 테이블](../../images/transit-gateway-route-tables.png)
 
 2. 우리는 앞서 VPN 연결에 정적 라우팅을 설정하였습니다. 따라서 소스 환경 네트워크에 대한 경로를 수동으로 생성해야 합니다. ```정적 경로 생성 (Create static route)```를 클릭하여 새 정적 경로를 추가합니다.
 
