@@ -1,0 +1,11 @@
+# 이것은 덧글입니다.
+
+# test.md 파일 무시
+test.md
+
+# README.md 파일 무시
+/README.md
+
+# "bin" 디렉토리 무시
+bin/*
+docs-hidden
