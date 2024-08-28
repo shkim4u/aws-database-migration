@@ -168,7 +168,7 @@
    ![소스 환경 라우팅 테이블 라우팅 추가](../../images/edit-route-to-source-vpc-route-table.png)   
 
    - **대상**: ```10.16.0.0/12```
-   - **대상 (Via)**: ```인슨터스 선택 > Bastion 호스트 인스턴스``` 선택 (에: ```OnPremBastion-DMSWorkshop-Source```)
+   - **대상 (Via)**: ```인스턴스 선택 > Bastion 호스트 인스턴스``` 선택 (에: ```OnPremBastion-DMSWorkshop-Source```)
 
    ![소스 환경 라우팅 테이블 라우팅 추가](../../images/add-route-to-source-vpc-route-table.png)
 
