@@ -65,3 +65,51 @@
    # Step 3: Load the Docker image
    docker load -i oracle-11.2.0.2-xe.tar
    ```
+
+5. 애플리케이션 소스 코드, Dockerfile, Docker Compose 파일을 담고 있는 리포지터리를 클론합니다.
+
+   ```bash
+   cd ~
+
+   # Update the package index
+   sudo yum update
+   
+   # Install Git
+   sudo yum install -y git
+   
+   # Verify the installation
+   git --version
+
+   git clone https://github.com/shkim4u/aws-database-migration.git
+   ```
+
+6. 클론한 리포지터리로 이동하여 애플리케이션을 빌드하고 실행합니다.
+
+   ```bash
+   cd ~/aws-database-migration/legacy
+   docker-compose -p travelbuddy up -d
+   ```
+
+   ![실행 중인 도커 컨테이너 확인](../../images/docker-ps.png)
+
+7. 애플리케이션 및 데이터베이스 컨테이너가 정상적으로 실행되었는지 확인합니다. 우선 로컬호스트에서 애플리케이션을 호출하여 정상적으로 응답이 오는지 확인합니다.
+
+   ```bash
+   curl http://localhost:8080/travelbuddy/
+   ```
+
+   ![로컬호스트에서 애플리케이션 호출](../../images/curl-localhost.png)
+
+8. 다음으로 ```애플리케이션 서버``` 보안 그룹에 ```8080``` 포트를 허용하여 외부에서도 애플리케이션에 접근할 수 있도록 합니다.
+
+   ![애플리케이션 서버 보안 그룹 수정](../../images/source-app-server-sg.png)
+
+9. ```애플리케이션 서버```의 퍼블릭 IP 주소를 확인하고 이를 이용하여 애플리케이션에 접근합니다.
+
+   ![애플리케이션 서버 퍼블릭 IP 확인](../../images/source-app-server-public-ip.png)
+
+   ![애플리케이션 서버 동작 확인](../../images/source-app-server-browser-access.png)
+
+   > **주의**<br>
+   > * 위에서 애플리케이션 동작을 확인할 사용하는 URL은 ```http://<애플리케이션 서버 퍼블릭 IP>:8080/travelbuddy/``` 입니다.
+   > * Request Mapping 정의에 따라 마지막에 ```/```를 붙여주어야 함을 유의하십시요.

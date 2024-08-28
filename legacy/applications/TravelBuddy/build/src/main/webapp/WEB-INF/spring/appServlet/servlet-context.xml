@@ -47,7 +47,7 @@
 		<beans:property name="maxIdle" value="5" />
 		<beans:property name="minIdle" value="2" />
 		<beans:property name="testOnBorrow" value="true" />
-		<beans:property name="validationQuery" value="select 1" />
+		<beans:property name="validationQuery" value="select 1 from dual" />
 		<beans:property name="validationInterval" value="30000" />
 	</beans:bean>
 

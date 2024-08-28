@@ -30,5 +30,5 @@ services:
       - oracle
 
 # Run docker compose command:
-# docker compose -p travelbuddy up -d
-# docker compose -p travelbuddy down --remove-orphans
+# docker-compose -p travelbuddy up -d
+# docker-compose -p travelbuddy down --remove-orphans
