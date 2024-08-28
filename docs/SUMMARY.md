@@ -6,7 +6,7 @@
   * [소스 환경 구성](setup-environment/Setup-Source-Environment.md)
   * [타겟 환경 구성](setup-environment/Setup-Target-Environment.md)
   * [소스/타겟 연결 구성](setup-environment/Setup-Source-Target-Connectivity.md)
-* [오라클 데이터베이스 동일기종 마이그레이션](migrate-oracle-to-oracle/Migrate-Oracle-to-Oracle-README.md)
+* [오라클 데이터베이스 동일기종 (Homogenous) 마이그레이션](migrate-oracle-to-oracle/Migrate-Oracle-to-Oracle-README.md)
   * [소스 데이터베이스 구성](migrate-oracle-to-oracle/Configure-Source-Database.md)
   * [DMS 복제 인스턴스 생성](migrate-oracle-to-oracle/Create-DMS-Replication-Instance.md)
   * [DMS 소스 및 타겟 엔드포인트 생성](migrate-oracle-to-oracle/Create-DMS-Source-and-Target-Endpoints.md)
