@@ -74,3 +74,52 @@ terraform plan -out tfplan
 # terraform apply
 terraform apply -auto-approve tfplan
 ```
+
+![타겟 환경 자원 배포 완료](../../images/target-resources-deployed-with-terraform.png)
+
+모든 자원의 생성이 완료되면 `Production`과 `Staging`을 위한 ```Amazon RDS``` 데이터베이스와 ```Amazon EKS``` 클러스터 2개가 생성됩니다.
+
+쿠버네테스의 경우 우리는 주로 `Production` 클러스터를 사용하므로 아래와 같이 환경 변수를 설정합니다.
+
+```bash
+cd ~/environment/aws-database-migration/infrastructure/terraform
+
+echo 'export KUBECONFIG=~/.kube/config:$(find ~/.kube/ -type f -name "*M2M-EksCluster*" | tr "\n" ":")' >> ~/.bash_profile 
+
+echo 'alias kcp="kubectl config use-context $(kubectl config get-contexts -o name | grep Production | sort -r | head -n 1)"' >> ~/.bash_profile
+echo 'alias kcs="kubectl config use-context $(kubectl config get-contexts -o name | grep Staging | sort -r | head -n 1)"' >> ~/.bash_profile
+echo 'alias kcc="kubectl config current-context"' >> ~/.bash_profile
+
+# Terraform helper aliases.
+echo 'alias ti="terraform init"' >> ~/.bash_profile
+echo 'alias taa="terraform apply -auto-approve"' >> ~/.bash_profile
+
+source ~/.bash_profile
+
+# Work with production cluster.
+kcp
+```
+
+또한 이후 작업의 편의를 위해 아래와 같이 ArgoCD Admin 암호를 설정합니다.<br>
+```bash
+# 아래 명령을 수행하면 ArgoCD 서버의 Admin 암호를 설정하고 이를 AWS Secrets Manager에 동기화 저장합니다.
+# AWS Secrets Manager에 동기화 저장된 암호는 어플리케이션의 배포 파이프라인에서 배포 단계에 사용됩니다.
+cd ~/environment/aws-database-migration/cloud9
+chmod +x *.sh
+
+# Staging 클러스터
+kcs
+ARGOCD_ADMIN_INITIAL_PASSWORD=`kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d`
+echo $ARGOCD_ADMIN_INITIAL_PASSWORD
+./set-argocd-admin-password-argocd-server.sh $ARGOCD_ADMIN_INITIAL_PASSWORD "Abraca00#1"
+
+# Production 클러스터
+kcp
+ARGOCD_ADMIN_INITIAL_PASSWORD=`kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d`
+echo $ARGOCD_ADMIN_INITIAL_PASSWORD
+./set-argocd-admin-password-argocd-server.sh $ARGOCD_ADMIN_INITIAL_PASSWORD "Abraca00#1"
+```
+
+## 축하합니다! 아마존 EKS 클러스터를 정상적으로 프로비저닝하였습니다.
+
+시간 여유가 있다면 진행자와 함께 생성된 자원, 특히 타겟 데이터베이스를 한번 살펴봅니다.
