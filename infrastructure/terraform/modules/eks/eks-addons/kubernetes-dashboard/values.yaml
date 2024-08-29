@@ -1,0 +1,27 @@
+protocolHttp: true
+service:
+  externalPort: 9090
+extraArgs:
+  - '--insecure-bind-address=0.0.0.0'
+  - '--enable-insecure-login'
+  - '--enable-skip-login=false'
+  - '--system-banner="!!! Welcome to AWS ProServe Kubernetes !!!"'
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60
+    alb.ingress.kubernetes.io/group.name: kubernetes-dashboard
+    alb.ingress.kubernetes.io/group.order: '1'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: ${certificate_arn}
+  customPaths:
+    - path: /
+      pathType: Prefix
+      backend:
+        service:
+          name: kubernetes-dashboard
+          port:
+            number: 9090

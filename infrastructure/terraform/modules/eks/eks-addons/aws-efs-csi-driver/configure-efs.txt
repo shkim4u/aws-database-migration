@@ -1,0 +1,87 @@
+# References:
+# - AWS EKS에서 EFS 사용하기: https://velog.io/@squarebird/AWS-EKS%EC%97%90%EC%84%9C-EFS-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0
+# 아래 커맨드를 실행하기 위한 EFS CSI Driver는 현재 모듈에서 설치됨
+
+# 1. EKS 클러스터의 vpc_id 값 조회
+vpc_id=$(aws eks describe-cluster --name M2M-EksCluster --query "cluster.resourcesVpcConfig.vpcId" --output text)
+echo $vpc_id
+
+# 2. EKS 클러스터가 속한 vpc의 network cidr 조회
+cidr_range=$(aws ec2 describe-vpcs --vpc-ids $vpc_id --query "Vpcs[].CidrBlock" --output text)
+echo $cidr_range
+
+# 3. EFS의 보안그룹 생성
+security_group_id=$(aws ec2 create-security-group --group-name efs_sg --description "Security group about EFS for EKS" --vpc-id $vpc_id --output text)
+echo $security_group_id
+
+# 4. 보안그룹에 인바운드 정책 추가
+aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 2049 --cidr $cidr_range
+
+# 5. EFS 생성
+file_system_id=$(aws efs create-file-system --region ap-northeast-2 --performance-mode generalPurpose --tag Key=Name,Value="EKS EFS" --query 'FileSystemId' --output text)
+echo $file_system_id
+
+# 6. Mount Target을 위한 서브넷 확인
+# aws ec2 describe-subnets \
+#     --filters "Name=vpc-id,Values=$vpc_id" \
+#     --query "Subnets[*].Tags[?Key=='Name'].Value" \
+#     --output table
+
+aws ec2 describe-subnets \
+    --filters "Name=vpc-id,Values=$vpc_id" \
+    --query "Subnets[*].{Name: Tags[?Key=='Name'].Value,SubnetId: SubnetId,AvailabilityZone: AvailabilityZone,CidrBlock: CidrBlock}" \
+    --output table
+
+# 7. 두 서브넷에 Mount Target 생성, 보안그룹 적용 -> NFS 엔드포인트 생성 (콘솔에서 확인)
+aws efs create-mount-target \
+    --file-system-id $file_system_id \
+    --subnet-id subnet-074b0f3e3251b5699 \
+    --security-groups $security_group_id
+
+aws efs create-mount-target \
+    --file-system-id $file_system_id \
+    --subnet-id subnet-026c605919098bbd2 \
+    --security-groups $security_group_id
+
+# 8. EKS 오브젝트 배포 및 테스트
+
+# 8.1. 샘플 Reposityry Clone
+git clone https://github.com/kubernetes-sigs/aws-efs-csi-driver.git
+
+# 8.2. 경로 이동
+cd aws-efs-csi-driver/examples/kubernetes/multiple_pods/
+
+# 8.3. EFS id 검색
+aws efs describe-file-systems --query "FileSystems[*].FileSystemId" --output text | pbcopy
+
+# 8.4. PV Yaml 파일 수정
+vi specs/pv.yaml
+
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: efs-pv
+# spec:
+#   capacity:
+#     storage: 5Gi
+#   volumeMode: Filesystem
+#   accessModes:
+#     - ReadWriteMany
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: efs-sc
+#   csi:
+#     driver: efs.csi.aws.com
+#     volumeHandle: fs-010d84d1452d8fbbb << EFS id값 붙여넣기
+
+# 8.5. storageclass, pv, pvc 배포
+kubectl apply -f specs/storageclass.yaml
+kubectl apply -f specs/pv.yaml
+kubectl apply -f specs/claim.yaml
+
+# 8.6. pod 배포
+kubectl apply -f specs/pod1.yaml
+kubectl apply -f specs/pod2.yaml
+
+# 8.7. Pod들이 EFS를 정상적으로 사용하고 있는지 Pod에 마운트된 경로에서 확인
+kubectl exec -ti app1 -- tail /data/out1.txt
+kubectl exec -ti app2 -- tail /data/out1.txt

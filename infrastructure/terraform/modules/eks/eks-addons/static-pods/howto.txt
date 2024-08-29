@@ -1,0 +1,51 @@
+# 1. 특정 노드에서
+# (주의) 테스트 결과 동작하지 않음 -> Security Group for Pod의 SGP (SecurityGroupPolicy)
+# 매칭을 찾을 수 없음 (VPC Resource Controller Webhook 에서)
+sudo su
+cd /etc/kubernetes/manifests
+cat <<EOF >static-web.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-web
+  labels:
+    role: myrole
+    app: myapp
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+        role: myrole
+  containers:
+    - name: web
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+          protocol: TCP
+EOF
+vi ../kublet/kubelet-config.json
+
+systemctl restart kubelet
+
+# Add this line.
+#  "staticPodPath": "/etc/kubernetes/manifests"
+
+cat >static-pod-group-policy.yaml <<EOF
+apiVersion: vpcresources.k8s.aws/v1beta1
+kind: SecurityGroupPolicy
+metadata:
+  name: my-security-group-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: myapp
+  securityGroups:
+    groupIds:
+      - sg-08879b26639db8b3f
+EOF

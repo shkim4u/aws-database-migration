@@ -1,0 +1,43 @@
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
+metadata:
+  name: gpu
+spec:
+  disruption:
+    consolidateAfter: 30s
+    consolidationPolicy: WhenEmpty
+    expireAfter: 2h0m0s
+  limits:
+    cpu: 1k
+    mem: 1000Gi
+  template:
+    metadata:
+      labels:
+        billing: aws-proserve
+        cluster-name: ${cluster_name}
+        workload-type/gpu: "true"
+    spec:
+      nodeClassRef:
+        name: aws-node-template
+      requirements:
+      - key: kubernetes.io/arch
+        operator: In
+        values:
+        - amd64
+      - key: karpenter.sh/capacity-type
+        operator: In
+        values:
+        - on-demand
+      - key: node.kubernetes.io/instance-type
+        operator: In
+        values:
+        - p3.8xlarge
+        - p3.16xlarge
+      - key: kubernetes.io/os
+        operator: In
+        values:
+        - linux
+      taints:
+      - effect: NoSchedule
+        key: workload-type/gpu
+        value: "true"

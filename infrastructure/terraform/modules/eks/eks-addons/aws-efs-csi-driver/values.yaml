@@ -1,0 +1,15 @@
+# For full default values for aws-efs-csi-driver, refer to:
+# - https://artifacthub.io/packages/helm/aws-efs-csi-driver/aws-efs-csi-driver?modal=values
+replicaCount: 2
+image:
+  repository: amazon/aws-efs-csi-driver
+  tag: "v1.6.0"
+  pullPolicy: IfNotPresent
+
+## Controller deployment variables
+
+controller:
+  # Specifies whether a service account should be created
+  serviceAccount:
+    create: false
+    name: ${service_account_name}

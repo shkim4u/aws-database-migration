@@ -1,0 +1,48 @@
+# See details at:
+# https://github.com/aws-controllers-k8s/lambda-controller/blob/main/helm/values.yaml
+metrics:
+  service:
+    # Set to true to automatically create a Kubernetes Service resource for the
+    # Prometheus metrics server endpoint in controller
+    create: true
+    # Which Type to use for the Kubernetes Service?
+    # See: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+    type: "ClusterIP"
+
+aws:
+  # If specified, use the AWS region for AWS API calls
+  region: ${aws_region}
+
+# log level for the controller
+log:
+  enable_development_logging: true
+  level: debug
+
+# Set to "namespace" to install the controller in a namespaced scope, will only
+# watch for object creation in the namespace. By default installScope is
+# cluster wide.
+installScope: cluster
+
+# Set the value of the "namespace" to be watched by the controller
+# This value is only used when the `installScope` is set to "namespace". If left empty, the default value is the release namespace for the chart.
+watchNamespace: ""
+
+# Set to "retain" to keep all AWS resources intact even after the K8s resources
+# have been deleted. By default, the ACK controller will delete the AWS resource
+# before the K8s resource is removed.
+deletionPolicy: delete
+
+# controller reconciliation configurations
+reconcile:
+  # The default duration, in seconds, to wait before resyncing desired state of custom resources.
+  defaultResyncPeriod: 3600 # Modified to 1 Hour (Default: 10 hors)
+  # An object representing the reconcile resync configuration for each specific resource.
+  resourceResyncPeriods: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  name: ack-lambda-controller
+  annotations:
+   eks.amazonaws.com/role-arn: ${service_account_role_arn}

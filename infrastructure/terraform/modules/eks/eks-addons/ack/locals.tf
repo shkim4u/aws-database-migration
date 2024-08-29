@@ -1,0 +1,3 @@
+locals {
+  namespace = "ack-system"
+}

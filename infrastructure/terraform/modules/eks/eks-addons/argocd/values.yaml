@@ -1,0 +1,28 @@
+server:
+  ingress:
+    enabled: true
+    annotations:
+      # Ingress core settings.
+      "kubernetes.io/ingress.class": "alb"
+      "alb.ingress.kubernetes.io/scheme": "internet-facing"
+      "alb.ingress.kubernetes.io/target-type": "ip"
+      "alb.ingress.kubernetes.io/target-group-attributes": "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60"
+      # Ingress group settings.
+      "alb.ingress.kubernetes.io/group.name": "argo"
+      "alb.ingress.kubernetes.io/group.order": "1"
+      # Needed when using TLS.
+      "alb.ingress.kubernetes.io/backend-protocol": "HTTPS"
+      "alb.ingress.kubernetes.io/healthcheck-protocol": "HTTPS"
+      "alb.ingress.kubernetes.io/listen-ports": '[{"HTTPS":443}]'
+      "alb.ingress.kubernetes.io/certificate-arn": ${certificate_arn}
+    extraRules:
+      - host: "*.ap-northeast-2.elb.amazonaws.com"
+        http:
+          paths:
+            - path: "/"
+              pathType: Prefix
+              backend:
+                service:
+                  name: argocd-server
+                  port:
+                    number: 443

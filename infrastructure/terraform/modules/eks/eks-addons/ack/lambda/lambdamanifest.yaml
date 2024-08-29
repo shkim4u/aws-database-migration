@@ -1,0 +1,46 @@
+# References:
+# - https://raw.githubusercontent.com/aws-controllers-k8s/lambda-controller/main/test/e2e/resources/function.yaml
+# - https://github.com/aws-controllers-k8s/lambda-controller/blob/main/config/crd/bases/lambda.services.k8s.aws_functions.yaml
+# - https://aws-controllers-k8s.github.io/community/reference/lambda/v1alpha1/function/
+apiVersion: lambda.services.k8s.aws/v1alpha1
+kind: Function
+metadata:
+  name: domain-protection-accounts-lambda-function-ack
+  annotations:
+    services.k8s.aws/region: ap-northeast-2
+  namespace: ack-system
+spec:
+  name: domain-protection-accounts-lambda-function-ack
+  code:
+#    s3Bucket: cdk-hnb659fds-assets-284613372749-ap-northeast-2
+#    s3Key: c64138dffe8dbb4e8059cb11b4ef498928f105cbdee3587898b5ea66687ee946.zip
+    s3Bucket: ack-controller
+    s3Key: domain-protection-accounts-lambda-function-ack.zip
+  role: arn:aws:iam::861063945558:role/domain-protection-accounts-lambda-role
+  runtime: python3.9
+  handler: accounts.lambda_handler
+  description: Function created by ACK lambda-controller
+  layers:
+    - arn:aws:lambda:ap-northeast-2:861063945558:layer:domainprotectionlambdalayer80D420D8:1
+#  See: https://aws-controllers-k8s.github.io/community/reference/lambda/v1alpha1/function/
+  environment:
+    variables: {
+      EXTERNAL_ID: "",
+      ORGANIZATION_PRIMARY_ACCOUNT: "878115720902",
+      PROJECT: "domain-protection",
+      SECURITY_AUDIT_ROLE_NAME: "DomainProtectionAuditRole",
+      SNS_TOPIC_ARN: "arn:aws:sns:ap-northeast-2:861063945558:domain-protection-sns-topic",
+      STATE_MACHINE_ARN: "arn:aws:states:ap-northeast-2:861063945558:stateMachine:domain-protection-scan"
+    }
+#      - name: "EXTERNAL_ID"
+#        value: ""
+#      - name: "ORGANIZATION_PRIMARY_ACCOUNT"
+#        value: "878115720902"
+#      - name: "PROJECT"
+#        value: "domain-protection"
+#      - name: "SECURITY_AUDIT_ROLE_NAME"
+#        value: "DomainProtectionAuditRole"
+#      - name: "SNS_TOPIC_ARN"
+#        value: "arn:aws:sns:ap-northeast-2:861063945558:domain-protection-sns-topic"
+#      - name: "STATE_MACHINE_ARN"
+#        value: "arn:aws:states:ap-northeast-2:861063945558:stateMachine:domain-protection-scan"

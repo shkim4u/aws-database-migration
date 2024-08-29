@@ -1,0 +1,57 @@
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
+metadata:
+  name: golang
+spec:
+  disruption:
+    consolidateAfter: 30s
+    consolidationPolicy: WhenEmpty
+    expireAfter: 2h0m0s
+  limits:
+    cpu: 1k
+    mem: 1000Gi
+  template:
+    metadata:
+      labels:
+        billing: aws-proserve
+        cluster-name: ${cluster_name}
+        workload-type/golang: "true"
+    spec:
+      nodeClassRef:
+        name: aws-node-template
+      requirements:
+      - key: karpenter.k8s.aws/instance-category
+        operator: In
+        values:
+        - c
+      - key: karpenter.k8s.aws/instance-cpu
+        operator: In
+        values:
+        - "4"
+        - "8"
+        - "16"
+        - "32"
+      - key: karpenter.k8s.aws/instance-hypervisor
+        operator: In
+        values:
+        - nitro
+      - key: karpenter.k8s.aws/instance-generation
+        operator: Gt
+        values:
+        - "4"
+      - key: kubernetes.io/arch
+        operator: In
+        values:
+        - amd64
+      - key: karpenter.sh/capacity-type
+        operator: In
+        values:
+        - on-demand
+      - key: kubernetes.io/os
+        operator: In
+        values:
+        - linux
+      taints:
+      - effect: NoSchedule
+        key: workload-type/golang
+        value: "true"

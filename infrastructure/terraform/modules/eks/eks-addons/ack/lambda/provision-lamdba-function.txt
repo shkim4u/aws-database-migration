@@ -1,0 +1,86 @@
+Provisioning a Lambda function from the Kubernetes cluster
+In this section, you write a sample “Hello world” Lambda function. You zip up the code and upload the zip file to an S3 bucket. Finally, you deploy that zip file to a Lambda function using the ACK Controller from the EKS cluster you created earlier. For this example, use Python3.9 as your language runtime.
+
+To provision the Lambda function:
+
+1. Run the following to create the sample “Hello world” Lambda function code, and then zip it up:
+
+mkdir my-helloworld-function
+cd my-helloworld-function
+cat << EOF > lambda_function.py
+import json
+
+def lambda_handler(event, context):
+    # TODO implement
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from Lambda!')
+    }
+EOF
+zip my-deployment-package.zip lambda_function.py
+Bash
+
+2. Create an S3 bucket following the instructions here. Alternatively, you can use an existing S3 bucket in the same Region of the Amazon EKS cluster.
+
+3. Run the following to upload the zip file into the S3 bucket from the previous step:
+export BUCKET_NAME=<provide the bucket name from step 2>
+aws s3 cp  my-deployment-package.zip s3://${BUCKET_NAME}
+Bash
+
+4. The output shows:
+upload: ./my-deployment-package.zip to s3://<BUCKET_NAME>/my-deployment-package.zip
+
+5. Create your Lambda function using the ACK Controller. The full spec with all the available fields is listed here. First, provide a name for the function:
+export FUNCTION_NAME=hello-world-s3-ack
+Bash
+
+6. Create and deploy the Kubernetes manifest file. The command at the end, kubectl create -f function.yaml submits the manifest file, with kind as ‘Function’. The ACK Controller for Lambda identifies this custom ‘Function’ object and deploys the Lambda function based on the manifest file.
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+export LAMBDA_ROLE="arn:aws:iam::${AWS_ACCOUNT_ID}:role/lambda_basic_execution"
+
+cat << EOF > lambdamanifest.yaml
+apiVersion: lambda.services.k8s.aws/v1alpha1
+kind: Function
+metadata:
+ name: $FUNCTION_NAME
+ annotations:
+   services.k8s.aws/region: $AWS_REGION
+spec:
+ name: $FUNCTION_NAME
+ code:
+   s3Bucket: $BUCKET_NAME
+   s3Key: my-deployment-package.zip
+ role: $LAMBDA_ROLE
+ runtime: python3.9
+ handler: lambda_function.lambda_handler
+ description: function created by ACK lambda-controller e2e tests
+EOF
+kubectl create -f lambdamanifest.yaml
+Bash
+
+### Use This for domain-protection-accounts-lambda-function in Audit account! ###
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+export LAMBDA_ROLE="arn:aws:iam::${AWS_ACCOUNT_ID}:role/lambda_basic_execution"
+
+# See lambdamanifest.yaml
+
+kubectl create -f lambdamanifest.yaml
+
+
+7. The output shows:
+function.lambda.services.k8s.aws/< FUNCTION_NAME> created
+
+8. To retrieve the details of the function using a Kubernetes command, run:
+kubectl describe function/$FUNCTION_NAME
+Bash
+
+9. This Lambda function returns a “Hello world” message. To invoke the function, run:
+aws lambda invoke --function-name $FUNCTION_NAME  response.json
+cat response.json
+Bash
+The
+ 10. Lambda function returns the following output:
+{"statusCode": 200, "body": "\"Hello from Lambda!\""}
+Congratulations! You created a Lambda function from your Kubernetes cluster.
+
+To learn how to provision the Lambda function using the ACK controller from an OCI container image instead of a zip file in an S3 bucket, follow these instructions.
