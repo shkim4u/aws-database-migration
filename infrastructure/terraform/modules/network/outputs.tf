@@ -42,3 +42,8 @@ output "nat_gateway_ids" {
   description = "NAT Gateway IDs"
   value = module.vpc.natgw_ids
 }
+
+# Output the Transit Gateway Attachment ID
+output "transit_gateway_attachment_id" {
+  value = aws_ec2_transit_gateway_vpc_attachment.dms_tgw_vpc_attachment.id
+}

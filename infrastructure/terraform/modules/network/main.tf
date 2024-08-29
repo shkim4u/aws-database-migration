@@ -6,7 +6,7 @@ module "vpc" {
    * Basic information
    */
   name = "M2M-VPC"
-  cidr = "10.21.0.0/16"
+  cidr = var.vpc_cidr
   azs = var.azs
 
   /*
@@ -31,4 +31,16 @@ module "vpc" {
   enable_dns_hostnames = true
 
   map_public_ip_on_launch = true
+}
+
+# Create the Transit Gateway Attachment
+resource "aws_ec2_transit_gateway_vpc_attachment" "dms_tgw_vpc_attachment" {
+#   subnet_ids         = aws_subnet.public[*].id
+  subnet_ids         = module.vpc.private_subnets
+  transit_gateway_id = data.aws_ec2_transit_gateway.dms_tgw.id
+  vpc_id             = module.vpc.vpc_id
+
+  tags = {
+    Name = "DMS-TGW-Workload-VPC-Attachment"
+  }
 }
