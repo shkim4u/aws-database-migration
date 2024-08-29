@@ -45,9 +45,32 @@ cd ~/environment/aws-database-migration/infrastructure/terraform
 
 env | grep TF_VAR
 
-cat <<EOF >> terraform.tfvars
+cat <<EOF > terraform.tfvars
 ca_arn = "${TF_VAR_ca_arn}"
 eks_cluster_production_name = "${TF_VAR_eks_cluster_production_name}"
 eks_cluster_staging_name = "${TF_VAR_eks_cluster_staging_name}"
 EOF
+```
+
+위와 같이 수행하면 ACM에 사설 CA가 생성되는데 진행자와 함께 ACM 콘솔로 이동하여 Private CA를 한번 살펴봅니다.<br>
+아래와 같이 Private CA가 활성 상태인 것을 확인합니다.<br>
+![Private CA Active](../../images/private-ca-active.png)
+
+> (참고)<br>
+> 현재 리포지터를 통해 공유된 테라폼 코드에는 테라폼 상태 공유 및 공동 작업을 위한 백엔드 (S3, DynamoDB)가 포함되어 있지 않은데, 이에 대해서 궁금하시면 관리자나 과정 진행자에게 문의하세요.
+
+이제 아래 명령어를 통해 타겟 데이터베이스 호스팅을 위한 ```Amazon RDS, 애플리케이션 컨테이너 구동을 위한 ```Amazon EKS ``` 클러스터 및 기타 자원을 생성합니다. 15 ~ 20분 정도 소요됩니다.<br>
+
+```bash
+# 1. IaC 디렉토리로 이동
+cd ~/environment/aws-database-migration/infrastructure/terraform
+
+# terraform init
+terraform init
+
+# terraform plan
+terraform plan -out tfplan
+
+# terraform apply
+terraform apply -auto-approve tfplan
 ```
