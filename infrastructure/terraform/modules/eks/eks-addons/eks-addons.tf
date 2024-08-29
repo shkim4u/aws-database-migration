@@ -239,27 +239,27 @@ module "kubehelper" {
 ### (참고) Staging 클러스터에서 DAST 스캔을 구성할 시 ZAP 스캐너의 Persistence Hook의 Target URL을 Production 클러스터에
 ### 설치된 DefctDojo의 Internal ALB를 가리키도록 설정할 것을 권장.
 ###
-module "defectdojo" {
-  source = "./defectdojo"
-  eks_cluster_name = var.eks_cluster_name
-
-  admin_password = var.defectdojo_admin_password
-  certificate_arn = var.aws_acm_certificate_arn
-
-  depends_on = [null_resource.wait_for_cluster, module.aws_ebs_csi_driver, module.aws_load_balancer_controller]
-}
+# module "defectdojo" {
+#   source = "./defectdojo"
+#   eks_cluster_name = var.eks_cluster_name
+#
+#   admin_password = var.defectdojo_admin_password
+#   certificate_arn = var.aws_acm_certificate_arn
+#
+#   depends_on = [null_resource.wait_for_cluster, module.aws_ebs_csi_driver, module.aws_load_balancer_controller]
+# }
 
 /*
  * SecureCodeBox for DAST (Dynamic Application Security Testing)
  */
-module "securecodebox" {
-  source = "./securecodebox"
-  eks_cluster_name = var.eks_cluster_name
-
-  defectdojo_admin_password = var.defectdojo_admin_password
-
-  depends_on = [null_resource.wait_for_cluster, module.defectdojo]
-}
+# module "securecodebox" {
+#   source = "./securecodebox"
+#   eks_cluster_name = var.eks_cluster_name
+#
+#   defectdojo_admin_password = var.defectdojo_admin_password
+#
+#   depends_on = [null_resource.wait_for_cluster, module.defectdojo]
+# }
 
 
 /**
