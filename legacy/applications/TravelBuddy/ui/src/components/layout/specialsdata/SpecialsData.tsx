@@ -35,15 +35,6 @@ const SpecialsData = () => {
             error: hotelSpecialsError
         } = useSelector(hotelSpecialsSelector.all);
 
-        // useInfiniteScroll({
-        //     target,
-        //     onIntersect: ([{isIntersecting}]) => {
-        //         if (isIntersecting) {
-        //             dispatch(hotelSpecialsAction.loadMore());
-        //         }
-        //     }
-        // });
-
         useEffect(() => {
            dispatch(flightSpecialsAction.load())
         }, []);

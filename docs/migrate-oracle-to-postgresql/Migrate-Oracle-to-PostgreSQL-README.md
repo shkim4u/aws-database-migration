@@ -16,18 +16,18 @@
 
 다음 순서로 진행합니다.
 
-- [파트 1: 스키마 변환](./Convert-Oracle-Schema-To-PostgreSQL.md)
-  - [AWS 스키마 변환 도구 (AWS Schema Conversion Tool) 설치](./Install-AWS-Schema-Conversion-Tool.md)
-  - [데이터베이스 마이그레이션 프로젝트 생성](./Create-Database-Migration-Project.md)
-  - [스키마 변화](./Convert-Schema.md)
-- [파트 2: 데이터 마이그레이션](./Data-Migration.md)
-  - [타겟 데이터베이스 설정](./Configure-Target-Database.md)
-  - [DMS 복제 인스턴스 생성](./Create-DMS-Replication-Instance.md)
-  - [DMS 소스 및 타겟 엔드포인트 생성](./Create-DMS-Source-and-Target-Endpoints.md)
-  - [DMS 마이그레이션 태스크 생성](./Create-DMS-Migration-Tasks.md)
-  - [타겟 데이터베이스 데이터 검사](./Inspect-Target-Database-Content.md)
-  - [데이터 변경 복제](./Replicate-Data-Changes.md)
-- [이기종 데이터 마이그레이션 요약](./Summary-Heterogeneous-Data-Migration.md)
+* [파트 1: 스키마 변환](./Convert-Oracle-Schema-To-PostgreSQL.md)
+  * [AWS 스키마 변환 도구 (AWS Schema Conversion Tool) 설치](./Install-AWS-Schema-Conversion-Tool.md)
+  * [데이터베이스 마이그레이션 프로젝트 생성](./Create-Database-Migration-Project.md)
+  * [스키마 변화](./Convert-Schema.md)
+* [파트 2: 데이터 마이그레이션](./Data-Migration.md)
+  * [타겟 데이터베이스 설정](./Configure-Target-Database.md)
+  * [DMS 복제 인스턴스 생성](./Create-DMS-Replication-Instance.md)
+  * [DMS 소스 및 타겟 엔드포인트 생성](./Create-DMS-Source-and-Target-Endpoints.md)
+  * [DMS 마이그레이션 태스크 생성](./Create-DMS-Migration-Tasks.md)
+  * [타겟 데이터베이스 데이터 검사](./Inspect-Target-Database-Content.md)
+  * [데이터 변경 복제](./Replicate-Data-Changes.md)
+* [이기종 데이터 마이그레이션 요약](./Summary-Heterogeneous-Data-Migration.md)
 
 ---
 

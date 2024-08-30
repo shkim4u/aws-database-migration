@@ -1,0 +1,6 @@
+{
+  "config": {
+    "api_endpoint_url_prefix": "http://k8s-travelbuddy-6172256b0f-730912344.ap-northeast-2.elb.amazonaws.com/travelbuddy",
+    "flightspecials_api_endpoint_url": "http://k8s-travelbuddy-6172256b0f-730912344.ap-northeast-2.elb.amazonaws.com/travelbuddy/flightspecials"
+  }
+}

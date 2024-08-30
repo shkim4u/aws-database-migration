@@ -46,4 +46,4 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    ![AWS SCT 이용약관 동의](../../images/SCT-agreement.png)
 
-5. ```AWS SCT```가 정상적으로 실행되면 아래와 같이 화면이 표시됩니다.
+6. ```AWS SCT```가 정상적으로 실행되면 아래와 같이 화면이 표시됩니다.

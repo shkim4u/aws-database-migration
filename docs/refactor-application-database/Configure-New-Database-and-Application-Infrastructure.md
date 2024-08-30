@@ -125,11 +125,48 @@ echo $ARGOCD_ADMIN_INITIAL_PASSWORD
 
 ---
 
-## 4. 신규 인프라 네트워크 설정
+## 4. 신규 인프라 네트워크 확인
 
-새롭게 생성된 데이터베이스와 애플리케이션 인프라를 위한 이전에 설정한 ```Transite Gateway```와 연결합니다.
+위의 과정이 차질없이 완료되면 다음 네트워크 구성도 자동으로 설정됩니다.
 
+* 새로운 ```워크로드 VPC```에 대한 ```Transit Gateway Attachment```
+* ```Transit Gateway 라우팅 테이블```에 ```워크로드 VPC```에 대한 라우팅 경로
 
+![워크로드 VPC에 대한 트랜짓 게이트웨이 라우팅 테이블](../../images/transit-gateway-routing-table-for-new-workload-vpc.png)
+
+우리는 소스 환경에서 오라클 데이터베이스를 사용하여 구축된 ```TravelBuddy``` 애플리케이션을 데이터베이스와 함께 타겟 환경으로 마이그레이션이 목적이므로 워크로드 VPC에서 소스 데이터베이스로 접근할 수 있는지 확인해 봅니다.
+
+1. ```EC2 > 인스턴스```로 이동하여 ```RDS Bastion```이라는 이름을 가진 인스턴스를 선택하고 ```접속```을 클릭합니다. 해당 인스턴스는 신규로 구축된 ```워크로드 VPC``` 내에 존재합니다.
+
+    ![RDS Bastion 인스턴스 선택](../../images/select-rds-bastion-instance.png)
+
+2. ```Session Manager```를 통하여 연결한 후, 간단한 소스 오라클 데이터베이스 접속 테스트를 수행합니다.
+
+    ![RDS Bastion 인스턴스 접속](../../images/connect-rds-bastion-instance.png)
+
+   * 아래에서 ```<소스 데이터 엔드포인트>```는 소스 환경의 ```OnPremAppServer-DMSWorkshop-Source``` 인스턴스의 Private IP 주소를 사용합니다. 왜냐하면 이 인스턴스에서 오라클 데이터베이스와 애플리케이션 서버가 함께 구동되고 있기 때문입니다.
+
+   ```bash
+   bash
+   sudo yum update -y
+   sudo yum install -y telnet
+   telnet <소스 데이터베이스 엔드포인트> 1521
+   ```
+   
+   * 별다른 작업을 하지 않았다면 아래와 같이 접속이 되지 않을 것입니다.<br>***원인이 무엇인지 추측해 보고 조치를 취해서 다시 접속을 시도해 봅니다. (힌트: 아래 사항을 살펴봅니다)***
+     * (소스 측) ```애플리케이션 서버```의 오라클 포트 방화벽 설정
+     * (타겟 측) ```워크로드 VPC```의 서브넷 별 라우팅 테이블
+ 
+   ![소스 데이터베이스 접속 테스트 실패](../../images/source-database-connect-test-failed.png)
+
+    * 위 조치 후에 다시 접속을 시도하면 아래와 같이 접속이 성공하는 것을 볼 수 있습니다.
+   
+    ![소스 데이터베이스 접속 테스트 성공](../../images/source-database-connect-test-success.png)
+
+    > **참고**<br>
+    > * 사실 새로운 타겟인 ```워크로드 VPC```에서 소스 환경으로 직접 통신이 수행될 필요는 없습니다.
+    > * ```AWS Database Migration Service```의 ```Replication Instance```가 소스 데이터베이스와 타겟 데이터베이스 간의 데이터 마이그레이션을 수행하기 때문입니다. (일종의 MITM; Machine In The Middle)
+    > * 이는 오직 마이그레이션 작업을 위한 일시적인 접속 테스트입니다. 이후 마이그레이션 작업은 ```DMS```를 통해 이루어집니다.
 
 ---
 

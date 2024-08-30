@@ -72,7 +72,7 @@
    cd ~
 
    # Update the package index
-   sudo yum update
+   sudo yum update -y
    
    # Install Git
    sudo yum install -y git

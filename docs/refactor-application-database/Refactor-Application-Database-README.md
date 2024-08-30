@@ -55,5 +55,22 @@
 
 아래와 같은 단계로 애플리케이션과 함께 데이터베이스를 마이그레이션합니다.
 
+TODO: Migration Path 옵션에 대한 설명 추가
+TODO: 대량의 데이터를 마이그레이션 하는 작업이 무중단 시간을 작게 가져가면서 수행하기에는 어려움을 설명
+
+> 📕 **참고**<br>
+> * [[무중단 데이터베이스 마이그레이션 전략 및 고려 사항]](./Zero-Downtime-Migration-Strategy.md)
+
+무중단 데이터베이스 마이그레이션 누구에게나 매력적으로 들릴 수 있지만 실제 환경에서는 달성하기 어려운 목표일 수 있습니다.<br>
+예를 들어 데이터베이스 관리자는 변경 데이터 캡처를 위한 시스템 설정 및 변경을 극도로 제한하는 등의 제약을 받을 수 있습니다.<br>
+
+
+1. 프론트엔드 사용자 인터페이스 분리 (React.js 등) -> ```FlightSpecials``` 데이터베이스 스키마 전환 -> 애플리케이션의 리플랫폼 (EC2 -> EKS)을 통한 ```FlightSpecials``` 백엔드 애플리케이션 마이그레이션 및 실행 -> [애플리케이션 트래픽 유입 중단] -> ```FlightSpecials``` 데이터 마이그레이션 -> ALB 요청 라우팅 설정 -> 프론트엔드 To 백엔드 접속 DNS를 ALB로 변경 (최초 일회) -> [넓은 지역으로 DNS 전파가 확인되면 트래픽 유입 재개] -> ```FlightSpecials``` 데이터의 SSOT 클라우드 전환 완료, ```HotelSpecials``` 트래픽은 기존 온프레미스로 유입 -> ```HotelSpecial``` 데이터베이스 스키마 전환 -> ```HotelSpecials``` 서비스 마이그레이션 및 실행 -> [애플리케이션 트래피 유입 중단] -> ```HotelSpecials``` 데이터 마이그레이션 ``` -> ALB 요청 라우팅 설정 -> [애플리케이션 트래픽 유입 재개] -> ```HotelSpecials``` 데이터 SSOT 클라우드 전환 완료
+
 * [(소스) 레거시 애플리케이션/데이터베이스 구성 및 실행](./Configure-and-Launch-Legacy-Application-and-Database.md)
 * [(타겟) 신규 데이터베이스 및 애플리케이션 인프라 구성](./Configure-New-Database-and-Application-Infrastructure.md)
+* [사용자 인터페이스 (프론트엔드) 분리](./Replatform-Application-and-Database.md)
+* [```FlightSpecials``` 데이터베이스 스키마 전환](./Convert-FlightSpecials-Database-Schema.md)
+* [사용자 인터페이스 분리](./Separate-User-Interface.md)
+* [HotelSpecial 서비스 분리](./Separate-HotelSpecial-Microservice.md)
+* [데이터베이스 역동기화](./Database-Resynchronization.md)

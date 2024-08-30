@@ -35,10 +35,10 @@ variable "grafana_admin_password" {
 
 variable "create_msk" {
   description = "True or False to exclude Amazon MSK cluster for its longer time to create"
-  default = false
+  default = true
 }
-variable "create_rds" {default = false}
-variable "create_frontend" {default = false}
+variable "create_rds" {default = true}
+variable "create_frontend" {default = true}
 variable "create_karpenter" {default = false}
 variable "create_documentdb" {default = false}
 

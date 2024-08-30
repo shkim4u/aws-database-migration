@@ -11,8 +11,7 @@ const env: Dictionary<string> = Object.values(Config)[0];
 console.log(`env: ${env}`);
 
 export const AppConfig = {
-    api_endpoint_url_prefix: env.api_endpoint_url_prefix,
-    flightspecials_api_endpoint_url: env.flightspecials_api_endpoint_url,
+    api_endpoint_url_prefix: env.api_endpoint_url_prefix
 }
 
 const root = ReactDOM.createRoot(

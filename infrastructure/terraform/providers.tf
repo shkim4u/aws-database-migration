@@ -3,7 +3,7 @@ provider "aws" {
   default_tags {
     tags = {
       "Managed_By" = "Terraform"
-      "Purpose" = "Amazon-EKS-Extended-Workshop-By-ProServe"
+      "Purpose" = "Amazon-Database-Migration-Workshop-By-ProServe"
     }
   }
 }
