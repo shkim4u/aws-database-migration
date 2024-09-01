@@ -9,7 +9,7 @@ fi
 
 # Check if the number of argument is 2.
 if [ $# -ne 2 ]; then
-  echo "Usage: $0 <argocd-admin-password> <AWS Secrets Manager SecretID>: (eg)riches-ci-argocd-admin-password>"
+  echo "Usage: $0 <argocd-admin-password> <AWS Secrets Manager SecretID>: (eg)hotelspecials-ci-argocd-admin-password>"
   exit 1
 fi
 

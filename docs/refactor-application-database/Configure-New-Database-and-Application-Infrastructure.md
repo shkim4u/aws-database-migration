@@ -163,17 +163,12 @@ source ~/.bash_profile
 cd ~/environment/aws-database-migration/cloud9
 chmod +x *.sh
 
-# Staging 클러스터
-kcs
-ARGOCD_ADMIN_INITIAL_PASSWORD=`kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d`
-echo $ARGOCD_ADMIN_INITIAL_PASSWORD
-./set-argocd-admin-password-argocd-server.sh $ARGOCD_ADMIN_INITIAL_PASSWORD "Abraca00#1"
-
 # Production 클러스터
 kcp
 ARGOCD_ADMIN_INITIAL_PASSWORD=`kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d`
 echo $ARGOCD_ADMIN_INITIAL_PASSWORD
 ./set-argocd-admin-password-argocd-server.sh $ARGOCD_ADMIN_INITIAL_PASSWORD "Abraca00#1"
+./set-argocd-admin-password-secrets-manager.sh "Abraca00#1" hotelspecials-ci-argocd-admin-password
 ```
 
 ---
