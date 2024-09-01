@@ -69,8 +69,9 @@ TODO: 대량의 데이터를 마이그레이션 하는 작업이 무중단 시�
 
 * [(소스) 레거시 애플리케이션/데이터베이스 구성 및 실행](./Configure-and-Launch-Legacy-Application-and-Database.md)
 * [(타겟) 신규 데이터베이스 및 애플리케이션 인프라 구성](./Configure-New-Database-and-Application-Infrastructure.md)
-* [사용자 인터페이스 (프론트엔드) 분리](./Replatform-Application-and-Database.md)
+* [사용자 인터페이스 (프론트엔드) 분리](./Separate-Frontend.md)
 * [```FlightSpecials``` 데이터베이스 스키마 전환](./Convert-FlightSpecials-Database-Schema.md)
+* [```FlightSpecials``` 서비스 마이그레이션](./Migrate-FlightSpecials-Service.md)
 * [사용자 인터페이스 분리](./Separate-User-Interface.md)
 * [HotelSpecial 서비스 분리](./Separate-HotelSpecial-Microservice.md)
 * [데이터베이스 역동기화](./Database-Resynchronization.md)

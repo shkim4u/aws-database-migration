@@ -850,6 +850,8 @@ Outputs:
     Value: !GetAtt BastionHost.PublicIp
   AppServerPrivateIp:
     Value: !GetAtt AppServer.PrivateIp
+  AppServerPublicIp:
+    Value: !GetAtt AppServer.PublicIp
   DnsServerPrivateIp:
     Value: !GetAtt DnsServer.PrivateIp
 

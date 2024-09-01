@@ -88,6 +88,7 @@
    ```bash
    cd ~/aws-database-migration/legacy
    docker-compose -p travelbuddy up -d
+   docker ps
    ```
 
    ![실행 중인 도커 컨테이너 확인](../../images/docker-ps.png)

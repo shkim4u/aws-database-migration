@@ -67,7 +67,10 @@
     cd ~/environment/aws-database-migration/legacy/applications/TravelBuddy/ui
     npm install
     npm run build
-    # 아래 예: aws s3 sync build s3://travelbuddy-frontend-537682470830
+    ```
+        
+    ```bash
+    # 프론트엔드를 오리진 S3 버킷에 업로드 - 예: aws s3 sync build s3://travelbuddy-frontend-537682470830
     aws s3 sync build/ s3://<CloudFront 배포 원본 이름>
     ```
 

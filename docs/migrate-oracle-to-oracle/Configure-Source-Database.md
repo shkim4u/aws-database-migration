@@ -78,6 +78,10 @@ Oracle을 ```AWS Database Migration Service (AWS DMS)```의 소스로 사용하�
     alter table dms_sample.nfl_data add supplemental log data (ALL) columns;
     ```
 
+   > 📌 **참고:**<br>
+   > * 위 SQL 문에서 ```DMS_USER```는 현재는 사용되지 않습니다. (```DBADMIN``` 사용자를 사용하여 마이그레이션을 수행합니다.)
+   > * 실제 애플리케이션과 데이터베이스를 실제로 마이그레이션할 때 이 사용자를 생성하고 실제로 사용해 보도록 하겠습니다.
+
 3. ```Run Script (F5)```를 클릭하여 SQL 문을 실행합니다.
 
     ![SQL Developer 스크립트 실행](../../images/sql-developer-run-script2.png)
