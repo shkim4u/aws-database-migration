@@ -14,9 +14,11 @@ phases:
       - echo "(dast) Pre-building..."
   build:
     commands:
-      - |
-        echo "(dast) Building..."
+      - echo "(dast) Building..."
+      - echo "(dast) Done." > output.txt
   post_build:
     commands:
-      - |
-        echo "(dast) Post-building..."
+      - echo "(dast) Post-building..."
+artifacts:
+  files:
+    - output.txt

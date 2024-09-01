@@ -14,9 +14,11 @@ phases:
       - echo "(postprocess) Pre-building..."
   build:
     commands:
-      - |
-        echo "(postprocess) Building..."
+      - echo "(postprocess) Building..."
+      - echo "(postprocess) Done." > output.txt
   post_build:
     commands:
-      - |
-        echo "(postprocess) Post-building..."
+      - echo "(postprocess) Post-building..."
+artifacts:
+  files:
+    - output.txt
