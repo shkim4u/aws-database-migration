@@ -4,7 +4,9 @@ env:
   git-credential-helper: yes
   variables:
     REGION: "ap-northeast-2"
-    IMAGE_TAG_KEY: "/application/travelbuddy/container/image/main/tag"
+  exported-variables:
+    - IMAGE_TAG
+    - COMMIT_ID
 phases:
   install:
     # runtime-versions:
@@ -18,6 +20,7 @@ phases:
       - aws --version
       - echo "### SRC_VERISON-> ${CODEBUILD_RESOLVED_SOURCE_VERSION} | Logging-in to ECR"
       - docker login --username AWS -p $(aws ecr get-login-password --region ${REGION}) ${ECR_REPO_URI}
+      - export COMMIT_ID="${CODEBUILD_RESOLVED_SOURCE_VERSION}"
       - export TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
       - export TAG=$(echo $TAG | sed -e "s/\.//g" | tr '[:upper:]' '[:lower:]')
       - export TAG=$(echo "${TAG:0:8}")
@@ -43,9 +46,11 @@ phases:
         echo "### Pushing container image tag to SSM for reuse ###"
         aws ssm put-parameter --name $IMAGE_TAG_KEY --value $IMAGE_TAG --type String --region $REGION --overwrite
       - echo "${IMAGE_TAG}" > image_tag.txt
+      - echo "${CODEBUILD_RESOLVED_SOURCE_VERSION}" > source_version.txt
 artifacts:
   files:
     - image_tag.txt
+    - source_version.txt
 cache:
   paths:
     - '/root/.gradle/caches/**/*'

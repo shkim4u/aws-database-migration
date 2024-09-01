@@ -4,8 +4,9 @@
 1. 개요
 2. ```Amazon EKS``` 클러스터에 배포
    1. ```GitOps``` 리포지터리 (```Helm```) 설정
-   2. 소스 리포지터리 클론 및 빌드 파이프라인 실행
-   2. GitOps 리포지터리 클론 및 배포
+   2. ```GitOps``` 배포 설정 (```ArgoCD```)
+   3. 소스 리포지터리 클론 및 빌드 파이프라인 실행
+   4. GitOps 리포지터리 클론 및 배포
 
 ---
 
@@ -57,7 +58,62 @@ git commit -am "First commit."
 git push --set-upstream origin main
 ```
 
-### **2.2. 소스 리포지터리 클론 및 빌드 파이프라인 실행**
+### **2.2. ```GitOps``` 배포 설정 (```ArgoCD```)**
+1. ArgoCD 접속에 필요한 정보 확인 및 접속<br>
+
+테라폼을 통해서 이미 배포한 EKS 클러스터에는 ```ArgCD```가 설치되어 있으며, 또한 ```AWS ELB (Elastic Load Balancer)```를 통하여 외부에서 접속할 수 있습니다.<br>
+
+아래와 같이 ```ArgoCD``` 접속에 필요한 URL을 확인합니다.<br>
+
+```bash
+# ArgoCD 접속 주소 확인
+kcp
+export ARGOCD_SERVER=`kubectl get ingress/argocd-server -n argocd -o json | jq --raw-output '.status.loadBalancer.ingress[0].hostname'`
+echo https://$ARGOCD_SERVER
+```
+
+확인한 접속 주소와 이미 설정한 패스워드 (```Abraca00#1```)를 사용하여 ArgoCD Web UI에 접속해 봅니다.<br>
+![ArgoCD UI](../../images/argocd_login.png)
+
+2. ```ArgoCD```가 배포 (Helm) 리포지터리에 접속할 수 있도록 IAM 사용자 및 Git Credentials을 생성하고 메모해 둡니다. (CLI 사용).<br>
+
+```bash
+# IAM User 생성
+aws iam create-user --user-name argocd 
+
+# AWSCodeCommitPowerUser 관리형 권한 정책 연결 (arn:aws:iam::aws:policy/AWSCodeCommitPowerUser)
+aws iam attach-user-policy --user-name argocd --policy-arn arn:aws:iam::aws:policy/AWSCodeCommitPowerUser
+
+# CodeCommit 접근을 위한 Specific Credential 생성
+# (중요) 결과로서 반환되는 "ServiceUserName"과 "ServicePassword"를 기록해 둡니다.
+aws iam create-service-specific-credential --user-name argocd --service-name codecommit.amazonaws.com
+```
+
+3. ArgoCD 설정<br>
+- 로그인 이후 좌측의 ```Settings```를 클릭한 뒤 ```Repositories``` 항목을 클릭합니다.<br>
+
+   ![ArgoCD Repository Settings](../../images/argo-setting.png)
+
+- Connect Repo 버튼을 클릭하고 Method는 ```VIA HTTPS```, Project는 ```default```를 입력합니다.<br>
+
+- ```Repository URL```에는 앞서 확인한 배포 ```CodeCommit``` Repository의 HTTPS 주소를 (혹은 아래 CLI로 확인 가능), Username 및 Password에는 메모해 둔 정보를 입력합니다.<br>
+
+   ```bash
+   export HELM_CODECOMMIT_URL=$(aws codecommit get-repository --repository-name hotelspecials-configuration --region ap-northeast-2 | grep -o '"cloneUrlHttp": "[^"]*'|grep -o '[^"]*$')
+   echo $HELM_CODECOMMIT_URL
+   ```
+
+![ArgoCD Repository Connect](../../images/argocd-repository-information-riches-01.png)
+![ArgoCD Repository Connect](../../images/argocd-repository-information-riches-success.png)
+
+- ```Application``` 텝에서 ```NewApp```버튼을 클릭합니다. ```Application Name```에는 ```hotelspecials```를, Project는 ```default```를 입력합니다. ```Sync Policy```에는 "Manual"을, ```Repository URL```에는 앞서 설정한 배포 리포지터리를, ```PATH```에는 ```.```을 각각 입력합니다. ```Destination``` 섹션의 Cluster URL에는 ```https://kubernetes.default.svc```, ```Namespace```에는 ```hotelspecials```를 입력하고 상단의 Create를 클릭합니다.<br>
+
+   ![ArgoCD HotelSpecials App](../../images/argocd-app-hotelspecials.png)
+
+> (참고)<br>
+> Application 생성 시 화면 하단에 Helm Setting 값들이 정상적으로 표시되는지 확인합니다.
+
+### **2.3. 소스 리포지터리 클론 및 빌드 파이프라인 실행**
 
 1. ```Cloud9``` 상에서 ```HotelSpecials``` 서비스의 소스 코드를 클론하고 빌드 파이프라인을 실행합니다.
 
