@@ -22,7 +22,8 @@ ingress:
   certificate_arn: ${CERTIFICATE_ARN}
 configmap:
   name: hotelspecials-configmap
-  environment: test
+  environment: dev
   database_endpoint: ${DATABASE_ENDPOINT}
   database_port: ${DATABASE_PORT}
   database_username: ${DATABASE_USERNAME}
+  database_password: ${DATABASE_PASSWORD}

@@ -338,17 +338,20 @@ module "network-testing" {
  * TravelBuddy - HotelSpecials.
  */
 module "hotelspecials" {
-    source = "./hotelspecials"
-    irsa_oidc_provider_arn = var.oidc_provider_arn
+  source = "./hotelspecials"
+  eks_cluster_name = var.eks_cluster_name
+  irsa_oidc_provider_arn = var.oidc_provider_arn
 
-    depends_on = [null_resource.wait_for_cluster]
+  depends_on = [null_resource.wait_for_cluster]
 }
 
 /**
  * TravelBuddy - FlightSpecials.
  */
 module "flightspecials" {
-    source = "./flightspecials"
-    irsa_oidc_provider_arn = var.oidc_provider_arn
+  source                 = "./flightspecials"
+  eks_cluster_name = var.eks_cluster_name
+  irsa_oidc_provider_arn = var.oidc_provider_arn
 
-    depends_on = [null_resource.wait_for_cluster]
+  depends_on = [null_resource.wait_for_cluster]
+}

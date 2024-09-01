@@ -10,7 +10,7 @@ resource "kubernetes_namespace" "hotelspecials" {
 }
 
 resource "aws_iam_policy" "hotelspecials_irsa" {
-  name = "HotelSpecials-IRSA-Policy"
+  name = "HotelSpecials-IRSA-Policy-${var.eks_cluster_name}"
   path = "/"
   policy = file("${path.module}/hotelspecials-irsa-policy.json")
   description = "IAM policy for HotelSpecials IRSA"
@@ -20,7 +20,7 @@ module "hotelspecials_irsa" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.0"
 
-  role_name = "HotelSpecials-IRSA-Role"
+  role_name = "HotelSpecials-IRSA-Role-${var.eks_cluster_name}"
 
   role_policy_arns = {
     policy = aws_iam_policy.hotelspecials_irsa.arn

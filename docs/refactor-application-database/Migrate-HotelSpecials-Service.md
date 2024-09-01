@@ -115,7 +115,20 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
 
 ### **2.3. 소스 리포지터리 클론 및 빌드 파이프라인 실행**
 
-1. ```Cloud9``` 상에서 ```HotelSpecials``` 서비스의 소스 코드를 클론하고 빌드 파이프라인을 실행합니다.
+1. ```Cloud9```에서 ```HotelSpecials``` 서비스가 사용하는 데이터베이스를 ```오라클``` -> ```MySQL```로 변경합니다.
+
+    * 40번째 줄 근처에 주석처리된 ```MySQL``` 드라이버 사용 구문을 주석 해제합니다. (사용)
+    * 그 다음 줄에 ```Oracle``` 드라이버 사용 구문을 주석 처리합니다. (미사용)
+    * 51번째 줄의 ```select 1 from dual``` 쿼리를 ```select 1```로 변경합니다.
+
+    ```bash
+    cd ~/environment/aws-database-migration/legacy/applications/TravelBuddy/build
+    c9 open src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml
+    ```
+
+    ![HotelSpecials 서비스 데이터베이스 변경](../../images/hotelspecials-database-change.png)
+
+2. ```Cloud9``` 상에서 ```HotelSpecials``` 서비스의 소스 코드를 클론하고 빌드 파이프라인을 실행합니다.
 
     ```bash
     # 0. Git 초기화
@@ -144,10 +157,29 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
     git push --set-upstream origin main
     ```
 
-2. ```CodeCommit``` 리포지터리에 소스 코드가 푸시되었음을 확인합니다.
+3. ```CodeCommit``` 리포지터리에 소스 코드가 푸시되었음을 확인합니다.
 
     ![HotelSpecials 소스 파일 푸시됨](../../images/hotelspecials-codecommit-repository-source-pushed.png)
 
-3. 또한 빌드 파이프라인도 트리거되어 실행되었음을 확인합니다. 다만, Build Spec이 없거나 정상적으로 구성되지 않은 등의 이유로 파이프라인은 실패하였을 수 있습니다.
+4. 또한 빌드 파이프라인도 트리거되어 실행되었음을 확인합니다. 다만, Build Spec이 없거나 정상적으로 구성되지 않은 등의 이유로 파이프라인은 실패하였을 수 있습니다. 발생한 오류를 확인하고 수정합니다.
 
    ![HotelSpecials 빌드 파이프라인 실패](../../images/hotelspecials-codepipeline-initial-run-failed.png)
+
+### **2.4. GitOps 리포지터리 클론 및 배포**
+위의 과정이 정상적으로 수행되면 ```ArgoCD```에서 ```hotelspecials``` 애플리케이션에 대한 배포가 자동으로 수행됩니다.
+
+![HotelSpecials GitOps 배포](../../images/hotelspecials-argocd-deployed.png)
+
+위 화면에서 ```hotelspecials-ingress``` 항목의 링크 열기 미니 아이콘을 클릭하여 ```HotelSpecials``` 서비스가 정상적으로 배포되었는지 확인합니다.
+
+![HotelSpecials 서비스 확인](../../images/hotelspecials-service-check.png)
+
+아래와 같이 요청이 정상적으로 처리되면 브라우저에 표시됩니다.
+
+![HotelSpecials 서비스 요청 처리](../../images/hotelspecials-service-request.png)
+
+> 📌 **참고**<br>
+> 브라우저에서 아무 데이터가 표시되지 않는 것은 정상입니다.<br>
+> 우리가 아직 데이터 마이그레이션을 수행하지 않았으므로 데이터베이스에 데이터가 없기 때문입니다.
+
+---

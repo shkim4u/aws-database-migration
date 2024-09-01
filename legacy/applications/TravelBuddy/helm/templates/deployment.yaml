@@ -15,7 +15,11 @@ spec:
       labels:
         app.kubernetes.io/name: {{ .Values.app.name }}
     spec:
-      serviceAccountName: riches-service-account
+      serviceAccountName: hotelspecials-service-account
+      volumes:
+        - name: config-volume
+          configMap:
+            name: "xray-config"
       containers:
         - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           name: {{ .Values.app.name }}
@@ -35,50 +39,78 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: environment
-                  name: riches-configmap
+                  name: hotelspecials-configmap
             - name: JAVA_OPTIONS
               value: "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}"
             - name: SPRING_PROFILES_ACTIVE
               valueFrom:
                 configMapKeyRef:
                   key: environment
-                  name: riches-configmap
+                  name: hotelspecials-configmap
             - name: DATABASE_ENDPOINT
               valueFrom:
                 configMapKeyRef:
                   key: database_endpoint
-                  name: riches-configmap
+                  name: hotelspecials-configmap
             - name: DATABASE_PORT
               valueFrom:
                 configMapKeyRef:
                   key: database_port
-                  name: riches-configmap
+                  name: hotelspecials-configmap
             - name: DATABASE_USERNAME
               valueFrom:
                 configMapKeyRef:
                   key: database_username
-                  name: riches-configmap
-            - name: DB_DEFAULT_SCHEMA
-              value: riches
-            - name: CODEBUILD_BUILD_NUMBER
-              value: "{{ .Values.app.build_number }}"
-        # - name: nginx
-        #   image: public.ecr.aws/nginx/nginx:1.21
-        #   ports:
-        #   - name: http
-        #     containerPort: 80
-        #   imagePullPolicy: IfNotPresent
-{{/*  strategy:*/}}
-{{/*    canary:*/}}
-{{/*      maxSurge: "50%"    # canary 배포로 생성할 pod의 비율*/}}
-{{/*      maxUnavailable: 0  # 업데이트 될 때 사용할 수 없는 pod의 최대 수*/}}
-{{/*      steps:*/}}
-{{/*        - setWeight: 20*/}}
-{{/*        - pause: {duration: 30s}*/}}
-{{/*        - setWeight: 40*/}}
-{{/*        - pause: {duration: 30s}*/}}
-{{/*        - setWeight: 60*/}}
-{{/*        - pause: {duration: 30s}*/}}
-{{/*        - setWeight: 80*/}}
-{{/*        - pause: {duration: 20s}*/}}
-{{/*  revisionHistoryLimit: 2*/}}
+                  name: hotelspecials-configmap
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: database_password
+                  name: hotelspecials-configmap
+            - name: JDBC_CONNECTION_STRING
+              value: "jdbc:mysql://${DATABASE_ENDPOINT}:${DATABASE_PORT}/m2m?useSSL=false&autoReconnect=true"
+            - name: JDBC_UID
+              value: ${DATABASE_USERNAME}
+            - name: JDBC_PWD
+              value: ${DATABASE_PASSWORD}
+            - name: TZ
+              value: Asia/Seoul
+        - name: xray-daemon
+          image: amazon/aws-xray-daemon:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: xray-ingest
+              containerPort: 2000
+              protocol: UDP
+            - name: xray-tcp
+              containerPort: 2000
+              protocol: TCP
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          # Volume mount for X-Ray Configuration.
+          volumeMounts:
+            - name: config-volume
+              mountPath: /aws/xray
+              readOnly: true
+---
+# Configuration for AWS X-Ray daemon.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: xray-config
+  namespace: hotelspecials
+data:
+  config.yaml: |-
+    TotalBufferSizeMB: 24
+    Socket:
+      UDPAddress: "0.0.0.0:2000"
+      TCPAddress: "0.0.0.0:2000"
+    LocalMode: true
+    Version: 2
+    Logging:
+      LogLevel: "debug"

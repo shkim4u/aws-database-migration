@@ -15,17 +15,19 @@ metadata:
       {"Type":"redirect","RedirectConfig":{"Port":"443","Protocol":"HTTPS","StatusCode":"HTTP_302"}}
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.ingress.certificate_arn }}
     alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
-    alb.ingress.kubernetes.io/healthcheck-path: /riches/login/Login.action
+    alb.ingress.kubernetes.io/group.name: travelbuddy
+    alb.ingress.kubernetes.io/group.order: '1'
+    alb.ingress.kubernetes.io/healthcheck-path: "/travelbuddy/health"
     alb.ingress.kubernetes.io/healthcheck-interval-seconds: '30'
     alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '10'
-    alb.ingress.kubernetes.io/success-codes: 200,201,302
+    alb.ingress.kubernetes.io/success-codes: 200,201,302,401
     alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=86400
 spec:
   rules:
 {{/*    - host: {{ .Values.service.name }}.{{ .Values.namespace.name }}.cluster.local*/}}
     - http:
         paths:
-          - path: /
+          - path: /travelbuddy/hotelspecials
             pathType: Prefix
             backend:
               service:

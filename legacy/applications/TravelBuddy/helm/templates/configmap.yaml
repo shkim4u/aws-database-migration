@@ -8,3 +8,4 @@ data:
   database_endpoint: "{{ .Values.configmap.database_endpoint}}"
   database_port: "{{ .Values.configmap.database_port }}"
   database_username: "{{ .Values.configmap.database_username }}"
+  database_password: "{{ .Values.configmap.database_password }}"

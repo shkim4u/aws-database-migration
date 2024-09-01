@@ -10,6 +10,8 @@ phases:
   install:
     commands:
       - env
+      - apt-get update
+      - apt-get install -y jq
       - aws eks update-kubeconfig --name $CLUSTER_NAME
       - |
         # Install ArgoCD CLI.
@@ -32,6 +34,13 @@ phases:
       - export AWS_SECRET_ACCESS_KEY=$(echo "${CREDENTIALS}" | jq -r '.Credentials.SecretAccessKey')
       - export AWS_SESSION_TOKEN=$(echo "${CREDENTIALS}" | jq -r '.Credentials.SessionToken')
       - export AWS_EXPIRATION=$(echo "${CREDENTIALS}" | jq -r '.Credentials.Expiration')
+      - echo "(deploy) Retrieving database information..."
+      - export DATABASE_ENDPOINT=$(aws rds describe-db-instances --query "DBInstances[?DBInstanceIdentifier=='mysql-excluded-1'].Endpoint.Address" --output text) && echo $DATABASE_ENDPOINT
+      - export DATABASE_PORT=$(aws rds describe-db-instances --query "DBInstances[?DBInstanceIdentifier=='mysql-excluded-1'].Endpoint.Port" --output text) && echo $DATABASE_PORT
+      - export DATABASE_SECRETS=$(aws secretsmanager list-secrets --filters Key=tag-value,Values="arn:aws:rds:ap-northeast-2:${AWS_ACCOUNT_ID}:cluster:m2m-general-aurora-mysql" --query "SecretList[0].Name" --output text) && echo $DATABASE_SECRETS
+      - export DATABASE_CREDENTIALS=$(aws secretsmanager get-secret-value --secret-id $DATABASE_SECRETS --query SecretString --output text) && echo $DATABASE_CREDENTIALS
+      - export DATABASE_USERNAME=$(echo $DATABASE_CREDENTIALS | jq -r '.username')
+      - export DATABASE_PASSWORD=$(echo $DATABASE_CREDENTIALS | jq -r '.password')
       - ls -altr
       - pwd
       - env
@@ -47,7 +56,7 @@ phases:
         cat ./values.yaml
         git status
         git config user.email "anyone@example.com"
-        git config user.name "RichesBank Developer"
+        git config user.name "TravelBuddy Developer"
         git add .
         git commit -m "Updated image tag to $IMAGE_TAG"
         git log --oneline
