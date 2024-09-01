@@ -42,9 +42,6 @@ phases:
         docker push $ECR_REPO_URI:$IMAGE_TAG
   post_build:
     commands:
-      - |
-        echo "### Pushing container image tag to SSM for reuse ###"
-        aws ssm put-parameter --name $IMAGE_TAG_KEY --value $IMAGE_TAG --type String --region $REGION --overwrite
       - echo "${IMAGE_TAG}" > image_tag.txt
       - echo "${CODEBUILD_RESOLVED_SOURCE_VERSION}" > source_version.txt
 artifacts:
