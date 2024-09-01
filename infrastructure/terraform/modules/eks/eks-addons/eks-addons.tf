@@ -333,3 +333,22 @@ module "network-testing" {
   depends_on = [null_resource.wait_for_cluster]
   certificate_arn = var.aws_acm_certificate_arn
 }
+
+/**
+ * TravelBuddy - HotelSpecials.
+ */
+module "hotelspecials" {
+    source = "./hotelspecials"
+    irsa_oidc_provider_arn = var.oidc_provider_arn
+
+    depends_on = [null_resource.wait_for_cluster]
+}
+
+/**
+ * TravelBuddy - FlightSpecials.
+ */
+module "flightspecials" {
+    source = "./flightspecials"
+    irsa_oidc_provider_arn = var.oidc_provider_arn
+
+    depends_on = [null_resource.wait_for_cluster]
