@@ -1,0 +1,22 @@
+version: 0.2
+env:
+  shell: bash
+  git-credential-helper: yes
+  variables:
+    REGION: "ap-northeast-2"
+    ENVIRONMENT: test
+phases:
+  install:
+    commands:
+      - echo "(dast) Installing toolchain..."
+  pre_build:
+    commands:
+      - echo "(dast) Pre-building..."
+  build:
+    commands:
+      - |
+        echo "(dast) Building..."
+  post_build:
+    commands:
+      - |
+        echo "(dast) Post-building..."

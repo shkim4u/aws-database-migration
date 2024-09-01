@@ -244,12 +244,13 @@ resource "aws_codepipeline" "pipeline" {
       provider = "CodeBuild"
       version = "1"
 
-      input_artifacts = ["BuildOutput"]
+      input_artifacts = ["SourceOutput", "BuildOutput"]
       output_artifacts = ["PostProcessOutput"]
       run_order = 1
 
       configuration = {
         ProjectName = module.post_process.codebuild_project_id
+        PrimarySource = "SourceOutput"
         EnvironmentVariables = jsonencode([
           {
             name = "IMAGE_TAG"
@@ -323,14 +324,14 @@ resource "aws_codepipeline" "pipeline" {
       version = "1"
 
       # TODO: Perform stop or go also with DAST result.
-      input_artifacts = ["BuildOutput", "PostProcessOutput", "DASTOutput"]
+      input_artifacts = ["SourceOutput", "BuildOutput", "PostProcessOutput", "DASTOutput"]
       output_artifacts = ["ApprovalHandlerOutput"]
       run_order = 1
 
       # Set primary source artifact as the first input artifact.
       configuration = {
         ProjectName = module.approval_handler.codebuild_project_id
-        PrimarySource = "BuildOutput"
+        PrimarySource = "SourceOutput"
       }
     }
   }
@@ -349,7 +350,7 @@ resource "aws_codepipeline" "pipeline" {
 
       configuration = {
         ProjectName = module.deploy.codebuild_project_id
-        PrimarySource = "BuildOutput"
+        PrimarySource = "SourceOutput"
         EnvironmentVariables = jsonencode([
           {
             name = "IMAGE_TAG"
