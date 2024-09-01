@@ -44,4 +44,4 @@
   * [(소스) 레거시 애플리케이션/데이터베이스 구성 및 실행](./refactor-application-database/Configure-and-Launch-Legacy-Application-and-Database.md)
   * [(타겟) 신규 데이터베이스 및 애플리케이션 인프라 구성](./refactor-application-database/Configure-New-Database-and-Application-Infrastructure.md)
   * [사용자 인터페이스 (프론트엔드) 분리](./refactor-application-database/Separate-Frontend.md)
-  * [```FlightSpecials``` 데이터베이스 스키마 전환](./refactor-application-database/Convert-FlightSpecials-Database-Schema.md)
+  * [```HotelSpecials``` 데이터베이스 스키마 전환](./refactor-application-database/Convert-Hotelspecials-Database-Schema.md)

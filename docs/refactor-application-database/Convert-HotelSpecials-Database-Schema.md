@@ -1,4 +1,4 @@
-# ***```FlightSpecials``` 데이터베이스 스키마 전환***
+# ***```HotelSpecials``` 데이터베이스 스키마 전환***
 
 ## **Agenda**
 1. 개요
@@ -13,11 +13,11 @@
 
 이제 본격적으로 ```TravelBuddy``` 시스템을 클라우드로 전환하는 작업을 시작합니다.
 
-우선 ```FlightSpecials``` 데이터베이스의 스키마를 전환하는 작업을 수행합니다. 실제 데이터는 해당 ```FlightSpecials``` 서비스가 클라우드로 전화되기 직적에 옮겨지 예정이므로 여기서는 스키마만을 전환하도록 하겠습니다.
+우선 ```HotelSpecials``` 데이터베이스의 스키마를 전환하는 작업을 수행합니다. 실제 데이터는 해당 ```HotelSpecials``` 서비스가 클라우드로 전화되기 직적에 옮겨질 예정이므로 여기서는 스키마만을 전환하도록 하겠습니다.
 
 전환 작업은 ```Oracle``` 소스에서 ```Amazon Aurora MySQL``` 타겟으로 진행합니다.
 
-![FlightSpecials 데이터베이스 스키마 전환](../../images/convert-oracle-schema-to-aurora-mysql.png)
+![HotelSpecials 데이터베이스 스키마 전환](../../images/convert-oracle-schema-to-aurora-mysql.png)
 
 ---
 
@@ -307,6 +307,6 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
 ```TravelBuddy``` 데이터베이스 스키마를 오라클 소스에서 ```Amazon Aurora MySQL``` 타겟으로 성공적으로 변환했습니다.
 
-이제 다음 단계로 진행하여 ```MySQL```을 사용하는 애플리케이션 증 ```FlightSpecials``` 기능을 클라우드로 이전해 보도록 하겠습니다. 
+이제 다음 단계로 진행하여 ```MySQL```을 사용하는 애플리케이션 증 ```HotelSpecials``` 기능을 클라우드로 이전해 보도록 하겠습니다. 
 
 ---
