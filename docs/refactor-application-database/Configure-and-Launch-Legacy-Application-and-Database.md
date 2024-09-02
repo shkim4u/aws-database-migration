@@ -15,7 +15,7 @@
 
    ![Session Manager로 인스턴스 연결됨](../../images/session-manager-connected.png)
 
-3. 컨테이너화된 애플리케이션 및 데이터베이스 서버를 실행하여야 하므로 ```Docker``` 설치합니다.
+3. 컨테이너화된 애플리케이션 및 데이터베이스 서버를 실행하여야 하므로 ```Docker```를 설치합니다.
 
    ```bash
    bash

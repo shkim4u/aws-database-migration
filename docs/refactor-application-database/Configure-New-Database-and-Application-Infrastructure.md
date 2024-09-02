@@ -19,6 +19,7 @@
 아래 명령은 ```Cloud9``` 환경을 구성하기 위하여 일련의 작업을 수행하므로 완료될 때까 다소 시간이 걸립니다 (1 ~ 2분)
 
 ```bash
+export AWS_PAGER=''
 curl -fsSL https://raw.githubusercontent.com/shkim4u/m2m-travelbuddy/main/cloud9/bootstrap-v2-with-admin-user-trust.sh | bash -s -- c5.9xlarge
 ```
 ### 1.2. ```AWS Cloud9``` IDE 설정
@@ -51,6 +52,7 @@ curl -fsSL https://raw.githubusercontent.com/shkim4u/m2m-travelbuddy/main/cloud9
 ```bash
 cd ~/environment/
 
+export AWS_PAGER=''
 # Cloud9 환경 설정
 curl -fsSL https://raw.githubusercontent.com/shkim4u/m2m-travelbuddy/main/cloud9/cloud9.sh | bash
 

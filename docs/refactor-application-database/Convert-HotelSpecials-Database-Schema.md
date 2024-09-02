@@ -102,7 +102,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    | **위치**        | ```C:\Users\Administrator\AWS Schema Conversion Tool\Projects (기본값)```                        |
    | **데이터베이스 타입** | ```SQL database```                                                                            |
    | **소스 엔진**     | ```Oracle```                                                                                  |
-   | **타겟 엔진 버전**  | ```Amazon Aurora (PostgreSQL compatible) 15```                                                |
+   | **타겟 엔진 버전**  | ```Amazon Aurora (PostgreSQL compatible) 15 (여기서는 사용되지 않으므로 무시해도 됩니다)```                      |
    | **전환 옵션**     | ```나는 엔진을 전환하고 클라우드용으로 최적화하려고 합니다 (I want to switch engines and optimize for the cloud)``` 선택 |
 
    ![SCT 프로젝트 생성 마법사](../../images/SCT-proj-wizard-screen-filled.png)
@@ -131,6 +131,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    > ⚠️ **참고**<br>
    > * 만약 연결 테스트가 실패하면 소스 데이터베이스 포트 ```1521```를 위한 위한 방화벽 (보안 그룹)에 ```10.16.0.0/12``` 대역이 허용되어 있는지 확인합니다.
    >   * 또한 아래와 같이 ```travelbuddy``` 사용자가 ```스키마 전환```에 필요한 권한이 없다는 오류가 나타날 수 있습니다.
+   >
    >   ![SCT 오라클 권한 오류](../../images/SCT-oracle-privilege-error.png)
 
    > 📕 **수행 과제**<br>
@@ -144,17 +145,17 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    * 소스 측에서 위 작업을 완료하면 타겟 측의 ```AWS SCT```로 돌아와 다음과 같이 값을 다시 설정하고 연결 테스트를 수행합니다.
    
    | **파라미터**                    | **값**                                                              |
-         |-----------------------------|--------------------------------------------------------------------|
-      | **연결 이름 (Connection name)** | ```TravelBuddy Oracle Source```                                    |
-      | **타입**                      | ```SID```                                                          |
-      | **서버 이름**                   | ```소스 환경의 CloudFormation의 출력 탭에서 확인 AppServer Private IP 확인```     |
-      | **서버 포트**                   | ```1521```                                                         |
-      | **SID**                     | ```XE```                                                           |
-      | **사용자 이름**                  | ```dmsuser```                                                      |
-      | **암호**                      | ```dmsuser123```                                                   |
-      | **SSL 사용**                  | ```체크 해제 (미사용)```                                                  |
-      | **암호 저장**                   | ```체크 (암호 저장)```                                                   |
-      | **오라클 드라이버 경로**             | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\ojdbc11.jar``` |
+   |-----------------------------|--------------------------------------------------------------------|
+   | **연결 이름 (Connection name)** | ```TravelBuddy Oracle Source```                                    |
+   | **타입**                      | ```SID```                                                          |
+   | **서버 이름**                   | ```소스 환경의 CloudFormation의 출력 탭에서 확인 AppServer Private IP 확인```     |
+   | **서버 포트**                   | ```1521```                                                         |
+   | **SID**                     | ```XE```                                                           |
+   | **사용자 이름**                  | ```dmsuser```                                                      |
+   | **암호**                      | ```dmsuser123```                                                   |
+   | **SSL 사용**                  | ```체크 해제 (미사용)```                                                  |
+   | **암호 저장**                   | ```체크 (암호 저장)```                                                   |
+   | **오라클 드라이버 경로**             | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\ojdbc11.jar``` |
 
    ![SCT 오라클 TravelBuddy 소스 연결 성공](../../images/SCT-oracle-connected-with-dmsuser.png)
 
