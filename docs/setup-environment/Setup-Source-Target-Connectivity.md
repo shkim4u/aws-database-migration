@@ -276,8 +276,9 @@
 
 10. 구성 파일 내의 ```(5) Create a new file ...``` 로 시작되는 부분의 아래 라인을 복사하여 붙여 넣습니다.
 
-    ![](../../images/source-vpn-aws-secrets.png)
-    ![](../../images/source-vpn-aws-secrets-value.png)
+   ![](../../images/source-vpn-aws-secrets.png)
+
+   ![](../../images/source-vpn-aws-secrets-value.png)
 
 11. ```Openswan```을 활성화하고 시작합니다.
 

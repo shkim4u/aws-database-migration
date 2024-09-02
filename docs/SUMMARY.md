@@ -26,7 +26,7 @@
     * [타겟 데이터베이스 데이터 검사](./migrate-oracle-to-postgresql/Inspect-Target-Database-Content.md)
     * [데이터 변경 복제](./migrate-oracle-to-postgresql/Replicate-Data-Changes.md)
   * [이기종 데이터 마이그레이션 요약](./migrate-oracle-to-postgresql/Summary-Heterogeneous-Data-Migration.md)
-* [애플리케이션 데이터베이스 리팩터](./refactor-application-database/Refactor-Application-Database-README.md)
+* [애플리케이션 데이터베이스 마이그레이션](./refactor-application-database/Refactor-Application-Database-README.md)
   * [(소스) 레거시 애플리케이션/데이터베이스 구성 및 실행](./refactor-application-database/Configure-and-Launch-Legacy-Application-and-Database.md)
   * [(타겟) 신규 데이터베이스 및 애플리케이션 인프라 구성](./refactor-application-database/Configure-New-Database-and-Application-Infrastructure.md)
   * [사용자 인터페이스 (프론트엔드) 분리](./refactor-application-database/Separate-Frontend.md)
