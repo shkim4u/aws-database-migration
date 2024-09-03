@@ -1,0 +1,77 @@
+version: 0.2
+
+env:
+  shell: bash
+  git-credential-helper: yes
+  variables:
+    AWS_REGION: "ap-northeast-2"
+
+phases:
+  install:
+    commands:
+      - env
+      - apt-get update
+      - apt-get install -y jq
+      - aws eks update-kubeconfig --name $CLUSTER_NAME
+      - |
+        # Install ArgoCD CLI.
+        curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/v2.10.1/argocd-linux-amd64
+        chmod +x /usr/local/bin/argocd
+        argocd version --client
+  pre_build:
+    commands:
+      - echo "AWSCLI version..."
+      - aws --version
+      # 운영 배포 시에는 Public ALB 배포 -> ACM Certificate ARN을 설정 필요
+      # INGRESS_ENABLED 환경변수를 통해 Ingress 리소스 생성 여부를 결정 -> true일 경우, Service 리소스와 함께 Ingress 리소스 생성 -> AWS ALB도 함께 생성
+      - export INGRESS_ENABLED=true
+      - export CERTIFICATE_ARN=`aws acm list-certificates --query "CertificateSummaryList[?DomainName=='www.mydemo.co.kr'&& RenewalEligibility=='ELIGIBLE'].CertificateArn" --output text`
+      - echo "(deploy) Using CERTIFICATE_ARN ${CERTIFICATE_ARN}"
+      # Access to EKS cluster.
+      - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output=text) && echo $AWS_ACCOUNT_ID
+      - export CREDENTIALS=$(aws sts assume-role --role-arn $ASSUME_ROLE_ARN --role-session-name codebuild-deploy-eks-role) && echo $CREDENTIALS
+      - export AWS_ACCESS_KEY_ID=$(echo "${CREDENTIALS}" | jq -r '.Credentials.AccessKeyId')
+      - export AWS_SECRET_ACCESS_KEY=$(echo "${CREDENTIALS}" | jq -r '.Credentials.SecretAccessKey')
+      - export AWS_SESSION_TOKEN=$(echo "${CREDENTIALS}" | jq -r '.Credentials.SessionToken')
+      - export AWS_EXPIRATION=$(echo "${CREDENTIALS}" | jq -r '.Credentials.Expiration')
+      - echo "(deploy) Retrieving database information..."
+      - export DATABASE_ENDPOINT=$(aws rds describe-db-instances --query "DBInstances[?DBInstanceIdentifier=='flightspecials-test-postgres-db'].Endpoint.Address" --output text) && echo $DATABASE_ENDPOINT
+      - export DATABASE_PORT=$(aws rds describe-db-instances --query "DBInstances[?DBInstanceIdentifier=='flightspecials-test-postgres-db'].Endpoint.Port" --output text) && echo $DATABASE_PORT
+      - export DATABASE_USERNAME=$(aws secretsmanager list-secrets --filters Key=tag-value,Values="arn:aws:rds:ap-northeast-2:${AWS_ACCOUNT_ID}:db:flightspecials-test-postgres-db" --query "SecretList[0].Name" --output text) && echo $DATABASE_USERNAME
+      - ls -altr
+      - pwd
+      - env
+  build:
+    commands:
+      - |
+        echo "(deploy) Updating image tag in Helm repo of ArgoCD Application..."
+        echo "Cloning ${APPLICATION_CONFIGURATION_REPO_URL}..."
+        git clone ${APPLICATION_CONFIGURATION_REPO_URL} application-configuration
+        cd application-configuration
+        ls -al
+        cat values-template.yaml | envsubst > ./values.yaml
+        cat ./values.yaml
+        git status
+        git config user.email "anyone@example.com"
+        git config user.name "FlightSpecials Developer"
+        git add .
+        git commit -m "Updated image tag to $IMAGE_TAG"
+        git log --oneline
+        git remote -v
+        git push -u origin main
+      - |
+        # Get ArgoCD Server URL.
+        export ARGOCD_SERVER=`kubectl get ingress/argocd-server -n argocd -o json | jq --raw-output '.status.loadBalancer.ingress[0].hostname'`
+        echo "ARGOCD_SERVER: ${ARGOCD_SERVER}"
+      - |
+        # Acquire ArgoCD admin password from AWS Secrets Manager.
+        export ARGOCD_ADMIN_PASSWORD=`aws secretsmanager get-secret-value --secret-id $ARGOCD_ADMIN_PASSWORD_SECRET_ID --query SecretString --output text`
+      - |
+        # Login to ArgoCD Server.
+        argocd login ${ARGOCD_SERVER} --username admin --password ${ARGOCD_ADMIN_PASSWORD} --insecure
+      - |
+        # Sync ArgoCD Application.
+        argocd app sync ${ARGOCD_APPLICATION_NAME} --insecure
+  post_build:
+    commands:
+      - echo "post_build"

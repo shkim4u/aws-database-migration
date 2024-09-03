@@ -70,8 +70,9 @@
     ```
         
     ```bash
+    export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output=text) && echo $AWS_ACCOUNT_ID
     # 프론트엔드를 오리진 S3 버킷에 업로드 - 예: aws s3 sync build s3://travelbuddy-frontend-537682470830
-    aws s3 sync build/ s3://<CloudFront 배포 원본 이름>
+    aws s3 sync build/ s3://travelbuddy-frontend-${AWS_ACCOUNT_ID}
     ```
 
     ![프론트엔드 빌드 및 배포](../../images/frontend-build-deploy.png)

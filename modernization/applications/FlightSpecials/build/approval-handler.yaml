@@ -1,0 +1,49 @@
+version: 0.2
+env:
+  shell: bash
+  git-credential-helper: yes
+  variables:
+    REGION: "ap-northeast-2"
+    ENVIRONMENT: test
+phases:
+  install:
+    commands:
+      - apt-get update
+      - apt-get install -y bc
+  pre_build:
+    commands:
+      - echo "Print awscli version"
+      - aws --version
+      - echo $CODEBUILD_SRC_DIR
+      - ls -al $CODEBUILD_SRC_DIR
+      - env
+  build:
+    commands:
+      - |
+        # Read some gate conditions here.
+        # export NVS=$(cat nvs.txt) && echo "NVS: $NVS"
+      - |
+        # Set CodePipeline manual approval status to "Approved" if the approval is not required.
+        # This is to avoid the pipeline to be stuck at the approval stage.
+        if [ "${AUTO_APPROVE_BY_NVS}" == "true" ]; then
+            echo "### Setting CodePipeline approval status to Approved ###"
+            # CodePipeline Name: Predefined ${CODEBUILD_INITIATOR} or ${PIPELINE_NAME}
+            # Stage Name: ${STAGE_NAME}
+            # Action Name: ${ACTION_NAME}
+  
+            TOKEN=$(aws codepipeline get-pipeline-state --name ${PIPELINE_NAME} --query "stageStates[?stageName=='${STAGE_NAME}'].actionStates[*].latestExecution.token" --output text) && echo $TOKEN
+            # Wait while the TOKEN is empty.
+            while [ -z "$TOKEN" ]; do
+                echo "### Waiting for the TOKEN to be available... ###"
+                sleep 5
+                TOKEN=$(aws codepipeline get-pipeline-state --name ${PIPELINE_NAME} --query "stageStates[?stageName=='${STAGE_NAME}'].actionStates[*].latestExecution.token" --output text) && echo $TOKEN
+            done
+            aws codepipeline put-approval-result --pipeline-name ${PIPELINE_NAME} --stage-name ${STAGE_NAME} --action-name ${ACTION_NAME} --token ${TOKEN} --result summary="NVS: ${NVS} < NVS_THRESHOLD (TODO)",status=Approved
+        fi
+      - echo "(approval-handler) Done." > output.txt
+  post_build:
+    commands:
+      - echo "(approval-handler) Post-building..."
+artifacts:
+  files:
+    - output.txt
