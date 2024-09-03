@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+{{/*apiVersion: argoproj.io/v1alpha1*/}}
+{{/*kind: Rollout*/}}
+metadata:
+  namespace: {{ .Values.namespace.name }}
+  name: {{ .Values.deployment.name }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Values.app.name }}
+    spec:
+      serviceAccountName: flightspecials-service-account
+      containers:
+        - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          name: {{ .Values.app.name }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.container.port }}
+              protocol: TCP
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "2048Mi"
+              cpu: "1000m"
+          env:
+            - name: PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  key: environment
+                  name: flightspecials-configmap
+            - name: JAVA_OPTIONS
+              value: "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}"
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  key: environment
+                  name: flightspecials-configmap
+            - name: DATABASE_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: database_endpoint
+                  name: flightspecials-configmap
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: database_port
+                  name: flightspecials-configmap
+            - name: DATABASE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  key: database_username
+                  name: flightspecials-configmap
+            - name: DB_DEFAULT_SCHEMA
+              value: travelbuddy
+            - name: CODEBUILD_BUILD_NUMBER
+              value: "{{ .Values.app.build_number }}"
+{{/*  strategy:*/}}
+{{/*    canary:*/}}
+{{/*      maxSurge: "50%"    # canary 배포로 생성할 pod의 비율*/}}
+{{/*      maxUnavailable: 0  # 업데이트 될 때 사용할 수 없는 pod의 최대 수*/}}
+{{/*      steps:*/}}
+{{/*        - setWeight: 20*/}}
+{{/*        - pause: {duration: 30s}*/}}
+{{/*        - setWeight: 40*/}}
+{{/*        - pause: {duration: 30s}*/}}
+{{/*        - setWeight: 60*/}}
+{{/*        - pause: {duration: 30s}*/}}
+{{/*        - setWeight: 80*/}}
+{{/*        - pause: {duration: 20s}*/}}
+{{/*  revisionHistoryLimit: 2*/}}

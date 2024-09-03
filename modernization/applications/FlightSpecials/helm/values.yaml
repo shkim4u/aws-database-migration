@@ -1,0 +1,28 @@
+namespace:
+  create: false
+  name: flightspecials
+app:
+  name: flightspecials
+  build_number: 0
+deployment:
+  name: flightspecials
+  replicas: 2
+image:
+  repository: ${ECR_REPO_URI}
+  tag: ${IMAGE_TAG}
+container:
+  port: 8080
+service:
+  name: flightspecials-service
+  type: NodePort
+  port: 80
+ingress:
+  enabled: true
+  name: flightspecials-ingress
+  certificate_arn: ${CERTIFICATE_ARN}
+configmap:
+  name: flightspecials-configmap
+  environment: test
+  database_endpoint: ${DATABASE_ENDPOINT}
+  database_port: ${DATABASE_PORT}
+  database_username: ${DATABASE_USERNAME}

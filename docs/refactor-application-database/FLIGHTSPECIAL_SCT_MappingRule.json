@@ -1,0 +1,136 @@
+{
+  "rules": [
+    {
+      "rule-type": "transformation",
+      "rule-id": "2",
+      "rule-name": "SchemaLower",
+      "rule-action": "convert-lowercase",
+      "rule-target": "schema",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "5",
+      "rule-name": "TableLower",
+      "rule-action": "convert-lowercase",
+      "rule-target": "table",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "6",
+      "rule-name": "IdLower",
+      "rule-action": "convert-lowercase",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "ID"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "7",
+      "rule-name": "HeaderLower",
+      "rule-action": "convert-lowercase",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "HEADER"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "8",
+      "rule-name": "BodyLower",
+      "rule-action": "convert-lowercase",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "BODY"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "9",
+      "rule-name": "OriginLower",
+      "rule-action": "convert-lowercase",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "ORIGIN"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "10",
+      "rule-name": "OriginCodeRename",
+      "rule-action": "rename",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "ORIGINCODE"
+      },
+      "value": "origin_code"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "11",
+      "rule-name": "DestinationLower",
+      "rule-action": "convert-lowercase",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "DESTINATION"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "12",
+      "rule-name": "DestinationCodeRename",
+      "rule-action": "rename",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "DESTINATIONCODE"
+      },
+      "value": "destination_code"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "13",
+      "rule-name": "CostLower",
+      "rule-action": "convert-lowercase",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "COST"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "14",
+      "rule-name": "ExpiryDateRename",
+      "rule-action": "rename",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "EXPIRYDATE"
+      },
+      "value": "expiry_date"
+    }
+  ]
+}

@@ -2,11 +2,11 @@
 
 ## **Agenda**
 1. 개요
-2. ```Amazon EKS``` 클러스터에 배포
+2. ```HotelSpecials``` 서비스 ```Amazon EKS``` 클러스터에 배포
    1. ```GitOps``` 리포지터리 (```Helm```) 설정
    2. ```GitOps``` 배포 설정 (```ArgoCD```)
-   3. 소스 리포지터리 클론 및 빌드 파이프라인 실행
-   4. GitOps 리포지터리 클론 및 배포
+   3. ```HotelSpecials``` 서비스 빌드
+   4. ```HotelSpecials``` 서비스 배포 확인
 
 ---
 
@@ -19,7 +19,7 @@
 
 ---
 
-## **2. ```Amazon EKS``` 클러스터에 배포**
+## **2. ```HotelSpecials``` 서비스 ```Amazon EKS``` 클러스터에 배포**
 우리의 주된 관심사가 데이터베이스 마이그레이션이므로 ```쿠버테네트``` 및 ```GitOps``` 배포 체계에 대해서 시간을 들여 알아보지는 않고 아래 읽을거리만을 간단하게 참고로 달아두었으니 관심있으신 분들은 읽어보셔도 좋을 것 같습니다.<br>
 
 > 📕 **참고 문서**<br>
@@ -103,38 +103,45 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
    echo $HELM_CODECOMMIT_URL
    ```
 
-![ArgoCD Repository Connect](../../images/argocd-repository-information-riches-01.png)
-![ArgoCD Repository Connect](../../images/argocd-repository-information-riches-success.png)
+    ![ArgoCD Repository Connect](../../images/argocd-repository-information-riches-01.png)
 
-- ```Application``` 텝에서 ```NewApp```버튼을 클릭합니다. ```Application Name```에는 ```hotelspecials```를, Project는 ```default```를 입력합니다. ```Sync Policy```에는 "Manual"을, ```Repository URL```에는 앞서 설정한 배포 리포지터리를, ```PATH```에는 ```.```을 각각 입력합니다. ```Destination``` 섹션의 Cluster URL에는 ```https://kubernetes.default.svc```, ```Namespace```에는 ```hotelspecials```를 입력하고 상단의 Create를 클릭합니다.<br>
+    ![ArgoCD Repository Connect](../../images/argocd-repository-information-riches-success.png)
+
+- ```Application``` 텝에서 ```NewApp```버튼을 클릭하고 아래 정보를 ```애플리케이션``` 하나를 생성합니다. 이는 ```ArgoCD```가 배포를 관리하는 애플리케이션 하나를 등록하는 의미입니다.
+
+    * **Application Name**: ```hotelspecials```
+    * **Project**: ```default```
+    * **Sync Policy**: ```Manual```
+    * **Repository URL**: ```앞서 설정한 배포 리포지터리```
+    * **PATH**: ```.```
+    * **Destination 섹션 > Cluster URL**: ```https://kubernetes.default.svc```
+    * **Destination 섹션 > Namespace**: ```hotelspecials```를 입력하고 상단의 Create를 클릭합니다.
 
    ![ArgoCD HotelSpecials App](../../images/argocd-app-hotelspecials.png)
 
-> (참고)<br>
-> Application 생성 시 화면 하단에 Helm Setting 값들이 정상적으로 표시되는지 확인합니다.
+    > (참고)<br>
+    > Application 생성 시 화면 하단에 Helm Setting 값들이 정상적으로 표시되는지 확인합니다.
 
-### **2.3. 소스 리포지터리 클론 및 빌드 파이프라인 실행**
+### **2.3. ```HotelSpecials``` 서비스 빌드**
 
 1. ```Cloud9```에서 ```HotelSpecials``` 서비스가 사용하는 데이터베이스를 ```오라클``` -> ```MySQL```로 변경합니다.
 
     * 40번째 줄 근처에 주석처리된 ```MySQL``` 드라이버 사용 구문을 주석 해제합니다. (사용)
     * 그 다음 줄에 ```Oracle``` 드라이버 사용 구문을 주석 처리합니다. (미사용)
-    * 51번째 줄의 ```select 1 from dual``` 쿼리를 ```select 1```로 변경합니다.
+    * 50번째 줄의 ```select 1 from dual``` 쿼리를 ```select 1```로 변경합니다.
+    * 60, 61번째 줄 각각 주석 처리 토글: ```Hibernate```의 ```Oracle``` Dialect 주석 처리, ```MySQL``` Dialect 주석 해제.
 
     ```bash
     cd ~/environment/aws-database-migration/legacy/applications/TravelBuddy/build
     c9 open src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml
     ```
 
-    ![HotelSpecials 서비스 데이터베이스 변경](../../images/hotelspecials-database-change.png)
+    ![HotelSpecials 서비스 데이터베이스 변경](../../images/hotelspecials-database-change-new.png)
 
-2. ```Cloud9``` 상에서 ```HotelSpecials``` 서비스의 소스 코드를 클론하고 빌드 파이프라인을 실행합니다.
+
+2. ```Cloud9``` 상에서 ```HotelSpecials``` 서비스의 소스 코드를 푸시하고 빌드 파이프라인을 실행합니다.
 
     ```bash
-    # 0. Git 초기화
-    cd ~/environment/aws-database-migration
-    rm -rf .git
-    
     # 1. 어플리케이션 소스 경로로 이동
     cd ~/environment/aws-database-migration/legacy/applications/TravelBuddy/build/
     
@@ -165,7 +172,7 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
 
    ![HotelSpecials 빌드 파이프라인 실패](../../images/hotelspecials-codepipeline-initial-run-failed.png)
 
-### **2.4. GitOps 리포지터리 클론 및 배포**
+### **2.4. ```HotelSpecials``` 서비스 배포 확인**
 위의 과정이 정상적으로 수행되면 ```ArgoCD```에서 ```hotelspecials``` 애플리케이션에 대한 배포가 자동으로 수행됩니다.
 
 ![HotelSpecials GitOps 배포](../../images/hotelspecials-argocd-deployed.png)

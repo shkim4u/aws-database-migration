@@ -1,0 +1,144 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.4' apply false
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE' apply false
+    id 'java'
+}
+
+group = 'com.amazon.proserve'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+allprojects {
+    configurations {
+        implementation {
+            exclude group: 'org.slf4j', module: 'slf4j-simple'
+            all*.exclude group: 'org.springframework.boot', module : 'spring-boot-starter-logging'
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    bootJar.enabled = false
+    jar.enabled = true
+
+    group = 'com.amazon.proserve'
+    version = '0.0.1-SNAPSHOT'
+    sourceCompatibility = '11'
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
+        testImplementation group: 'org.spockframework', name: 'spock-spring', version: '2.0-groovy-3.0'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+project(':domain') {
+    dependencies {
+        // NOTHING
+    }
+}
+
+project(':application') {
+    dependencies {
+        implementation project(':domain')
+    }
+}
+
+project(':infrastructure') {
+    ext {
+        CODEBUILD_BUILD_NUMBER = "0"
+        set ('CODEBUILD_BUILD_NUMBER', System.getenv("CODEBUILD_BUILD_NUMBER") ?: "0")
+    }
+
+    dependencies {
+        implementation project(':domain')
+        implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+        implementation 'org.postgresql:postgresql'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.kafka:spring-kafka'
+        testImplementation 'org.springframework.kafka:spring-kafka-test'
+        testImplementation "org.junit.jupiter:junit-jupiter:5.8.1"
+        testImplementation "org.testcontainers:testcontainers:1.16.3"
+        testImplementation "org.testcontainers:junit-jupiter:1.16.3"
+        testImplementation "org.testcontainers:postgresql:1.16.3"
+
+        // https://mvnrepository.com/artifact/org.gradle/api
+//        implementation group: 'org.gradle', name: 'api', version: '1.0'
+        implementation gradleApi()
+    }
+}
+
+project(':interface') {
+    bootJar.enabled = true
+    bootJar.archiveFileName = "flightspecials.jar"
+    jar.enabled = false
+
+    ext {
+        // Dependency management for Spring Cloud AWS.
+        springCloudAwsVersion = '2.4.2'
+        springCloudVersion = '2021.0.3'
+
+        // [2021-12-29] log4j2 security issue hot fix (2.17.0 -> 2.17.1)
+        set ('log4j2.version', '2.17.1')
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}"
+            //OpenFeign, https://spring.io/projects/spring-cloud 의 Release Train 참고 하여 spring boot 버전에 맞는 버전 사용
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    dependencies {
+        implementation project(':application')
+        implementation project(':infrastructure')
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.kafka:spring-kafka'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+
+        implementation 'org.springframework.boot:spring-boot-starter-log4j2' // log4j2
+
+        implementation platform('software.amazon.awssdk:bom:2.16.64')
+
+        /*
+        * [2023-06-10] Fixing not assuming IRSA role.
+        * - https://github.com/external-secrets/kubernetes-external-secrets/issues/452
+         */
+        implementation 'com.amazonaws:aws-java-sdk-sts:1.12.484'
+
+        // Spring Cloud AWS.
+        implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store-config'
+        implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config'
+        // https://mvnrepository.com/artifact/com.amazonaws.secretsmanager/aws-secretsmanager-jdbc
+        implementation group: 'com.amazonaws.secretsmanager', name: 'aws-secretsmanager-jdbc', version: '1.0.12'
+        implementation group: 'com.amazonaws.secretsmanager', name: 'aws-secretsmanager-caching-java', version: '1.0.2'
+
+        // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
+        implementation group: 'org.flywaydb', name: 'flyway-core', version: '7.15.0'
+    }
+}

@@ -13,7 +13,7 @@
 
 이제 본격적으로 ```TravelBuddy``` 시스템을 클라우드로 전환하는 작업을 시작합니다.
 
-우선 ```HotelSpecials``` 데이터베이스의 스키마를 전환하는 작업을 수행합니다. 실제 데이터는 해당 ```HotelSpecials``` 서비스가 클라우드로 전화되기 직적에 옮겨질 예정이므로 여기서는 스키마만을 전환하도록 하겠습니다.
+우선 ```HotelSpecials``` 데이터베이스의 스키마를 전환하는 작업을 수행합니다. 실제 데이터는 해당 ```HotelSpecials``` 서비스가 클라우드로 전화되기 직전에 옮겨질 예정이므로 여기서는 스키마만을 전환하도록 하겠습니다.
 
 전환 작업은 ```Oracle``` 소스에서 ```Amazon Aurora MySQL``` 타겟으로 진행합니다.
 
@@ -80,13 +80,14 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
 다음 단계는 설치된 ```스키마 변환 도구 (AWS Schema Conversion Tool)```를 사용하여 데이터베이스 마이그레이션 프로젝트를 생성하는 것입니다.
 
-```Amazon Aurora MySQL```을 타겟으로 하는 프로젝트를 생성하기 위해서는 우선 ```MySQL JDBC 드라이버```를 설정합니다. 다음 단계를 따라 진행하세요.
+(Optional) ```Amazon Aurora MySQL```을 타겟으로 하는 프로젝트를 생성하기 위해서는 우선 ```MySQL JDBC 드라이버```를 설정합니다. 다음 단계를 따라 진행하세요.
 
-1. ```AWS SCT```를 실행한 후 ```Settings > Global Settings```를 선택합니다.
+1. (Optional) ```AWS SCT```를 실행한 후 ```Settings > Global Settings```를 선택합니다.
 
    ![SCT Global Settings](../../images/SCT-global-settings.png)
 
-2. ```MySQL JDBC 드라이버```를 아래 그림과 같이 설정해 줍니다.
+2. (Optional) ```MySQL JDBC 드라이버```를 아래 그림과 같이 설정해 줍니다.
+   * ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\mysql-connector-j-8.3.0.jar```
 
    ![SCT MySQL JDBC 드라이버 설정](../../images/SCT-mysql-jdbc-driver.png)
 
@@ -172,7 +173,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    > 📕 **참고**<br>
    > ```다음```을 누르고 메타데이터를 로드한 후 다음과 같은 경고 메시지가 나타날 수 있습니다. **Metadata loading was interrupted because of data fetching issues.** 이 메시지는 워크샵 진행에 영향을 주지 않으므로 무시해도 됩니다. ```SCT```가 데이터베이스 개체를 분석하는 데 몇 분 정도 걸립니다.
 
-6. ```데이터베이스 마이그레이션 평가 보고서```의 요약 페이지를 검토한 다음 ```Amazon Aurora PostgreSQL``` 변환 섹션까지 아래로 스크롤합니다 (오른쪽 스크롤 막대의 중간 조금 아래에 있습니다).
+6. ```데이터베이스 마이그레이션 평가 보고서```의 요약 페이지를 검토한 다음 ```Amazon Aurora MySQL``` 변환 섹션까지 아래로 스크롤합니다 (오른쪽 스크롤 막대의 중간 조금 아래에 있습니다).
 
    ![SCT 오라클 TravelBuddy 평가 보고서](../../images/SCT-oracle-travelbuddy-assessment-report.png)
 
@@ -199,31 +200,38 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 | **Amazon Aurora 드라이버 경로**   | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\postgresql-42.7.3.jar``` |
 
    * 아래와 같이 접속이 실패합니다. 진행자의 안내를 받아 필요한 설정을 수행하고 다시 시도해 보세요.
-     * 타겟 환경의 ```DmsVPC```와 ```워크로드 VPC (M2M-VPC)``` 간의 라우팅 테이블 - 각 VPC에 ```10.16.0.0/12``` 주소 대역을 ```Transit Gateway```로 라우팅하는 라우팅 테이블이 있는지 확인합니다.
-     * ```Amazon Aurora MySQL```의 보안 그룹 설정 - ```Inbound``` 규칙에 ```10.16.0.0/12``` 대역을 허용하는 규칙이 있는지 확인합니다.
-     * 또한 ```MySQL Workbench```를 통해 ```AWS SCT``` 및 ```AWS DMS``` 작업에 사용할 사용자를 생성하고 필요한 권한을 할당해 줄 필요도 있습니다.
- 
-         ```sql
-         CREATE USER 'dmsuser' IDENTIFIED BY 'dmsuser123';
-         GRANT CREATE ON *.* TO 'dmsuser';
-         GRANT ALTER ON *.* TO 'dmsuser';
-         GRANT DROP ON *.* TO 'dmsuser';
-         GRANT INDEX ON *.* TO 'dmsuser';
-         GRANT REFERENCES ON *.* TO 'dmsuser';
-         GRANT SELECT ON *.* TO 'dmsuser';
-         GRANT CREATE VIEW ON *.* TO 'dmsuser';
-         GRANT SHOW VIEW ON *.* TO 'dmsuser';
-         GRANT TRIGGER ON *.* TO 'dmsuser';
-         GRANT CREATE ROUTINE ON *.* TO 'dmsuser';
-         GRANT ALTER ROUTINE ON *.* TO 'dmsuser';
-         GRANT EXECUTE ON *.* TO 'dmsuser';
-         GRANT CREATE TEMPORARY TABLES ON *.* TO 'dmsuser';
-         GRANT AWS_LAMBDA_ACCESS TO 'dmsuser';
-         GRANT INSERT, UPDATE ON AWS_ORACLE_EXT.* TO 'dmsuser';
-         GRANT INSERT, UPDATE, DELETE ON AWS_ORACLE_EXT_DATA.* TO 'dmsuser';
-         ```
+   
+   ![SCT MySQL TravelBuddy 타겟 연결 실패](../../images/SCT-travelbuddy-mysql-connect-fail.png)
 
-         ![MySQL Workbench로 MySQL 사용자 생성 및 권한 부여](../../images/mysql-workbench-create-sct-dms-user.png)
+  * 타겟 환경의 ```DmsVPC```와 ```워크로드 VPC (M2M-VPC)``` 간의 라우팅 테이블 - 각 VPC에 ```10.16.0.0/12``` 주소 대역을 ```Transit Gateway```로 라우팅하는 라우팅 테이블이 있는지 확인합니다.
+  * ```Amazon Aurora MySQL```의 보안 그룹 설정 - ```Inbound``` 규칙에 ```10.16.0.0/12``` 대역을 허용하는 규칙이 있는지 확인합니다.
+  * 또한 ```MySQL Workbench```를 통해 ```AWS SCT``` 및 ```AWS DMS``` 작업에 사용할 사용자를 생성하고 필요한 권한을 할당해 줄 필요도 있습니다. (진행자의 안내를 받아 ```AWS SecretsManager```에 저장된 비밀번호를 확인하고 접속하십시요)
+ 
+      ```sql
+      CREATE USER 'dmsuser' IDENTIFIED BY 'dmsuser123';
+      GRANT CREATE ON *.* TO 'dmsuser';
+      GRANT ALTER ON *.* TO 'dmsuser';
+      GRANT DROP ON *.* TO 'dmsuser';
+      GRANT INDEX ON *.* TO 'dmsuser';
+      GRANT INSERT ON *.* to 'dmsuser';
+      GRANT UPDATE ON *.* to 'dmsuser';
+      GRANT DELETE ON *.* to 'dmsuser';
+      GRANT REFERENCES ON *.* TO 'dmsuser';
+      GRANT SELECT ON *.* TO 'dmsuser';
+      GRANT CREATE VIEW ON *.* TO 'dmsuser';
+      GRANT SHOW VIEW ON *.* TO 'dmsuser';
+      GRANT TRIGGER ON *.* TO 'dmsuser';
+      GRANT CREATE ROUTINE ON *.* TO 'dmsuser';
+      GRANT ALTER ROUTINE ON *.* TO 'dmsuser';
+      GRANT EXECUTE ON *.* TO 'dmsuser';
+      GRANT CREATE TEMPORARY TABLES ON *.* TO 'dmsuser';
+      GRANT AWS_LAMBDA_ACCESS TO 'dmsuser';
+      GRANT INSERT, UPDATE ON AWS_ORACLE_EXT.* TO 'dmsuser';
+      GRANT INSERT, UPDATE, DELETE ON AWS_ORACLE_EXT_DATA.* TO 'dmsuser';
+      GRANT ALL PRIVILEGES ON awsdms_control.* TO 'dmsuser';
+      ```
+
+      ![MySQL Workbench로 MySQL 사용자 생성 및 권한 부여](../../images/mysql-workbench-create-sct-dms-user.png)
 
 
    ![SCT MySQL TravelBuddy 타겟 연결 실패](../../images/SCT-travelbuddy-mysql-connect-fail-dmsuser.png)
@@ -312,3 +320,9 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 이제 다음 단계로 진행하여 ```MySQL```을 사용하는 애플리케이션 증 ```HotelSpecials``` 기능을 클라우드로 이전해 보도록 하겠습니다. 
 
 ---
+
+## **References**
+* [Oracle Sequences and Identity Columns and MySQL Sequences and AUTO INCREMENT Columns](
+https://docs.aws.amazon.com/dms/latest/oracle-to-aurora-mysql-migration-playbook/chap-oracle-aurora-mysql.sql.identity.html)
+
+* [Oracle 데이터베이스를 Amazon Aurora로 마이그레이션 하기](https://aws.amazon.com/ko/blogs/korea/how-to-migrate-your-oracle-database-to-amazon-aurora/)
