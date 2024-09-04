@@ -1,7 +1,12 @@
 # ***```FlightSpecials``` 서비스 마이그레이션***
 
 ## **어젠다**
-
+1. 개요
+2. ```FlightSpecials``` 서비스 ```Amazon EKS``` 클러스터에 배포
+   1. ```GitOps``` 리포지터리 (```Helm```) 설정
+   2. ```GitOps``` 배포 설정 (```ArgoCD```)
+   3. ```FlightSpecials``` 서비스 빌드
+   4. ```FlightSpecials``` 서비스 배포 확인
 
 ---
 
@@ -171,3 +176,6 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
 > 우리가 아직 데이터 마이그레이션을 수행하지 않았으므로 데이터베이스에 데이터가 없기 때문입니다.
 
 ---
+
+## **3. 추가 사항**
+TODO: Flyway

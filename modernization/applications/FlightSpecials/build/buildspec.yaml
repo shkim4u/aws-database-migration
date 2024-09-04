@@ -5,8 +5,9 @@ env:
   variables:
     REGION: "ap-northeast-2"
     ENVIRONMENT: test
-#    // Not needed any more because this script will modified the deploy manifest directly.
-#    IMAGE_TAG_KEY: "/application/flightspecial/container/image/main/tag"
+  exported-variables:
+    - IMAGE_TAG
+    - COMMIT_ID
 phases:
   install:
     # runtime-versions:
@@ -21,6 +22,7 @@ phases:
       - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output=text) && echo $AWS_ACCOUNT_ID
       - echo "### SRC_VERISON-> ${CODEBUILD_RESOLVED_SOURCE_VERSION} | Logging-in to ECR"
       - docker login --username AWS -p $(aws ecr get-login-password --region ${REGION}) ${ECR_REPO_URI}
+      - export COMMIT_ID="${CODEBUILD_RESOLVED_SOURCE_VERSION}"
       #     Mix with one alphabet "t" to avoid floating type conversion in helm operation.
       - export TAG="t${CODEBUILD_RESOLVED_SOURCE_VERSION}"
       - export TAG=$(echo $TAG | sed -e "s/\.//g" | tr '[:upper:]' '[:lower:]')

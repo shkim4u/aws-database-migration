@@ -47,6 +47,22 @@
     {
       "rule-type": "transformation",
       "rule-id": "5",
+      "rule-name": "IdChangeDataType",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL",
+        "column-name": "ID"
+      },
+      "rule-action": "change-data-type",
+      "data-type": {
+        "type": "int8"
+      },
+      "expression": "CAST(ID AS bigint)"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "6",
       "rule-name": "HeaderLower",
       "rule-action": "convert-lowercase",
       "rule-target": "column",
@@ -58,7 +74,7 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "6",
+      "rule-id": "7",
       "rule-name": "BodyLower",
       "rule-action": "convert-lowercase",
       "rule-target": "column",
@@ -70,7 +86,7 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "7",
+      "rule-id": "8",
       "rule-name": "OriginLower",
       "rule-action": "convert-lowercase",
       "rule-target": "column",
@@ -82,7 +98,7 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "8",
+      "rule-id": "9",
       "rule-name": "OriginCodeRename",
       "rule-action": "rename",
       "rule-target": "column",
@@ -95,7 +111,7 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "9",
+      "rule-id": "10",
       "rule-name": "DestinationLower",
       "rule-action": "convert-lowercase",
       "rule-target": "column",
@@ -107,7 +123,7 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "10",
+      "rule-id": "11",
       "rule-name": "DestinationCodeRename",
       "rule-action": "rename",
       "rule-target": "column",
@@ -120,7 +136,7 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "11",
+      "rule-id": "12",
       "rule-name": "CostLower",
       "rule-action": "convert-lowercase",
       "rule-target": "column",
@@ -132,16 +148,34 @@
     },
     {
       "rule-type": "transformation",
-      "rule-id": "12",
+      "rule-id": "13",
       "rule-name": "ExpiryDateRename",
-      "rule-action": "rename",
+      "rule-action": "remove-column",
       "rule-target": "column",
       "object-locator": {
         "schema-name": "TRAVELBUDDY",
         "table-name": "FLIGHTSPECIAL",
         "column-name": "EXPIRYDATE"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "14",
+      "rule-name": "458497515",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "TRAVELBUDDY",
+        "table-name": "FLIGHTSPECIAL"
       },
-      "value": "expiry_date"
+      "rule-action": "add-column",
+      "value": "expiry_date_num",
+      "old-value": null,
+      "data-type": {
+        "type": "numeric",
+        "precision": "38",
+        "scale": "10"
+      },
+      "expression": "$EXPIRYDATE"
     }
   ]
 }

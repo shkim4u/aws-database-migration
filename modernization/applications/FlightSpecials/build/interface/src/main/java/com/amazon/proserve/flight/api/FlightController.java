@@ -15,18 +15,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/travelbuddy/flightspecials")
+@RequestMapping(value = "/travelbuddy")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class FlightController {
         private final GetFlightSpecialUseCase getFlightSpecialUseCase;
         private final ChangeFlightNameUseCase changeFlightNameUseCase;
 
-        @GetMapping({ "/" })
+        @GetMapping({ "/flightspecials" })
         public List<FlightSpecialView> getFlightSpecial() {
                 return getFlightSpecialUseCase.getFlightSpecial();
         }
 
-        @PostMapping(value = "/{prfId}/name", produces = "application/json")
+        @PostMapping(value = "/flightspecials/{prfId}/name", produces = "application/json")
         public ResponseEntity<ApiResult<String>> changeFlightName(@PathVariable(name = "prfId") String profileId,
                         @RequestBody ChangeFlightNameRequest request) {
                 ChangeFlightNameCommand command = ChangeFlightNameCommand.of(request.getFlightNo(),

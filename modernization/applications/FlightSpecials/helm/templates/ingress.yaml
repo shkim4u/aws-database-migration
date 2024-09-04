@@ -21,7 +21,7 @@ metadata:
     alb.ingress.kubernetes.io/healthcheck-path: "/travelbuddy/flightspecials"
     alb.ingress.kubernetes.io/healthcheck-interval-seconds: '30'
     alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '10'
-    alb.ingress.kubernetes.io/success-codes: 200,201,302,401
+    alb.ingress.kubernetes.io/success-codes: 200,201,302,401,404
     alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=86400
 spec:
   rules:

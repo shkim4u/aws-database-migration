@@ -340,6 +340,7 @@ create table if not exists travelbuddy.flightspecial
     destination_code                varchar(6),
     cost                            int4,
     expiry_date                     TIMESTAMP,
+    expiry_date_number              numeric(38,10)  -- 소스의 NUMBER(38,10) 데이터 타입
     primary key (id)
 );
 ```
