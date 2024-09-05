@@ -84,7 +84,7 @@
 
 ### 4. 타겟 -> 소스 통신을 위한 라우팅 테이블 구성
 
-1. ```VPC > Transit Gateway > Transit Gateway 라우팅 테이블```로 이동하여 위에서 생성한 Transit Gateway `DMS-TGW`의 기본 경로 테이블이 선택되어 있는지 확인한 다음 하단 창에서 ```경로 (Routes)``` 탭을 선택합니다.
+1. ```VPC > Transit Gateway > Transit Gateway 라우팅 테이블```로 이동하여 위에서 생성한 Transit Gateway `DMS-TGW`의 기본 경로 테이블을 선택한 다음 하단 창에서 ```경로 (Routes)``` 탭을 선택합니다.
 
    ![Transit Gateway 라우팅 테이블](../../images/transit-gateway-route-tables.png)
 
@@ -187,7 +187,7 @@
 
 ### 2. VPN 장비 (가상 Bastion 호스트) 구성
 
-비록 우리는 온프레미스 소스 환경을 시뮬레이션하기 위하여 자원을 AWS 클라우드에 생성하였지만, 이를 타겟 환경과 연결하기 위하여 개발형 스펙은 IPSec VPN을 사용한다고 말씀드렸습니다.
+비록 우리는 온프레미스 소스 환경을 시뮬레이션하기 위하여 자원을 AWS 클라우드에 생성하였지만, 이를 타겟 환경과 연결하기 위하여 개방형 스펙인 IPSec VPN을 사용한다고 말씀드렸습니다.
 
 이를 위해 필요한 설정을 다음과 같이 수행합니다.
 
