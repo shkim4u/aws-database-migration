@@ -144,7 +144,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    * 소스 측에서 위 작업을 완료하면 타겟 측의 ```AWS SCT```로 돌아와 다음과 같이 값을 다시 설정하고 연결 테스트를 수행합니다.
 
    | **파라미터**                    | **값**                                                              |
-      |-----------------------------|--------------------------------------------------------------------|
+   |-----------------------------|--------------------------------------------------------------------|
    | **연결 이름 (Connection name)** | ```TravelBuddy Oracle Source```                                    |
    | **타입**                      | ```SID```                                                          |
    | **서버 이름**                   | ```소스 환경의 CloudFormation의 출력 탭에서 확인 AppServer Private IP 확인```     |
@@ -203,7 +203,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    * 타겟 환경의 ```DmsVPC```와 ```워크로드 VPC (M2M-VPC)``` 간의 라우팅 테이블 - 각 VPC에 ```10.16.0.0/12``` 주소 대역을 ```Transit Gateway```로 라우팅하는 라우팅 테이블이 있는지 확인합니다.
    * ```Amazon RDS PostgreSQL```의 보안 그룹 설정 - ```Inbound``` 규칙에 ```10.16.0.0/12``` 대역을 허용하는 규칙이 있는지 확인합니다.
-   * 또한 ```pgAdmin4```를 통해 ```AWS SCT``` 및 ```AWS DMS``` 작업에 사용할 ```postgres``` 데이터베이스 유저의 암호를 확인하여 입력해 줍니다. (진행자의 안내를 받아 ```AWS SecretsManager```에 저장된 비밀번호를 확인하고 접속하십시요)
+   * 또한 ```pgAdmin4```를 통해 ```AWS SCT``` 및 ```AWS DMS``` 작업에 사용할 ```PostgreSQL``` 데이터베이스 유저를 생성하고 (`dmsuser`) 암호를 확인하여 입력해 줍니다. (진행자의 안내를 받아 ```AWS SecretsManager```에 저장된 비밀번호를 확인하고 접속하십시요)
 
        ```sql
        CREATE ROLE dmsuser LOGIN PASSWORD 'dmsuser123';
@@ -238,11 +238,11 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
 [//]: # (![SCT PostgreSQL TravelBuddy 타겟 연결 실패]&#40;../../images/SCT-travelbuddy-mysql-connect-fail-dmsuser.png&#41;)
 
-![SCT PostgreSQL 타겟 연결 성공](../../images/SCT-travelbuddy-postgresql-connect-success-dmsuser.png)
+   ![SCT PostgreSQL 타겟 연결 성공](../../images/SCT-travelbuddy-postgresql-connect-success-dmsuser.png)
 
 
-> 📕 **참고**<br>
-> ```다음```을 누르고 메타데이터를 로드한 후 다음과 같은 경고 메시지가 나타날 수 있습니다. **Metadata loading was interrupted because of data fetching issues.** 이 메시지는 워크샵 진행에 영향을 주지 않으므로 무시해도 됩니다. ```SCT```가 데이터베이스 개체를 분석하는 데 몇 분 정도 걸립니다.
+   > 📕 **참고**<br>
+   > ```다음```을 누르고 메타데이터를 로드한 후 다음과 같은 경고 메시지가 나타날 수 있습니다. **Metadata loading was interrupted because of data fetching issues.** 이 메시지는 워크샵 진행에 영향을 주지 않으므로 무시해도 됩니다. ```SCT```가 데이터베이스 개체를 분석하는 데 몇 분 정도 걸립니다.
 
 ---
 
@@ -278,22 +278,209 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    ![SCT TravelBuddy 스키마 변환 Mapping View 2](../../images/sct-travelbuddy-schema-mapping-new-rule-add.png)
 
-6. 아래와 같이 스키마 이름을 ```m2m```으로 변경하는 매핑 규칙을 추가합니다.
-    * **Name** : ```RenameSchema```
-    * **For**: ```schema```
-    * **where schema name like**: ```TRAVELBUDDY```
-    * **Actions**: ```rename to``` ```m2m```
-    * ```Save > Close``` 버튼 클릭
+   * 진행자의 안내를 받아 아래 `JSON` 형식의 매핑 규칙을 윈도우 인스턴스 측에 파일로 저장한 후 `AWS SCT`에 업로드하여 적용합니다.
 
-   ![SCT TravelBuddy 스키마 변환 Mapping View 3](../../images/sct-travelbuddy-schema-mapping-new-rule-rename-schema.png)
+   ```json
+   {
+     "rules": [
+       {
+         "rule-type": "selection",
+         "rule-id": "1",
+         "rule-name": "SelectFlightspecial",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL"
+         },
+         "rule-action": "include",
+         "filters": []
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "2",
+         "rule-name": "SchemaLower",
+         "rule-action": "convert-lowercase",
+         "rule-target": "schema",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY"
+         }
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "3",
+         "rule-name": "TableLower",
+         "rule-action": "convert-lowercase",
+         "rule-target": "table",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL"
+         }
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "4",
+         "rule-name": "IdLower",
+         "rule-action": "convert-lowercase",
+         "rule-target": "column",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL",
+           "column-name": "ID"
+         }
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "5",
+         "rule-name": "HeaderLower",
+         "rule-action": "convert-lowercase",
+         "rule-target": "column",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL",
+           "column-name": "HEADER"
+         }
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "6",
+         "rule-name": "BodyLower",
+         "rule-action": "convert-lowercase",
+         "rule-target": "column",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL",
+           "column-name": "BODY"
+         }
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "7",
+         "rule-name": "OriginLower",
+         "rule-action": "convert-lowercase",
+         "rule-target": "column",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL",
+           "column-name": "ORIGIN"
+         }
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "8",
+         "rule-name": "OriginCodeRename",
+         "rule-action": "rename",
+         "rule-target": "column",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL",
+           "column-name": "ORIGINCODE"
+         },
+         "value": "origin_code"
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "9",
+         "rule-name": "DestinationLower",
+         "rule-action": "convert-lowercase",
+         "rule-target": "column",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL",
+           "column-name": "DESTINATION"
+         }
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "10",
+         "rule-name": "DestinationCodeRename",
+         "rule-action": "rename",
+         "rule-target": "column",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL",
+           "column-name": "DESTINATIONCODE"
+         },
+         "value": "destination_code"
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "11",
+         "rule-name": "CostLower",
+         "rule-action": "convert-lowercase",
+         "rule-target": "column",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL",
+           "column-name": "COST"
+         }
+       },
+       {
+         "rule-type": "transformation",
+         "rule-id": "12",
+         "rule-name": "ExpiryDateRename",
+         "rule-action": "rename",
+         "rule-target": "column",
+         "object-locator": {
+           "schema-name": "TRAVELBUDDY",
+           "table-name": "FLIGHTSPECIAL",
+           "column-name": "EXPIRYDATE"
+         },
+         "value": "expiry_date"
+       }
+     ]
+   }
+   ```
 
-7. ```보기 > Data Migration View (Standard DMS)```로 전환합니다.
+[//]: # (6. 아래와 같이 스키마 이름을 ```m2m```으로 변경하는 매핑 규칙을 추가합니다.)
+
+[//]: # (    * **Name** : ```RenameSchema```)
+
+[//]: # (    * **For**: ```schema```)
+
+[//]: # (    * **where schema name like**: ```TRAVELBUDDY```)
+
+[//]: # (    * **Actions**: ```rename to``` ```m2m```)
+
+[//]: # (    * ```Save > Close``` 버튼 클릭)
+
+[//]: # ()
+[//]: # (   ![SCT TravelBuddy 스키마 변환 Mapping View 3]&#40;../../images/sct-travelbuddy-schema-mapping-new-rule-rename-schema.png&#41;)
+
+6. ```보기 > Data Migration View (Standard DMS)```로 전환합니다.
 
    ![SCT TravelBuddy 스키마 변환 Data Migration View](../../images/sct-travelbuddy-schema-migration-view-for-flightspecials.png)
 
-8. 왼쪽 패널에서 ```TRAVELBUDDY``` 스키마를 오른쪽 버튼 클릭하고 ```스키마 변환 (Convert Schema)```를 클릭합니다.
+7. 왼쪽 패널에서 ```TRAVELBUDDY``` 스키마를 오른쪽 버튼 클릭하고 ```스키마 변환 (Convert Schema)```를 클릭합니다.
 
    ![SCT TravelBuddy 스키마 변환](../../images/sct-travelbuddy-schema-conversion-for-flightspecials.png)
+
+8. 스키마가 변환되어 오른쪽 타겟 쪽에서 표시되면 아래 그림과 같이 스키마 객체를 선택하고 소스와 타겟을 비교할 수 있게 됩니다.
+
+    ![SCT TravelBuddy FlightSpecial 테이블 소스 타겟 비교](../../images/sct-flightspecial-source-target-comparison.png)
+
+   * 타겟 쪽 테이블 정의에 아래 스크립트를 붙여넣고 `CTRL + S`를 눌러 저장합니다.
+
+   ```sql
+   create table if not exists travelbuddy.flightspecial
+   (
+       id                              int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY,
+       header                          varchar(255) not null,
+       body                            varchar(255),
+       origin                          varchar(255),
+       origin_code                     varchar(6),
+       destination                     varchar(255),
+       destination_code                varchar(6),
+       cost                            int4,
+       expiry_date                     TIMESTAMP WITH TIME ZONE,
+       expiry_date_num                 numeric(38,10),  -- 소스의 NUMBER(38,10) 데이터 타입
+       primary key (id)
+   );
+   ```
+
+   ![SCT TravelBuddy FlightSpecial 테이블 타겟 정의](../../images/sct-flightspecial-target-definition.png)
+
+9. 타겟 측에서 `flightspecial` 테이블 만을 선택한 후 `데이터베이스에 적용 (Apply to database)` 버튼을 누릅니다.
+
+   ![SCT TravelBuddy 스키마 변환 적용](../../images/sct-travelbuddy-flightspecial-schema-apply-to-database.png)
 
 9. "대상 데이터베이스에 개체가 이미 존재할 수 있습니다. 바꾸시겠습니까?"라는 대화 상자가 표시될 수 있습니다. **예**를 선택합니다.
 
@@ -301,47 +488,38 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    ![SCT TravelBuddy 스키마 변환 진행 완료](../../images/sct-travelbuddy-schema-conversion-done-for-flightspecials.png)
 
+10. ```TravelBuddy``` 데이터베이스 스키마 중 `FlighSpecials` 서비스가 사용하는 테이블 (`flightspecial`)을 오라클 소스에서 ```Amazon Aurora PostgreSQL``` 타겟으로 성공적으로 변환했습니다.
 
-10. 오른쪽 패널에서 ```m2m``` 스키마를 마우스 오른쪽 버튼으로 클릭하고 ```데이터베이스에 적용```을 클릭합니다. - (참고) 해당 메뉴가 비활성화 되어 있으면 ```Connect to the server```를 클릭하여 타겟 데이터베이스에 연결한 후 수행합니다.
+11. 마지막으로 `FlightSpecials` 서비스는 신규 서비스 기능을 위해 소스에는 없었던 몇몇 추가적인 테이블을 사용합닏다. 해당 테이블들을 `pgAdmin4`에서 생성해 줍니다.
 
-![SCT TravelBuddy 타겟 데이터베이스에 적용](../../images/sct-travelbuddy-apply-to-target-database-m2m.png)
+   ```sql
+   create sequence if not exists travelbuddy.hibernate_sequence start 1 increment 1;
+   create table if not exists travelbuddy.flight
+   (
+      flight_no                       int8 GENERATED ALWAYS AS IDENTITY,
+      profile_id                      varchar(255),
+      flight_name                     varchar(255) not null,
+      pushing_status_code             varchar(255) not null,
+      poping_step                     int4         not null,
+      register_id                     varchar(255) not null,
+      registration_date_time          TIMESTAMP    not null,
+      primary key (flight_no)
+      );
+   create table if not exists travelbuddy.flight_name_history
+   (
+      flight_name_history_no          int8 GENERATED ALWAYS AS IDENTITY,
+      flight_name                     varchar(255) not null,
+      flight_no                       int8         not null,
+      primary key (flight_name_history_no)
+      );
+   
+   alter table travelbuddy.flight_name_history
+      add constraint flight_name_history_fk_flight_no foreign key (flight_no) references travelbuddy.flight;
+   ```
 
-11. 스키마를 데이터베이스에 적용할지 묻는 메시지가 나타나면 예를 클릭합니다.
-
-![SCT TravelBuddy 스키마 적용 확인](../../images/sct-travelbuddy-apply-confirm-m2m.png)
-
-12. 이제 타겟 데이터베이스에 스키마가 적용되었습니다. 테이블, 뷰, 프로시저 등을 보려면 오른쪽 창에서 ```m2m``` 스키마를 확장하세요.
-
-![SCT TravelBuddy 스키마 적용 완료](../../images/sct-travelbuddy-apply-complete-m2m.png)
-
-13. ```PostgreSQL Workbench```를 사용하여 ```m2m``` 스키마를 확인합니다.
-
-    ![PostgreSQL Workbench로 m2m 스키마 확인](../../images/mysql-workbench-m2m-schema.png)
-
-```TravelBuddy``` 데이터베이스 스키마를 오라클 소스에서 ```Amazon Aurora PostgreSQL``` 타겟으로 성공적으로 변환했습니다.
+   ![FlightSpecials 서비스 추가 테이블 생성](../../images/flightspecials-create-additional-tables.png)
 
 이제 다음 단계로 진행하여 ```PostgreSQL```을 사용하는 애플리케이션 증 ```FlightSpecials``` 기능을 클라우드로 이전해 보도록 하겠습니다.
-
-
-
-
-```sql
-create table if not exists travelbuddy.flightspecial
-(
-    id                              int8 NOT NULL GENERATED BY DEFAULT AS IDENTITY,
-    header                          varchar(255) not null,
-    body                            varchar(255),
-    origin                          varchar(255),
-    origin_code                     varchar(6),
-    destination                     varchar(255),
-    destination_code                varchar(6),
-    cost                            int4,
-    expiry_date                     TIMESTAMP WITH TIME ZONE,
-    expiry_date_number              numeric(38,10)  -- 소스의 NUMBER(38,10) 데이터 타입
-    primary key (id)
-);
-```
-
 
 ---
 
