@@ -111,7 +111,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 4. 양식에 아래 값을 사용하여 소스 데이터베이스 구성을 지정합니다. 그런 다음 ```Test connection```을 클릭하세요. 연결 테스트가 성공적으로 완료되면 연결 성공 버튼에서 ```확인```을 클릭한 후 ```다음```을 클릭하세요.
 
    | **파라미터**                    | **값**                                                              |
-         |-----------------------------|--------------------------------------------------------------------|
+   |-----------------------------|--------------------------------------------------------------------|
    | **연결 이름 (Connection name)** | ```TravelBuddy Oracle Source```                                    |
    | **타입**                      | ```SID```                                                          |
    | **서버 이름**                   | ```소스 환경의 CloudFormation의 출력 탭에서 확인 AppServer Private IP 확인```     |
@@ -199,18 +199,18 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    * 아래와 같이 접속이 실패합니다. 진행자의 안내를 받아 필요한 설정을 수행하고 다시 시도해 보세요.
 
-![SCT PostgreSQL TravelBuddy 타겟 연결 실패](../../images/SCT-travelbuddy-postgresql-connect-fail.png)
+   ![SCT PostgreSQL TravelBuddy 타겟 연결 실패](../../images/SCT-travelbuddy-postgresql-connect-fail.png)
 
-* 타겟 환경의 ```DmsVPC```와 ```워크로드 VPC (M2M-VPC)``` 간의 라우팅 테이블 - 각 VPC에 ```10.16.0.0/12``` 주소 대역을 ```Transit Gateway```로 라우팅하는 라우팅 테이블이 있는지 확인합니다.
-* ```Amazon RDS PostgreSQL```의 보안 그룹 설정 - ```Inbound``` 규칙에 ```10.16.0.0/12``` 대역을 허용하는 규칙이 있는지 확인합니다.
-* 또한 ```pgAdmin4```를 통해 ```AWS SCT``` 및 ```AWS DMS``` 작업에 사용할 ```postgres``` 데이터베이스 유저의 암호를 확인하여 입력해 줍니다. (진행자의 안내를 받아 ```AWS SecretsManager```에 저장된 비밀번호를 확인하고 접속하십시요)
+   * 타겟 환경의 ```DmsVPC```와 ```워크로드 VPC (M2M-VPC)``` 간의 라우팅 테이블 - 각 VPC에 ```10.16.0.0/12``` 주소 대역을 ```Transit Gateway```로 라우팅하는 라우팅 테이블이 있는지 확인합니다.
+   * ```Amazon RDS PostgreSQL```의 보안 그룹 설정 - ```Inbound``` 규칙에 ```10.16.0.0/12``` 대역을 허용하는 규칙이 있는지 확인합니다.
+   * 또한 ```pgAdmin4```를 통해 ```AWS SCT``` 및 ```AWS DMS``` 작업에 사용할 ```postgres``` 데이터베이스 유저의 암호를 확인하여 입력해 줍니다. (진행자의 안내를 받아 ```AWS SecretsManager```에 저장된 비밀번호를 확인하고 접속하십시요)
 
-    ```sql
-    CREATE ROLE dmsuser LOGIN PASSWORD 'dmsuser123';
-    GRANT CREATE ON DATABASE dso TO dmsuser;
-    ALTER DATABASE dso SET SEARCH_PATH = "$user", public_synonyms, public;
-    GRANT rds_superuser TO dmsuser; -- 필요 시 제한적 사용
-    ```
+       ```sql
+       CREATE ROLE dmsuser LOGIN PASSWORD 'dmsuser123';
+       GRANT CREATE ON DATABASE dso TO dmsuser;
+       ALTER DATABASE dso SET SEARCH_PATH = "$user", public_synonyms, public;
+       GRANT rds_superuser TO dmsuser; -- 필요 시 제한적 사용
+       ```
 
 
 [//]: # ([Step 3: Configure Your PostgreSQL Target Database]&#40;https://docs.aws.amazon.com/dms/latest/sbs/chap-oracle2postgresql.steps.configurepostgresql.html&#41;)
