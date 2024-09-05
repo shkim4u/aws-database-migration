@@ -106,7 +106,7 @@
 
 ## **4. 요청 라우팅 테스트**
 
-이제 브라우저에서 ```Application Loadb Balancer```의 ```DNS 이름```을 사용하여 ```/travelbuddy/hotelspecials``` 경로와 (클라우드 타겟) ```/travelbuddy/flightspecials``` 경로 (온프레미스 소스) 모두 서비스그ㅏ 정상적으로 동작하는지 확인합니다.
+이제 브라우저에서 ```Application Load Balancer```의 ```DNS 이름```을 사용하여 ```/travelbuddy/hotelspecials``` 경로와 (클라우드 타겟) ```/travelbuddy/flightspecials``` 경로 (온프레미스 소스) 모두 서비스그ㅏ 정상적으로 동작하는지 확인합니다.
 
 1. ```Application Load Balancer```의 ```DNS 이름```을 복사합니다.
 

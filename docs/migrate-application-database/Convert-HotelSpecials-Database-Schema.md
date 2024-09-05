@@ -143,6 +143,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    >   * ```애플리케이션 서버 (OnPremAppServer-DMSWorkshop-Source)```에 AWS 콘솔의 ```Session Manager```로 접속합니다.
    >   * ```Oracle``` 데이터베이스 컨테이너로 직접 접속합니다 (docker exec -it <Oracle 컨테이너 ID> /bin/bash).
    >   * 이후에는 오라클 서버를 관린하는 옛날(?) 기억을 되살려 ```SQLPlus```를 사용하여 ```DMS_USER``` 사용자를 생성하고 필요한 권한을 부여합니다.
+   > * [가이드 문서](./(Challenge-Commentary)-Create-DMS-SCT-Database-User.md)를 참고하여 진행해 보세요.
 
    * 소스 측에서 위 작업을 완료하면 타겟 측의 ```AWS SCT```로 돌아와 다음과 같이 값을 다시 설정하고 연결 테스트를 수행합니다.
    
@@ -289,7 +290,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    ![SCT TravelBuddy 스키마 변환 Data Migration View](../../images/sct-travelbuddy-schema-migration-view.png)
   
-8. 왼쪽 패널에서 ```TRAVELBUDDY``` 스키마를 클릭하고 ```스키마 변환 (Convert Schema)```를 클릭합니다.
+8. 왼쪽 패널에서 ```TRAVELBUDDY``` 스키마를 오른쪽 버튼 클릭하고 ```스키마 변환 (Convert Schema)```를 클릭합니다.
 
    ![SCT TravelBuddy 스키마 변환](../../images/sct-travelbuddy-schema-conversion-m2m.png)
 

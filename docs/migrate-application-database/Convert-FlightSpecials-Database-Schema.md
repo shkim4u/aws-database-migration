@@ -110,56 +110,53 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
 4. 양식에 아래 값을 사용하여 소스 데이터베이스 구성을 지정합니다. 그런 다음 ```Test connection```을 클릭하세요. 연결 테스트가 성공적으로 완료되면 연결 성공 버튼에서 ```확인```을 클릭한 후 ```다음```을 클릭하세요.
 
+   | **파라미터**                    | **값**                                                              |
+         |-----------------------------|--------------------------------------------------------------------|
+   | **연결 이름 (Connection name)** | ```TravelBuddy Oracle Source```                                    |
+   | **타입**                      | ```SID```                                                          |
+   | **서버 이름**                   | ```소스 환경의 CloudFormation의 출력 탭에서 확인 AppServer Private IP 확인```     |
+   | **서버 포트**                   | ```1521```                                                         |
+   | **SID**                     | ```XE```                                                           |
+   | **사용자 이름**                  | ```travelbuddy```                                                  |
+   | **암호**                      | ```welcome```                                                      |
+   | **SSL 사용**                  | ```체크 해제 (미사용)```                                                  |
+   | **암호 저장**                   | ```체크 (암호 저장)```                                                   |
+   | **오라클 드라이버 경로**             | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\ojdbc11.jar``` |
 
-| **파라미터**                    | **값**                                                              |
-      |-----------------------------|--------------------------------------------------------------------|
-| **연결 이름 (Connection name)** | ```TravelBuddy Oracle Source```                                    |
-| **타입**                      | ```SID```                                                          |
-| **서버 이름**                   | ```소스 환경의 CloudFormation의 출력 탭에서 확인 AppServer Private IP 확인```     |
-| **서버 포트**                   | ```1521```                                                         |
-| **SID**                     | ```XE```                                                           |
-| **사용자 이름**                  | ```travelbuddy```                                                  |
-| **암호**                      | ```welcome```                                                      |
-| **SSL 사용**                  | ```체크 해제 (미사용)```                                                  |
-| **암호 저장**                   | ```체크 (암호 저장)```                                                   |
-| **오라클 드라이버 경로**             | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\ojdbc11.jar``` |
+   ![SCT 오라클 TravelBuddy 소스 연결](../../images/SCT-oracle-connect.png)
 
-![SCT 오라클 TravelBuddy 소스 연결](../../images/SCT-oracle-connect.png)
+   ![SCT SSL 미사용 경고 수용](../../images/SCT-oracle-ssl-warning.png)
 
-![SCT SSL 미사용 경고 수용](../../images/SCT-oracle-ssl-warning.png)
+   > ⚠️ **참고**<br>
+   > * 만약 연결 테스트가 실패하면 소스 데이터베이스 포트 ```1521```를 위한 위한 방화벽 (보안 그룹)에 ```10.16.0.0/12``` 대역이 허용되어 있는지 확인합니다.
+   >   * 또한 아래와 같이 ```travelbuddy``` 사용자가 ```스키마 전환```에 필요한 권한이 없다는 오류가 나타날 수 있습니다.
 
+   ![SCT 오라클 권한 오류](../../images/SCT-oracle-privilege-error.png)
 
-> ⚠️ **참고**<br>
-> * 만약 연결 테스트가 실패하면 소스 데이터베이스 포트 ```1521```를 위한 위한 방화벽 (보안 그룹)에 ```10.16.0.0/12``` 대역이 허용되어 있는지 확인합니다.
-    >   * 또한 아래와 같이 ```travelbuddy``` 사용자가 ```스키마 전환```에 필요한 권한이 없다는 오류가 나타날 수 있습니다.
->
-
-![SCT 오라클 권한 오류](../../images/SCT-oracle-privilege-error.png)
-
-> 📕 **수행 과제**<br>
-> * <u>***소스 측을 담당하는 분께서는 위의 오류를 해결하고 다시 연결 테스트를 수행해 보도록 합니다.***</u>
-> * 타겟 측을 담당하시는 분과 긴밀하게 협력하여 진행해 주시면 감사하겠습니다.
-> * 힌트<br>
+    > 📕 **수행 과제 (이미 진행하였다면 건너뛰십시요!)**<br>
+    > * <u>***소스 측을 담당하는 분께서는 위의 오류를 해결하고 다시 연결 테스트를 수행해 보도록 합니다.***</u>
+    > * 타겟 측을 담당하시는 분과 긴밀하게 협력하여 진행해 주시면 감사하겠습니다.
+    > * 힌트<br>
     >   * ```애플리케이션 서버 (OnPremAppServer-DMSWorkshop-Source)```에 AWS 콘솔의 ```Session Manager```로 접속합니다.
->   * ```Oracle``` 데이터베이스 컨테이너로 직접 접속합니다 (docker exec -it <Oracle 컨테이너 ID> /bin/bash).
->   * 이후에는 오라클 서버를 관린하는 옛날(?) 기억을 되살려 ```SQLPlus```를 사용하여 ```DMS_USER``` 사용자를 생성하고 필요한 권한을 부여합니다.
+    >   * ```Oracle``` 데이터베이스 컨테이너로 직접 접속합니다 (docker exec -it <Oracle 컨테이너 ID> /bin/bash).
+    >   * 이후에는 오라클 서버를 관린하는 옛날(?) 기억을 되살려 ```SQLPlus```를 사용하여 ```DMS_USER``` 사용자를 생성하고 필요한 권한을 부여합니다.
 
-* 소스 측에서 위 작업을 완료하면 타겟 측의 ```AWS SCT```로 돌아와 다음과 같이 값을 다시 설정하고 연결 테스트를 수행합니다.
+   * 소스 측에서 위 작업을 완료하면 타겟 측의 ```AWS SCT```로 돌아와 다음과 같이 값을 다시 설정하고 연결 테스트를 수행합니다.
 
-| **파라미터**                    | **값**                                                              |
-   |-----------------------------|--------------------------------------------------------------------|
-| **연결 이름 (Connection name)** | ```TravelBuddy Oracle Source```                                    |
-| **타입**                      | ```SID```                                                          |
-| **서버 이름**                   | ```소스 환경의 CloudFormation의 출력 탭에서 확인 AppServer Private IP 확인```     |
-| **서버 포트**                   | ```1521```                                                         |
-| **SID**                     | ```XE```                                                           |
-| **사용자 이름**                  | ```dmsuser```                                                      |
-| **암호**                      | ```dmsuser123```                                                   |
-| **SSL 사용**                  | ```체크 해제 (미사용)```                                                  |
-| **암호 저장**                   | ```체크 (암호 저장)```                                                   |
-| **오라클 드라이버 경로**             | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\ojdbc11.jar``` |
+   | **파라미터**                    | **값**                                                              |
+      |-----------------------------|--------------------------------------------------------------------|
+   | **연결 이름 (Connection name)** | ```TravelBuddy Oracle Source```                                    |
+   | **타입**                      | ```SID```                                                          |
+   | **서버 이름**                   | ```소스 환경의 CloudFormation의 출력 탭에서 확인 AppServer Private IP 확인```     |
+   | **서버 포트**                   | ```1521```                                                         |
+   | **SID**                     | ```XE```                                                           |
+   | **사용자 이름**                  | ```dmsuser```                                                      |
+   | **암호**                      | ```dmsuser123```                                                   |
+   | **SSL 사용**                  | ```체크 해제 (미사용)```                                                  |
+   | **암호 저장**                   | ```체크 (암호 저장)```                                                   |
+   | **오라클 드라이버 경로**             | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\ojdbc11.jar``` |
 
-![SCT 오라클 TravelBuddy 소스 연결 성공](../../images/SCT-oracle-connected-with-dmsuser.png)
+   ![SCT 오라클 TravelBuddy 소스 연결 성공](../../images/SCT-oracle-connected-with-dmsuser.png)
 
 5. ```TRAVELBUDDY``` 스키마를 선택한 다음 ```다음```을 클릭합니다.
 
@@ -177,30 +174,30 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    ![SCT 오라클 TravelBuddy 평가 보고서](../../images/SCT-oracle-travelbuddy-assessment-report.png)
 
-    - ```SCT```는 소스 데이터베이스 스키마의 모든 개체를 자세히 검토합니다. 가능한 한 많은 것을 자동으로 변환하고 변환할 수 없는 항목에 대한 자세한 정보를 제공합니다.
+   * ```SCT```는 소스 데이터베이스 스키마의 모든 개체를 자세히 검토합니다. 가능한 한 많은 것을 자동으로 변환하고 변환할 수 없는 항목에 대한 자세한 정보를 제공합니다.
 
    ![SCT PostgreSQL TravelBuddy 변환 보고서 섹션](../../images/SCT-travelbuddy-postgresql-conversion-report.png)
 
-    - 우리가 지금 마이그레이션 하고자 하는 ```TravelBuddy``` 데이터베이스에는 해당하지 않지만, 일반적으로 소스 데이터베이스는 패키지, 프로시저 및 함수는 가장 많은 사용자 지정 또는 독점 SQL 코드를 포함하고 있기 때문에 해결해야 할 문제가 있을 가능성이 높습니다. ```AWS SCT```는 각 개체 유형을 변환하는 데 필요한 수동 변경의 양을 산정합니다. 또한 이러한 개체를 대상 스키마에 성공적으로 적응시키기 위한 힌트를 제공합니다.
+   * 우리가 지금 마이그레이션 하고자 하는 ```TravelBuddy``` 데이터베이스에는 해당하지 않지만, 일반적으로 소스 데이터베이스는 패키지, 프로시저 및 함수는 가장 많은 사용자 지정 또는 독점 SQL 코드를 포함하고 있기 때문에 해결해야 할 문제가 있을 가능성이 높습니다. ```AWS SCT```는 각 개체 유형을 변환하는 데 필요한 수동 변경의 양을 산정합니다. 또한 이러한 개체를 대상 스키마에 성공적으로 적응시키기 위한 힌트를 제공합니다.
 
 7. 데이터베이스 마이그레이션 평가 보고서 검토를 마친 후 ```다음```을 클릭합니다.
 
 8. 아래 값을 사용하여 타겟 데이터베이스에 대한 정보를 제공합니다. ```Test connection``` 버튼을 눌러 연결 테스트가 성공적으로 완료되면 ```마침```을 클릭하세요.
 
-| **파라미터**                    | **값**                                                                        |
-|-----------------------------|------------------------------------------------------------------------------|
-| **타겟 엔진**                   | ```Amazon RDS for PostgreSQL (기본값이 아니므로 변경하세요)```                            |
-| **연결 이름 (Connection name)** | ```TravelBuddy PostgreSQL Target```                                          |
-| **서버 이름**                   | ```(진행자와 함께 타겟 환경의 RDS 콘솔에서 확인합니다)```                                        |
-| **서버 포트**                   | ```5432```                                                                   |
-| **데이터베이스**                  | ```dso```                                                                    |
-| **사용자 이름**                  | ```postgres```                                                               |
-| **암호**                      | ```<진행자와 함께 SecretsManager에서 확인>```                                          |
-| **SSL 사용**                  | ```체크 해제 (미사용)```                                                            |
-| **암호 저장**                   | ```체크 (암호 저장)```                                                             |
-| **Amazon Aurora 드라이버 경로**   | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\postgresql-42.7.3.jar``` |
+   | **파라미터**                    | **값**                                                                        |
+   |-----------------------------|------------------------------------------------------------------------------|
+   | **타겟 엔진**                   | ```Amazon RDS for PostgreSQL (기본값이 아니므로 변경하세요)```                            |
+   | **연결 이름 (Connection name)** | ```TravelBuddy PostgreSQL Target```                                          |
+   | **서버 이름**                   | ```(진행자와 함께 타겟 환경의 RDS 콘솔에서 확인합니다)```                                        |
+   | **서버 포트**                   | ```5432```                                                                   |
+   | **데이터베이스**                  | ```dso```                                                                    |
+   | **사용자 이름**                  | ```postgres```                                                               |
+   | **암호**                      | ```<진행자와 함께 SecretsManager에서 확인>```                                          |
+   | **SSL 사용**                  | ```체크 해제 (미사용)```                                                            |
+   | **암호 저장**                   | ```체크 (암호 저장)```                                                             |
+   | **Amazon Aurora 드라이버 경로**   | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\postgresql-42.7.3.jar``` |
 
-* 아래와 같이 접속이 실패합니다. 진행자의 안내를 받아 필요한 설정을 수행하고 다시 시도해 보세요.
+   * 아래와 같이 접속이 실패합니다. 진행자의 안내를 받아 필요한 설정을 수행하고 다시 시도해 보세요.
 
 ![SCT PostgreSQL TravelBuddy 타겟 연결 실패](../../images/SCT-travelbuddy-postgresql-connect-fail.png)
 
@@ -294,7 +291,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    ![SCT TravelBuddy 스키마 변환 Data Migration View](../../images/sct-travelbuddy-schema-migration-view-for-flightspecials.png)
 
-8. 왼쪽 패널에서 ```TRAVELBUDDY``` 스키마를 클릭하고 ```스키마 변환 (Convert Schema)```를 클릭합니다.
+8. 왼쪽 패널에서 ```TRAVELBUDDY``` 스키마를 오른쪽 버튼 클릭하고 ```스키마 변환 (Convert Schema)```를 클릭합니다.
 
    ![SCT TravelBuddy 스키마 변환](../../images/sct-travelbuddy-schema-conversion-for-flightspecials.png)
 

@@ -72,7 +72,8 @@ export ARGOCD_SERVER=`kubectl get ingress/argocd-server -n argocd -o json | jq -
 echo https://$ARGOCD_SERVER
 ```
 
-확인한 접속 주소와 이미 설정한 패스워드 (```Abraca00#1```)를 사용하여 ArgoCD Web UI에 접속해 봅니다.<br>
+확인한 접속 주소와 이미 설정한 패스워드 (```Abraca00#1```)를 사용하여 ArgoCD Web UI에 접속해 봅니다.
+
 ![ArgoCD UI](../../images/argocd_login.png)
 
 2. (Optional) ```ArgoCD```가 배포 (Helm) 리포지터리에 접속할 수 있도록 IAM 사용자 및 Git Credentials을 생성하고 메모해 둡니다. 만약 이전 단계에서 사용자를 생성하였으면 해당 정보를 사용합니다.<br>

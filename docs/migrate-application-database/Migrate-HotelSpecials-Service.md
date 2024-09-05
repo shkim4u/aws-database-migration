@@ -11,7 +11,7 @@
 ---
 
 ## **1. 개요**
-우리는 앞서 ```FlightSpeicals``` 서비스를 마이그레이션하기 위해 우선 데이터베이스 스키마를 준비해 두었습니다. 이제 이 서비스를 ```Amazon EKS``` 클러스터에 배포해 보겠습니다.
+우리는 앞서 ```HotelSpeicals``` 서비스를 마이그레이션하기 위해 우선 데이터베이스 스키마를 준비해 두었습니다. 이제 이 서비스를 ```Amazon EKS``` 클러스터에 배포해 보겠습니다.
 
 > 📌 **참고**<br>
 > * 온프레미스에서 이미 운영 중인 ```TravelBuddy``` 애플리케이션은 비록 화면 표현 계층과 비즈니스 로직, 그리고 각 서비스별 단일 데이터베이스를 가진 모놀리식 구조이지만, ```HotelSpecials``` 서비스를 위한 모델 조회용 ```REST``` API는 이미 분리되어 있습니다. 이 API는 ```HotelSpecials``` 서비스의 데이터베이스 스키마를 조회하는 역할을 합니다.
@@ -72,7 +72,8 @@ export ARGOCD_SERVER=`kubectl get ingress/argocd-server -n argocd -o json | jq -
 echo https://$ARGOCD_SERVER
 ```
 
-확인한 접속 주소와 이미 설정한 패스워드 (```Abraca00#1```)를 사용하여 ArgoCD Web UI에 접속해 봅니다.<br>
+확인한 접속 주소와 이미 설정한 패스워드 (```Abraca00#1```)를 사용하여 ArgoCD Web UI에 접속해 봅니다.
+
 ![ArgoCD UI](../../images/argocd_login.png)
 
 2. ```ArgoCD```가 배포 (Helm) 리포지터리에 접속할 수 있도록 IAM 사용자 및 Git Credentials을 생성하고 메모해 둡니다. (CLI 사용).<br>
@@ -129,7 +130,7 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
     * 40번째 줄 근처에 주석처리된 ```MySQL``` 드라이버 사용 구문을 주석 해제합니다. (사용)
     * 그 다음 줄에 ```Oracle``` 드라이버 사용 구문을 주석 처리합니다. (미사용)
     * 50번째 줄의 ```select 1 from dual``` 쿼리를 ```select 1```로 변경합니다.
-    * 60, 61번째 줄 각각 주석 처리 토글: ```Hibernate```의 ```Oracle``` Dialect 주석 처리, ```MySQL``` Dialect 주석 해제.
+    * 66, 67번째 줄 각각 주석 처리 토글: ```Hibernate```의 ```Oracle``` Dialect 주석 처리, ```MySQL``` Dialect 주석 해제.
 
     ```bash
     cd ~/environment/aws-database-migration/legacy/applications/TravelBuddy/build

@@ -25,4 +25,4 @@ configmap:
   environment: test
   database_endpoint: ${DATABASE_ENDPOINT}
   database_port: ${DATABASE_PORT}
-  database_username: ${DATABASE_USERNAME}
+  database_username: "${DATABASE_USERNAME}"
