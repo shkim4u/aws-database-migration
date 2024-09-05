@@ -201,7 +201,7 @@
 
    ![Stop Source/Destination Check](../../images/stop-source-destination-check.png)
 
-5. EC2 콘솔에서 Bastion 호스트를 선택한 상태에서 하단 창에서 ```보안 (Security)``` 탭을 선택하고, ```보안 그룹 (Security Groups)``` 링크를 클릭합니다. 새탭으로 열리는 보안 그룹 편집 창에서 AWS VPN 엔드포인트가 IPSEC를 통해 인스턴스와 통신할 수 있도록 허용해야 합니다.
+5. EC2 콘솔에서 Bastion 호스트를 선택한 상태에서 하단 창에서 ```보안 (Security)``` 탭을 선택하고, ```보안 그룹 (Security Groups)``` 링크를 클릭합니다. 새탭으로 열리는 보안 그룹 편집 창에서 AWS VPN 엔드포인트가 IPSec을 통해 인스턴스와 통신할 수 있도록 허용해야 합니다.
 
    ![Bastion 호스트 보안 그룹 열기](../../images/edit-bastion-host-security-group.png)
 
