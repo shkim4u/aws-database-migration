@@ -47,4 +47,4 @@
   * [```FlightSpecials``` 데이터 마이그레이션](docs/migrate-application-database/Migrate-FlightSpecials-Data.md)
   * [프론트엔드로 트래픽 유입 재개](docs/migrate-application-database/Resume-Frontend-Traffic.md)
   * [```FlightSpecials`` 데이터의 SSOT 클라우드 전환 완료 선언](docs/migrate-application-database/Declare-FlightSpecials-SSOT-Cloud-Transition-Complete.md)
-  * [데이터베이스 역동기화](docs/migrate-application-database/Database-Resynchronization.md)
+  * [데이터베이스 역동기화](docs/migrate-application-database/Database-Reverse-Synchronization.md)

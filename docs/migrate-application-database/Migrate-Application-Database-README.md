@@ -85,4 +85,4 @@ TODO: 대량의 데이터를 마이그레이션 하는 작업이 무중단 시�
 * [```FlightSpecials``` 데이터 마이그레이션](./Migrate-FlightSpecials-Data.md)
 * [프론트엔드로 트래픽 유입 재개](./Resume-Frontend-Traffic.md)
 * [```FlightSpecials`` 데이터의 SSOT 클라우드 전환 완료 선언](./Declare-FlightSpecials-SSOT-Cloud-Transition-Complete.md)
-* [데이터베이스 역동기화](./Database-Resynchronization.md)
+* [데이터베이스 역동기화](./Database-Reverse-Synchronization.md)
