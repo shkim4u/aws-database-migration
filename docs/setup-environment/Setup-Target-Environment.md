@@ -3,10 +3,10 @@
 이번에는 타겟 환경을 구성해 보겠습니다. 타겟 환경은 다음과 같은 자원을 포함합니다.
 
 - 타겟 환경 자원
-  - 3개의 퍼블릭 서브넷이 있는 Amazon Virtual Private Cloud (Amazon VPC)와 기본 네트워크 토폴로지
+  - 3개의 퍼블릭 서브넷이 있는 `Amazon Virtual Private Cloud (Amazon VPC)`와 기본 네트워크 토폴로지
   - 위 VPC에 위치하는 ```AWS Database Migration Service (AWS DMS)``` 복제 인스턴스
   - 타겟 데이터베이스
-  - Amazon Elastic Compute Cloud (EC2) 인스턴스 (윈도우)
+  - `Amazon Elastic Compute Cloud (EC2)` 인스턴스 (윈도우)
     - 마이그레이션에 사용하는 데이터베이스 도구 및 AWS SCT (AWS Schema Conversion Tool) 포함
 
 ---

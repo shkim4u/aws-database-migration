@@ -43,7 +43,7 @@
 
 ### 2. 타겟 VPC Attachment 생성
 
-1. ```VPC > Transite Gateway > Transit Gateway 연결```로 이동하여 ```Create Transit Gateway 생성 (Create Transit Gateway Attachment)```을 클릭합니다.
+1. ```VPC > Transite Gateway > Transit Gateway 연결```로 이동하여 ```Transit Gateway Attachement 생성 (Create Transit Gateway Attachment)```을 클릭합니다.
 
    ![타겟 VPC Transit Gateway Attachment 생성](../../images/create-target-vpc-transit-gateway-attachment.png)
 
