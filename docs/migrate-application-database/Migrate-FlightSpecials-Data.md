@@ -388,7 +388,7 @@
    ```sql
    -- Oracle 소스의 밀리초 Epoch 값을 초단위 Epoch값으로 변환
    UPDATE travelbuddy.flightspecial
-   SET expiry_date = to_timestamp(expiry_date_num / 1000);
+   SET expiry_date = (to_timestamp(expiry_date_num / 1000) AT TIME ZONE 'Asia/Seoul');
    ```
 
     ![FlightSpecials DMS 마이그레이션 Expiry Datetime 설정](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-set-expiry-datetime.png)
@@ -399,9 +399,11 @@
 
    ![FlightSpecials DMS 마이그레이션 프론트엔드 확인](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-data-check-frontend.png)
 
-   > **잠깐!**<br>
-   > * 동작 환경에 따라 조금씩 다를 수 있지만 위의 프론트엔드 화면에서 조금 이상한 점을 눈치채지 못하셨나요? 이는 ```PostgreSQL```이 지원하는 ```timestamp``` 데이터 타입에서 기인하는데 결론적으로 말씀드리면, 위에서 ```expiry_date``` 컬럼에 값을 채워 넣을 때 Timezone Offset을 고려하거나, ```timestamptz``` 데이터 타입을 사용하면 됩니다.
-   > * 이 부분에 대해 관심이 있으시면 각자 개인적으로 살펴보시면 좋을 것 같습니다.
+[//]: # (   > **잠깐!**<br>)
+
+[//]: # (   > * 동작 환경에 따라 조금씩 다를 수 있지만 위의 프론트엔드 화면에서 조금 이상한 점을 눈치채지 못하셨나요? 이는 ```PostgreSQL```이 지원하는 ```timestamp``` 데이터 타입에서 기인하는데 결론적으로 말씀드리면, 위에서 ```expiry_date``` 컬럼에 값을 채워 넣을 때 Timezone Offset을 고려하거나, ```timestamptz``` 데이터 타입을 사용하면 됩니다.)
+
+[//]: # (   > * 이 부분에 대해 관심이 있으시면 각자 개인적으로 살펴보시면 좋을 것 같습니다.)
 
 ---
 

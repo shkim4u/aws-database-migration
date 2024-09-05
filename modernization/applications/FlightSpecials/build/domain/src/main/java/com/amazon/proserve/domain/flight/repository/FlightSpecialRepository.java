@@ -6,4 +6,5 @@ import com.amazon.proserve.domain.flight.FlightSpecial;
 
 public interface FlightSpecialRepository {
     List<FlightSpecial> findAll();
+    List<FlightSpecial> findAllByOrderByExpiryDateAsc();
 }

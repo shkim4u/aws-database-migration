@@ -22,4 +22,10 @@ public class GetFlightSpecialService implements GetFlightSpecialUseCase {
         List<FlightSpecial> list = repository.findAll();
         return list.stream().map(x -> FlightSpecialView.of(x)).collect(Collectors.toList());
     }
+    
+    @Override
+    public List<FlightSpecialView> getAllFlightSpecialsSortedByExpiryDate() {
+        List<FlightSpecial> list = repository.findAllByOrderByExpiryDateAsc();
+        return list.stream().map(x -> FlightSpecialView.of(x)).collect(Collectors.toList());
+    }
 }

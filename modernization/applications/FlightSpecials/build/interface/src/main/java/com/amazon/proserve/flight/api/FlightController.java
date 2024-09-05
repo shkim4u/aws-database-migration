@@ -24,7 +24,8 @@ public class FlightController {
 
         @GetMapping({ "/flightspecials" })
         public List<FlightSpecialView> getFlightSpecial() {
-                return getFlightSpecialUseCase.getFlightSpecial();
+                // return getFlightSpecialUseCase.getFlightSpecial();
+                return getFlightSpecialUseCase.getAllFlightSpecialsSortedByExpiryDate();
         }
 
         @PostMapping(value = "/flightspecials/{prfId}/name", produces = "application/json")

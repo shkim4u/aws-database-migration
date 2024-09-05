@@ -19,4 +19,9 @@ public class FlightSpecialPersistenceAdapter implements FlightSpecialRepository 
     public List<FlightSpecial> findAll() {
         return repository.findAll().stream().map(x -> x.toDomainEntity()).collect(Collectors.toList());
     }
+    
+    @Override
+    public List<FlightSpecial> findAllByOrderByExpiryDateAsc() {
+        return repository.findAllByOrderByExpiryDateAsc().stream().map(x -> x.toDomainEntity()).collect(Collectors.toList());
+    }
 }

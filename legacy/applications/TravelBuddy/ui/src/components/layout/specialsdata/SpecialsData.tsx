@@ -50,6 +50,27 @@ const SpecialsData = () => {
             return <Error />;
         }
 
+        const formatRemainingTime = (expiryDate: Date): string => {
+            const dateFuture = new Date(expiryDate);
+            const dateNow = new Date();
+
+            const seconds = Math.floor((dateFuture.getTime() - dateNow.getTime()) / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            const remainingHours = hours - (days * 24);
+            const remainingMinutes = minutes - (days * 24 * 60) - (remainingHours * 60);
+
+            if (days > 30) return "Plenty of time";
+            if (days > 1) return `${days} days to go`;
+            if (remainingHours > 1) return `${remainingHours} hours to go`;
+            if (remainingMinutes > 30) return `${remainingMinutes} minutes to go`;
+            if (remainingMinutes === 1) return "1 minute to go";
+            if (remainingMinutes <= 0) return "deal over";
+            return `${remainingMinutes} minutes to go`;
+        };
+
         console.log("SpecialsData render().");
         console.log(`flightSpecials: ${flightSpecials}`);
         console.log(`hotelSpecials: ${hotelSpecials}`);
@@ -81,7 +102,8 @@ const SpecialsData = () => {
                                                 </td>
                                                 <td width="200">
                                                     <span className="flighttime pull-right">
-                                                        {moment(flightSpecial.expiryDate).format('YYYY-MM-DD HH:mm:ss')}
+                                                        {/*{moment(flightSpecial.expiryDate).format('YYYY-MM-DD HH:mm:ss')}*/}
+                                                        {formatRemainingTime(flightSpecial.expiryDate)}
                                                     </span>
                                                 </td>
                                             </tr>
@@ -115,7 +137,8 @@ const SpecialsData = () => {
                                                     </td>
                                                     <td width="200">
                                                         <span className="flighttime pull-right">
-                                                            {moment(hotelSpecial.expiryDate).format('YYYY-MM-DD HH:mm:ss')}
+                                                            {/*{moment(hotelSpecial.expiryDate).format('YYYY-MM-DD HH:mm:ss')}*/}
+                                                            {formatRemainingTime(hotelSpecial.expiryDate)}
                                                         </span>
                                                     </td>
                                                 </tr>
