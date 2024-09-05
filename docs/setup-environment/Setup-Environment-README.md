@@ -17,8 +17,7 @@
 
 1. 소스 환경
    - Amazon Elastic Compute Cloud (EC2) 인스턴스 (윈도우)
-     - 마이그레이션에 사용하는 데이터베이스 도구 및 AWS SCT (AWS Schema Conversion Tool) 포함 
-   - (옵션) Microsoft SQL Server 마이그레이션 워크숍에서는 이 EC2 인스턴스를 사용하여 소스 데이터베이스
+     - 마이그레이션에 사용하는 데이터베이스 도구 및 `AWS SCT (AWS Schema Conversion Tool)` 포함 
      - 소스 데이터베이스를 시뮬레이션하기 위해 사용하는 오라클 데이터베이스 인스턴스 (```Amazon RDS```)
      - 예제 애플리케이션을 호스팅하기 위한 애플리케이션 서버 (리눅스)
      - 클라우드 환경과의 연결을 위한 VPN 게이트웨이 역할을 하는 EC2 인스턴스 (리눅스)

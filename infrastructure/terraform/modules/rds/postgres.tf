@@ -36,6 +36,12 @@ resource "aws_db_parameter_group" "flightspecials" {
     apply_method = "pending-reboot"
   }
 
+  parameter {
+    name = "shared_preload_libraries"
+    value = "pglogical"
+    apply_method = "pending-reboot"
+  }
+
   lifecycle {
     create_before_destroy = true
   }

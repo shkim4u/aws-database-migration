@@ -9,7 +9,11 @@ resource "aws_iam_role" "m2m_admin" {
         Effect    = "Allow"
         Sid       = ""
         Principal = {
-          Service = "ec2.amazonaws.com"
+          Service: [
+            "ec2.amazonaws.com",
+            "dms.amazonaws.com",
+            "dms.ap-northeast-2.amazonaws.com"
+          ]
         }
       },
     ]

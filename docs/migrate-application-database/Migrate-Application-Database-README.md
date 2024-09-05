@@ -2,7 +2,14 @@
 
 ---
 
-## **개요**
+## **Agenda**
+1. 개요
+2. 시나리오
+3. 실습 단계
+
+---
+
+## **1. 개요**
 
 애플리케이션 데이터베이스 리팩토링은 데이터베이스 스키마를 변경하고 데이터를 마이그레이션하는 작업을 말합니다. 이 작업은 데이터베이스의 테이블 구조를 변경하거나 데이터를 이전하는 등의 작업을 포함합니다. 특히 이 과정에서 온프레이스 환경으로부터 클라우드 환경으로의 데이터 마이그레이션을 수행하는 경우가 많습니다.
 
@@ -16,7 +23,7 @@
 
 ---
 
-## **시나리오**
+## **2. 시나리오**
 
 이번 실습은 다음과 같은 시나리오로 진행됩니다.
 
@@ -51,7 +58,7 @@
 
 ---
 
-## **실습 단계**
+## **3. 실습 단계**
 
 아래와 같은 단계로 애플리케이션과 함께 데이터베이스를 마이그레이션합니다.
 
@@ -78,11 +85,11 @@ TODO: 대량의 데이터를 마이그레이션 하는 작업이 무중단 시�
 * [프론트엔드의 백엔드 접속 엔드포인트 (DNS)를 ALB로 변경](./Change-Frontend-Backend-ALB.md)
 * [넓은 지역으로 DNS 전파 확인](./Check-DNS-Propagation.md)
 * [프론트엔드로 트래픽 유입 재개](./Resume-Frontend-Traffic.md)
-* [```HotelSpecials`` 데이터의 SSOT 클라우드 전환 완료 선언](./Declare-HotelSpecials-SSOT-Cloud-Transition-Complete.md)
+* [```HotelSpecials``` 데이터의 SSOT 클라우드 전환 완료 선언](./Declare-HotelSpecials-SSOT-Cloud-Transition-Complete.md)
 * [```FlightSpecials``` 데이터베이스 스키마 전환](./Convert-FlightSpecials-Database-Schema.md)
 * [애플리케이션 트래픽 유입 중단](./Stop-Application-Traffic-Inflow.md)
 * [```FlightSpecials``` 서비스 마이그레이션](./Migrate-FlightSpecials-Service.md)
 * [```FlightSpecials``` 데이터 마이그레이션](./Migrate-FlightSpecials-Data.md)
 * [프론트엔드로 트래픽 유입 재개](./Resume-Frontend-Traffic.md)
-* [```FlightSpecials`` 데이터의 SSOT 클라우드 전환 완료 선언](./Declare-FlightSpecials-SSOT-Cloud-Transition-Complete.md)
+* [```FlightSpecials``` 데이터의 SSOT 클라우드 전환 완료 선언](./Declare-FlightSpecials-SSOT-Cloud-Transition-Complete.md)
 * [데이터베이스 역동기화](./Database-Reverse-Synchronization.md)
