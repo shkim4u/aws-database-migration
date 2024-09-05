@@ -78,35 +78,30 @@
 
 1. 다음 값을 사용하여 ```Amazon RDS PostgreSQL```에 대한 타겟 엔드포인트를 생성합니다```연결  테스트```를 수행하고 ```엔드포인트 생성```을 클릭합니다.
 
-   | **파라미터**                         | **값**                                  |
-   |----------------------------------|----------------------------------------|
-   | **엔드포인트 유형**                     | ```대상 엔드포인트```                         |
-   | **RDS DB 인스턴스 선택**               | ```체크```                               |
-   | **RDS DB 인스턴스**                  | ```flightspecials-test-postgres-db```  |
-   | **엔드포인트 식별자**                    | ```flightspecials-postgresql-target``` |
-   | **대상 엔진**                        | ```PostgreSQL```                       |
-   | **엔드포인트 데이터베이스 액세스**             | ```수동으로 액세스 정보 제공```                   |
-   | **서버 이름**                        | ```(자동으로 설정)```                        |
-   | **포트**                           | ```5432```                             |
-   | **사용자 이름**                       | ```dmsuser```                          |
-   | **비밀번호**                         | ```dmsuser123```                       |
-   | **SSL 모드**                       | ```없음```                               | 
-   | **데이터베이스 이름**                    | ```dso```                              | 
-   | **엔드포인트 연결 테스트 -> VPC**          | ```이름에 DmsVpc가 포함된 VPC ID```           |
-   | **엔드포인트 연결 테스트 -> 복제 인스턴스**                      | ```dmsworkshop-target-dmsrepl```       |
-   | **엔드포인트 연결 속성 사용 체크 > 추가 연결 속성** | ```truncateTrailingZerosForPlainNumeric=true```       |
-
+   | **파라미터**                         | **값**                                                            |
+   |----------------------------------|------------------------------------------------------------------|
+   | **엔드포인트 유형**                     | ```대상 엔드포인트```                                                   |
+   | **RDS DB 인스턴스 선택**               | ```체크```                                                         |
+   | **RDS DB 인스턴스**                  | ```flightspecials-test-postgres-db```                            |
+   | **엔드포인트 식별자**                    | ```flightspecials-postgresql-target```                           |
+   | **대상 엔진**                        | ```PostgreSQL```                                                 |
+   | **엔드포인트 데이터베이스 액세스**             | ```수동으로 액세스 정보 제공```                                             |
+   | **서버 이름**                        | ```(자동으로 설정)```                                                  |
+   | **포트**                           | ```5432```                                                       |
+   | **사용자 이름**                       | ```dmsuser```                                                    |
+   | **비밀번호**                         | ```dmsuser123```                                                 |
+   | **SSL 모드**                       | ```없음```                                                         | 
+   | **데이터베이스 이름**                    | ```dso```                                                        | 
+   | **엔드포인트 연결 테스트 -> VPC**          | ```이름에 DmsVpc가 포함된 VPC ID```                                     |
+   | **엔드포인트 연결 테스트 -> 복제 인스턴스**                      | ```dmsworkshop-target-dmsrepl```                                 |
+   | **엔드포인트 연결 속성 사용 체크 > 추가 연결 속성** | ```truncateTrailingZerosForPlainNumeric=true``` (`Reference` 참조) |
 
    > **참고**<br>
    > 만약 연결이 실패하면 보안 그룹 설정을 확인하십시요.
 
    ![```FlightSpecials``` PostgreSQL 타겟 엔드포인트 1](../../images/flightspecials-postgresql-target/flightspecials-postgresql-dms-target-endpoint-1.png)
 
-   * TODO: 아래 연결 포인트 설정 사용
-   * (참조): https://repost.aws/questions/QUTo0pRJ5KQI-vB5s2XsNp8Q/dms-load-from-oracle-number-38-to-aurora-postgres-bigint-fails-although-all-values-2-000-000-000
-   * (참조) https://github.com/aws-samples/amazon-dms-guid-uuid-blog/blob/main/dms-cfm-template/dms-template.yaml
-
-   ![```FlightSpecials``` PostgreSQL 타겟 엔드포인트 2](../../images/flightspecials-postgresql-target/flightspecials-postgresql-dms-target-endpoint-2.png)
+   ![```FlightSpecials``` PostgreSQL 타겟 엔드포인트 2](../../images/flightspecials-postgresql-target/flightspecials-postgresql-dms-target-endpoint-2-connection-attributes.png)
 
    ![```FlightSpecials``` PostgreSQL 타겟 엔드포인트 3](../../images/flightspecials-postgresql-target/flightspecials-postgresql-dms-target-endpoint-3.png)
 
@@ -364,7 +359,7 @@
 
 5. ```마이그레이션 태스크``` 실행이 시작되고 소스의 ```TRAVELBUDDY``` 스키마의 데이터가 ```Amazon RDS PostgreSQL``` 인스턴스로 복제되기 시작합니다. 데이터의 복제가 완료되면 아래와 같이 표시됩니다.
 
-   ![FlightSpecials DMS 마이그레이션 태스크 생성료](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-task-created.png)
+   ![FlightSpecials DMS 마이그레이션 태스크 생성 와료](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-task-created.png)
 
    ![FlightSpecials DMS 마이그레이션 태스크 실행 완료](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-task-completed.png)
 
@@ -385,7 +380,7 @@
 
    ![FlightSpecials DMS 마이그레이션 데이터 확인 3](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-data-check3.png)
 
-9. ```expiry_dae_num``` 컬럼의 ```Epoch``` 값으로부터 ```expiry_date``` (```Timestamp``` 타입) 컬럼을 유도하여 채워넣으면 전체 마이그레이션은 완료됩니다.
+9. ```expiry_date_num``` 컬럼의 ```Epoch``` 값으로부터 ```expiry_date``` (```Timestamp``` 타입) 컬럼을 유도하여 채워넣으면 전체 마이그레이션은 완료됩니다.
 
    ```sql
    -- Oracle 소스의 밀리초 Epoch 값을 초단위 Epoch값으로 변환
@@ -416,3 +411,10 @@
 ### - 이로서 앞서 진행한 ```HotelSpecials``` 서비스의 데이터 마이그레이션과 함께 ```TravelBuddy``` 애플리케이션의 모든 데이터베이스와 서비스의 마이그레이션이 성공적으로 완료되었습니다.
 
 ### - 이제 모든 데이터의 ```SSoT```가 신규 클라우드 환경에 있음을 선언하고 전체 서비스 트래픽을 신규 환경으로 재개하면 됩니다.
+
+---
+
+## **참고 자료**
+* 엔드포인트 연결 설정 속성
+  * https://repost.aws/questions/QUTo0pRJ5KQI-vB5s2XsNp8Q/dms-load-from-oracle-number-38-to-aurora-postgres-bigint-fails-although-all-values-2-000-000-000
+  * https://github.com/aws-samples/amazon-dms-guid-uuid-blog/blob/main/dms-cfm-template/dms-template.yaml

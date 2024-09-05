@@ -64,4 +64,10 @@ public class FlightSpecial {
     public int hashCode() {
         return Objects.hash(header, body, origin, originCode, destination, destinationCode, cost, expiryDate);
     }
+
+    public void updateFlightSpecialsHeader(String newFlightSpecialsHeader) {
+        Header oldHeader = this.header;
+        Header newHeader = Header.of(newFlightSpecialsHeader);
+        this.header = newHeader;
+    }
 }

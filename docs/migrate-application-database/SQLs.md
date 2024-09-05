@@ -38,3 +38,25 @@ ALTER COLUMN expiry_date
 TYPE timestamptz
 USING expiry_date AT TIME ZONE 'Asia/Seoul';
 ```
+
+* 그 외
+[pglogical을 사용하여 인스턴스 간 데이터 동기화
+  ](https://docs.aws.amazon.com/ko_kr/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.pglogical.html)
+```sql
+SELECT id, header, body, origin, origin_code, destination, destination_code, cost, expiry_date
+	FROM travelbuddy.flightspecial;
+
+-- Oracle 소스의 밀리초 Epoch 값을 초단위 Epoch값으로 변환
+UPDATE travelbuddy.flightspecial
+SET expiry_date = (to_timestamp(expiry_date_num / 1000) AT TIME ZONE 'Asia/Seoul');
+
+alter table travelbuddy.flightspecial drop column expiry_date_num;
+
+UPDATE travelbuddy.flightspecial
+SET header = 'London to Paris' where id = 1;
+
+SHOW shared_preload_libraries;
+SHOW wal_level;
+
+CREATE EXTENSION pglogical;
+```
