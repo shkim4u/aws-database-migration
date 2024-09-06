@@ -314,44 +314,13 @@ export API_URI=${API_URL}/travelbuddy/flightspecials/1/name && echo ${API_URI}
 curl --location --verbose ${API_URI} --header 'Content-Type: application/json' --data '{"id": 1, "flightSpecialHeader": "London to Busan"}'
 ```
 
+TODO: 이미지
+
 6. ```마이그레이션 태스크 (flightspecials-postgresql-to-oracle-rsync-task)```를 클릭하고 ```테이블 통계``` 탭으로 이동하여 테이블 통계를 보고 이동된 행 수를 확인합니다.
 
+TODO: 이미지 교체
+
    ![FlightSpecials DMS 마이그레이션 태스크 테이블 통계](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-task-table-stats.png)
-
-7. 오류가 발생하면 상태 색상이 녹색에서 빨간색으로 변경됩니다. 디버그할 로그에 대해 로그 보기 링크를 클릭합니다.
-
-
-8. ```윈도우 인스턴스 (DMSWorkshop-Target-EC2Instance)```의 ```Fleet Manager``` RDP 세션으로 돌아와 ```pgAdmin4``` 화면에서 ```dso``` 데이터베이스를 선택하고 ```travelbuddy``` 스키마의 ```flightspecial``` 테이블을 선택하여 데이터가 정상적으로 마이그레이션되었는지 확인합니다.
-
-   ![FlightSpecials DMS 마이그레이션 데이터 확인 1](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-data-check1.png)
-
-   ![FlightSpecials DMS 마이그레이션 데이터 확인 2](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-data-check2.png)
-
-   * 특히 ```id``` 컬럼이 ```Identity``` 값으로 채워졌는지, ```expiry_date```는 ```null```인지, ```expiry_date_num``` 컬럼이 ```NUMERIC``` 타입으로 채워졌는지 확인합니다.
-
-   ![FlightSpecials DMS 마이그레이션 데이터 확인 3](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-data-check3.png)
-
-9. ```expiry_date_num``` 컬럼의 ```Epoch``` 값으로부터 ```expiry_date``` (```Timestamp``` 타입) 컬럼을 유도하여 채워넣으면 전체 마이그레이션은 완료됩니다.
-
-   ```sql
-   -- Oracle 소스의 밀리초 Epoch 값을 초단위 Epoch값으로 변환
-   UPDATE travelbuddy.flightspecial
-   SET expiry_date = (to_timestamp(expiry_date_num / 1000) AT TIME ZONE 'Asia/Seoul');
-   ```
-
-   ![FlightSpecials DMS 마이그레이션 Expiry Datetime 설정](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-set-expiry-datetime.png)
-
-   ![FlightSpecials DMS 마이그레이션 Expiry Datetime 설정 결과](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-set-expiry-datetime-result.png)
-
-10. 이제 ```FlightSpecials``` 서비스의 데이터 마이그레이션이 완료되었습니다. 프론트엔드에 브라우저로 접속하여 데이터가 정상적으로 조회되는지 확인합니다.
-
-![FlightSpecials DMS 마이그레이션 프론트엔드 확인](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-data-check-frontend.png)
-
-[//]: # (   > **잠깐!**<br>)
-
-[//]: # (   > * 동작 환경에 따라 조금씩 다를 수 있지만 위의 프론트엔드 화면에서 조금 이상한 점을 눈치채지 못하셨나요? 이는 ```PostgreSQL```이 지원하는 ```timestamp``` 데이터 타입에서 기인하는데 결론적으로 말씀드리면, 위에서 ```expiry_date``` 컬럼에 값을 채워 넣을 때 Timezone Offset을 고려하거나, ```timestamptz``` 데이터 타입을 사용하면 됩니다.)
-
-[//]: # (   > * 이 부분에 대해 관심이 있으시면 각자 개인적으로 살펴보시면 좋을 것 같습니다.)
 
 ---
 

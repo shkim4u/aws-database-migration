@@ -9,13 +9,13 @@
 ![소스/타겟 IPSec VPN 연결 구성](../../images/source-target-ipsec-vpn-connectivity.png)
 
 아래 순서로 작업을 진행합니다.
-- 타겟 환경 (AWS 클라우드 환경 구성)
-- 소스 환경 (온프레미스 환경 구성)
-- 타겟 환경에서 소스 데이터베이스 접속 확인
+1. 타겟 (AWS 클라우드) 환경 구성
+2. 소스 (온프레미스) 환경 구성
+3. 타겟 환경에서 소스 데이터베이스 접속 확인
 
 ---
 
-## 타겟 환경 (AWS 클라우드) 환경 구성
+## 1. 타겟 (AWS 클라우드) 환경 구성
 
 타겟 환경인 AWS 클라우드 측에서는 아래 순서로 수행하여 소스 환경과 연결하기 위한 네트워크 요소를 구성합니다.
 
@@ -25,7 +25,7 @@
 4. 타겟 -> 소스 통신을 위한 라우팅 테이블 구성
 5. VPN 구성 정보 다운로드
 
-### 1. Transit Gateway 생성
+### 1.1. Transit Gateway 생성
 1. ```VPC > Transite Gateway > Transit Gateway 생성```으로 이동합니다.
 
    ![Transit Gateway 생성](../../images/create-transit-gateway.png)
@@ -41,7 +41,7 @@
 
    ![Transit Gateway 생성 완료](../../images/create-transit-gateway-complete.png)
 
-### 2. 타겟 VPC Attachment 생성
+### 1.2. 타겟 VPC Attachment 생성
 
 1. ```VPC > Transite Gateway > Transit Gateway 연결```로 이동하여 ```Transit Gateway Attachement 생성 (Create Transit Gateway Attachment)```을 클릭합니다.
 
@@ -61,7 +61,7 @@
 
    ![타겟 VPC Transit Gateway Attachment 생성 완료](../../images/create-target-vpc-transit-gateway-attachment-complete.png)
 
-### 3. Customer Gateway 및 VPN Attachment 생성
+### 1.3. Customer Gateway 및 VPN Attachment 생성
 
 1. ```VPC > Transit Gateway > Transit Gateway 연결```로 이동하여 ```Transit Gateway 생성 (Create Transit Gateway Attachment)```을 클릭합니다.
 
@@ -82,7 +82,7 @@
 
    ![VPN을 위한 Transit Gateway Attachment 생성 완료](../../images/create-transit-gateway-attachment-for-vpn-complete.png)
 
-### 4. 타겟 -> 소스 통신을 위한 라우팅 테이블 구성
+### 1.4. 타겟 -> 소스 통신을 위한 라우팅 테이블 구성
 
 1. ```VPC > Transit Gateway > Transit Gateway 라우팅 테이블```로 이동하여 위에서 생성한 Transit Gateway `DMS-TGW`의 기본 경로 테이블을 선택한 다음 하단 창에서 ```경로 (Routes)``` 탭을 선택합니다.
 
@@ -116,17 +116,17 @@
    > ⚠️ 생성된 정적 경로는 ```블랙홀 (Blackhole)``` 상태로 전환됩니다. 이는 VPN 연결이 활성화되지 않아서 발생하는 현상입니다. 소스 환경에서 VPN 연결을 활성화하고, 라우팅 테이블을 구성하면 이 경로는 활성화됩니다.
    > 
 
-4. 위에서 타겟 환경이 소스 환경으로 거쳐가기 위한 Transit Gateway VPN 연결의 라우팅 경로를 설정하였습니다. 이번에는 타겟 환경의 VPC 내부에서 소스 환경으로 향하는 패킷이 거쳐가는 (Via) 경로를 Transit Gateway로 설정해 보겠습니다.
+5. 위에서 타겟 환경이 소스 환경으로 거쳐가기 위한 Transit Gateway VPN 연결의 라우팅 경로를 설정하였습니다. 이번에는 타겟 환경의 VPC 내부에서 소스 환경으로 향하는 패킷이 거쳐가는 (Via) 경로를 Transit Gateway로 설정해 보겠습니다.
 
-5. ```VPC > 라우팅 테이블```로 이동하여 타겟 VPC `DMSWorkshop-Target-RouteTable` 의 라우팅 테이블을 선택합니다.
+6. ```VPC > 라우팅 테이블```로 이동하여 타겟 VPC `DMSWorkshop-Target-RouteTable` 의 라우팅 테이블을 선택합니다.
 
    ![타겟 VPC 라우팅 테이블 선택](../../images/select-target-vpc-route-table.png)
 
-6. 라우팅 테이블의 ```라우팅``` 탭을 선택하고 ```라우팅 편집```을 클릭합니다.
+7. 라우팅 테이블의 ```라우팅``` 탭을 선택하고 ```라우팅 편집```을 클릭합니다.
 
    ![타겟 VPC 라우팅 테이블 라우팅 편집](../../images/edit-route-to-target-vpc-route-table.png)
 
-7. 다음 정보를 사용하여 라우팅을 추가합니다.
+8. 다음 정보를 사용하여 라우팅을 추가합니다.
    - **대상**: ```10.0.0.0/12```
    - **대상 (Via)**: ```Transit Gateway``` 선택 > ```Transit Gateway ID (DMS-TGW)```
 
@@ -134,7 +134,7 @@
 
    ![타겟 VPC 라우팅 테이블 라우팅 추가 결과](../../images/add-route-to-target-vpc-route-table-result.png)
 
-### 5. VPN 구성 정보 다운로드
+### 1.5. VPN 구성 정보 다운로드
 앞서 ```Customer Gateway```를 생성하게 되면 고객 측 VPN 장비와 연결할 수 있는 Site-to-Site VPN 터널도 함께 구성되며, 이에 대한 구성 정보를 다운로드할 수 있습니다.
 
 1. ```VPC > Site-to-Site VPN 연결```로 이동하여 생성한 VPN 연결을 선택합니다.
@@ -151,7 +151,7 @@
 
 ---
 
-## 소스 환경 (온프레미스) 환경 구성
+## 2. 소스 (온프레미스) 환경 구성
 
 소스 환경인 온프레미스 측에서는 아래 순서로 수행하여 타겟 환경과 연결하기 위한 네트워크 요소를 구성합니다.
 
@@ -160,7 +160,7 @@
 3. IPSec 데몬 (Openswan) 설정 및 VPN 터널 기동
 4. 연결 확인
 
-### 1. 온프레미스 네트워크의 라우팅 경로 구성
+### 2.1. 온프레미스 네트워크의 라우팅 경로 구성
 1. 온프레미스 네트워크의 라우팅 테이블을 열어, 타겟 환경으로 향하는 패킷이 VPN 연결을 통해 전달되도록 설정합니다. 이러한 패킷을 전달하는 장비는 Bastion 호스트이므로 타겟 환경으로 향하는 패킷을 Bastion 호스트로 전달하도록 라우팅 테이블을 구성합니다.
 
 2. 온프레미스 소스 환경의 ```VPC > 라우팅 테이블 (Route Tables)```로 이동하여, ```DMSWorkshop-Source-RouteTable (혹은 설정한 이름에 따른 라우팅 테이블)``` 을 선택한 후 다음과 같이 라우팅 경로를 추가합니다 (라우팅 탭).
@@ -185,7 +185,7 @@
    > - ```10.16.0.0/12``` 범위는 소스와 타겟을 세부적으로 분리하면서도, 소스의 범위를 포괄하는 범위이므로 세분성과 확장성을 동시에 달성할 수 있습니다.
    > - 즉, `10.0.0.0 ~ 10.15.255.255.255` 범위는 소스 측 범위로 할당된 것이라면, `10.16.0.0 ~ 10.31.255.255` 범위는 타겟 측 범위로 할당된 것이라고 볼 수 있습니다.
 
-### 2. VPN 장비 (가상 Bastion 호스트) 구성
+### 2.2. VPN 장비 (가상 Bastion 호스트) 구성
 
 비록 우리는 온프레미스 소스 환경을 시뮬레이션하기 위하여 자원을 AWS 클라우드에 생성하였지만, 이를 타겟 환경과 연결하기 위하여 개방형 스펙인 IPSec VPN을 사용한다고 말씀드렸습니다.
 
@@ -218,7 +218,7 @@
 >📕 참고<br>
 > 우리는 시뮬레이션된 온프레이스 소스 환경을 가정하므로 AWS 기능을 사용하지만, 실제 현장에서는 데이터센터의 물리적인 네트워크 설정을 통해 유사하게 이루어지는 작업임을 강조하고 싶습니다.
 
-### 3. IPSec 데몬 (Openswan) 설정 및 VPN 터널 기동
+### 2.3. IPSec 데몬 (Openswan) 설정 및 VPN 터널 기동
 
 이제 소스 환경인 온프레미스의 네트워크를 구성하고 타겟 환경인 AWS 클라우드에 대한 VPN 연결을 만들었으므로, Bastion 호스트에서 Openswan을 구성하고 터널을 실행할 준비가 되었습니다. Openswan은 이미 Bastion 호스트에 설치되어 있습니다.
 
@@ -295,7 +295,7 @@
 
 ---
 
-## 타겟 환경에서 소스 데이터베이스 접속 확인
+## 3. 타겟 환경에서 소스 데이터베이스 접속 확인
 
 마지막으로 타겟 한겨에서 소스 데이터베이스로 접속됨을 확인합니다.
 
