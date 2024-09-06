@@ -1,3 +1,16 @@
+## `Oracle`
+* 스키마의 데이터 양 조회
+```sql
+SELECT OWNER, SUM(BYTES) / 1024 / 1024 AS SIZE_MB
+FROM DBA_SEGMENTS
+WHERE OWNER = 'YOUR_SCHEMA_NAME'
+GROUP BY OWNER;
+```
+
+---
+
+## `PostgreSQL`
+
 * (미사용) Epoch 값이 입력될 때 이를 PostgreSQL의 timestamp 값으로 저장하는 트리거
 ```sql
 -- 타겟 PostgreSQL에서 트리거 함수 정의

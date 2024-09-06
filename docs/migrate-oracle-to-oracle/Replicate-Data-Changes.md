@@ -1,6 +1,6 @@
 # ***데이터 변경 복제***
 
-이제 소스 데이터베이스의 ```SPORT_TYPE``` 테이블을 업데이트하여 소스 데이터베이스에 대한 트랜잭션을 시뮬레이션하겠습니다. ```Database Migration Service```는 이러한 변경 사항을 자동으로 감지하고 대상 데이터베이스에 복제합니다.
+이제 소스 데이터베이스의 ```SPORT_TYPE``` 테이블에 신규 레코드를 추가하여 소스 데이터베이스에 대한 트랜잭션을 시뮬레이션하겠습니다. ```Database Migration Service```는 이러한 변경 사항을 자동으로 감지하고 대상 데이터베이스에 복제합니다.
 
 ---
 
@@ -14,13 +14,13 @@
     
     | **파라미터** | **값**                           |
     | --- |---------------------------------|
-    | **연결 이름** | ```SourceOracle```              |
+    | **연결 이름** | ```Oracle Source```             |
     | **사용자 이름** | ```dbadmin```                   |
     | **암호** | ```dbadmin123```                |
     | **암호 저장** | ```체크```                        |
     | **호스트 이름** | ```CloudFormation의 출력 탭에서 확인``` |
     | **포트** | 1521                            |
-    | **SID/서비스 이름** | ```ORACLEDB```                        |
+    | **SID/서비스 이름** | ```ORACLEDB```                  |
     
     ![소스 오라클 연결](../../images/source-oracle-connection.png)
 
@@ -28,21 +28,13 @@
 
     ```sql
     INSERT ALL
-   
     INTO dms_sample.sport_type (name,description) VALUES ('hockey', 'A sport in which two teams play against each other by trying to more a puck into the opponents goal using a hockey stick')
-
     INTO dms_sample.sport_type (name,description) VALUES ('basketball', 'A sport in which two teams of five players each that oppose one another shoot a basketball through the defenders hoop')
-
     INTO dms_sample.sport_type (name,description) VALUES ('soccer','A sport played with a spherical ball between two teams of eleven players')
-
     INTO dms_sample.sport_type (name,description) VALUES ('volleyball','two teams of six players are separated by a net and each team tries to score by grounding a ball on the others court')
-
     INTO dms_sample.sport_type (name,description) VALUES ('cricket','A bat-and-ball game between two teams of eleven players on a field with a wicket at each end')
-
     SELECT * FROM dual;
-
     COMMIT;
-
     SELECT * FROM dms_sample.sport_type;
     ```
 
@@ -50,7 +42,7 @@
 
 ---
 
-## (대상 환경) 데이터 변경 사항 확인
+## (타겟 환경) 데이터 변경 사항 확인
 
 1. 마찬가지로 ```Oracle SQL Developer``` 툴을 사용하여 타겟 데이터베이스 접속 후 다음 SQL 문을 실행하여 ```SPORT_TYPE``` 테이블에 새로운 행이 추가되었는지 확인합니다.
 

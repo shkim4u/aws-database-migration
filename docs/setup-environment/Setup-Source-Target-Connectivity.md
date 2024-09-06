@@ -333,7 +333,7 @@
    ![소스 오라클 데이터베이스 접속 정보 확인](../../images/source-oracle-endpoint.png)
 
 7. SQL Developer에서 ```새 연결```을 클릭하여 아래 정보를 입력하고 ```Test``` 버튼을 클릭하여 연결을 테스트합니다.
-   - **접속 이름**: ```SourceOracle```
+   - **연결 이름**: ```Oracle Source```
    - **사용자 이름**: ```dbadmin```
    - **비밀번호**: ```dbadmin123```
    - **Hostname**: 위에서 확인한 ```SourceOracleEndpoint```
