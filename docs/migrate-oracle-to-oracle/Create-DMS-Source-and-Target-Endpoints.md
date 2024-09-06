@@ -63,7 +63,8 @@
    | **엔드포인트 연결 테스트 -> VPC**              | ```DMSWorkshop-Target-DmsVpc```                                      |
    | **복제 인스턴스**                          | ```앞서 생성한 복제 인스턴스```                                      |
 
-   ![타겟 엔드포인트 생성 1](../../images/dms-create-endpoint-target-info1.png)<br>
-   ![타겟 엔드포인트 생성 2](../../images/dms-create-endpoint-target-info2.png)<br>
+   ![타겟 엔드포인트 생성 1](../../images/dms-create-endpoint-target-info1.png)
+
+   ![타겟 엔드포인트 생성 2](../../images/dms-create-endpoint-target-info2.png)
 
 ___
