@@ -1,6 +1,6 @@
 # ***타겟 데이터베이스 데이터 검사***
 
-1. EC2 서버 내에서 ```pgAdmin4```를 연 다음 이전에 생성한 타겟 ```Aurora RDS (PostgreSQL)``` 데이터베이스 연결합니다.
+1. EC2 서버 내에서 ```pgAdmin4```를 연 다음 이전에 생성한 타겟 ```Aurora RDS (PostgreSQL)``` 데이터베이스에 연결합니다.
 
 2. 대상 데이터베이스의 테이블 중 하나를 쿼리하여 마이그레이션된 데이터를 검사합니다. 예를 들어 다음 쿼리는 두 개의 행이 있는 테이블을 반환해야 합니다 (혹은 앞선 워크샵 결과가 남아 있다면 좀 더 많은 행).
 
@@ -126,4 +126,7 @@
    FOREIGN KEY (transferred_from_id)
    REFERENCES dms_sample.person (ID);
    ```
+
    ![타겟 데이터베이스 제약 조건 재활성화](../../images/target-postgresql-recreate-fk.png)
+
+--

@@ -213,3 +213,10 @@ done
 
 echo $FRONTEND_DOMAIN_NAME
 ```
+
+---
+
+## 진정으로 무중단 데이터 마이그레이션을 어렵게 만드는 요인
+1. 데이터의 크기
+2. Entrenched Data & IT Culture
+3. DNS Propagation
