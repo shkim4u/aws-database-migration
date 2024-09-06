@@ -29,9 +29,11 @@
    > ⚠️ **주의**<br>
    > - ```대상 테이블 준비 모드```에 ```아무 작업 안 함``` 선택하십시오. 그렇지 않으면 오류가 발생합니다!!!
 
-   ![DMS 태스크 생성 1](../../images/dms-create-task-info1.png)<br>
-   ![DMS 태스크 생성 2](../../images/dms-create-task-info2.png)<br>
-   ![DMS 태스크 생성 3](../../images/dms-create-task-info3.png)<br>
+   ![DMS 태스크 생성 1](../../images/dms-create-task-info1.png)
+
+   ![DMS 태스크 생성 2](../../images/dms-create-task-info2.png)
+
+   ![DMS 태스크 생성 3](../../images/dms-create-task-info3.png)
 
 3. ````테이블 매핑`` `섹션을 확장하고 편집 모드로 ```마법사```를 선택합니다.
 
