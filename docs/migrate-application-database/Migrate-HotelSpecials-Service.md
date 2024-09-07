@@ -7,6 +7,7 @@
    2. ```GitOps``` 배포 설정 (```ArgoCD```)
    3. ```HotelSpecials``` 서비스 빌드
    4. ```HotelSpecials``` 서비스 배포 확인
+3. 다음 단계
 
 ---
 
@@ -20,14 +21,17 @@
 ---
 
 ## **2. ```HotelSpecials``` 서비스 ```Amazon EKS``` 클러스터에 배포**
-우리의 주된 관심사가 데이터베이스 마이그레이션이므로 ```쿠버테네트``` 및 ```GitOps``` 배포 체계에 대해서 시간을 들여 알아보지는 않고 아래 읽을거리만을 간단하게 참고로 달아두었으니 관심있으신 분들은 읽어보셔도 좋을 것 같습니다.<br>
+우리의 주된 관심사가 데이터베이스 마이그레이션이므로 ```쿠버테네스``` 및 ```GitOps``` 배포 체계에 대해서 시간을 들여 알아보지는 않고 아래 읽을거리만을 간단하게 참고로 달아두었으니 관심있으신 분들은 읽어보셔도 좋을 것 같습니다.<br>
 
 > 📕 **참고 문서**<br>
-> * [Kubernetes Solutions Market Forecast](https://www.linkedin.com/pulse/kubernetes-solutions-market-2024-cagr-2371-forecast-gplwc/)
 > * [데브옵스의 확장 모델 – 깃옵스(GitOps) 이해하기 - 삼성SDS 인사이트 리포트](https://www.samsungsds.com/kr/insights/gitops.html)
+
+[//]: # (> * [Kubernetes Solutions Market Forecast]&#40;https://www.linkedin.com/pulse/kubernetes-solutions-market-2024-cagr-2371-forecast-gplwc/&#41;)
 
 ### **2.1. ```GitOps``` 리포지터리 (```Helm```) 설정**
 먼저 애플리케이션이 빌드되면 ```Amazon EKS``` 클러스터에 배포하기 위한 ```GitOps``` 리포지터리를 설정합니다.
+
+타겟 환경의 `Cloud9` 터미널에서 작업합니다.
 
 참고로 이 리포지터리는 ```GitOps```를 담당하는 ```ArgoCD```에 의해 사용되며, 컨테이너 이미지가 빌드되어 ```ECR```에 푸시되면 이 리포지터리를 통해 ```Amazon EKS``` 클러스터에 배포됩니다.
 
@@ -120,25 +124,24 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
 
    ![ArgoCD HotelSpecials App](../../images/argocd-app-hotelspecials.png)
 
-    > (참고)<br>
-    > Application 생성 시 화면 하단에 Helm Setting 값들이 정상적으로 표시되는지 확인합니다.
+   > 📌 **참고**<br>
+   > * Application 생성 시 화면 하단에 Helm Setting 값들이 정상적으로 표시되는지 확인합니다.
 
 ### **2.3. ```HotelSpecials``` 서비스 빌드**
 
-1. ```Cloud9```에서 ```HotelSpecials``` 서비스가 사용하는 데이터베이스를 ```오라클``` -> ```MySQL```로 변경합니다.
-
-    * 40번째 줄 근처에 주석처리된 ```MySQL``` 드라이버 사용 구문을 주석 해제합니다. (사용)
-    * 그 다음 줄에 ```Oracle``` 드라이버 사용 구문을 주석 처리합니다. (미사용)
-    * 50번째 줄의 ```select 1 from dual``` 쿼리를 ```select 1```로 변경합니다.
-    * 66, 67번째 줄 각각 주석 처리 토글: ```Hibernate```의 ```Oracle``` Dialect 주석 처리, ```MySQL``` Dialect 주석 해제.
+1. ```Cloud9``` 상에서 ```HotelSpecials``` 서비스가 사용하는 데이터베이스를 ```오라클``` -> ```MySQL```로 변경합니다.
 
     ```bash
     cd ~/environment/aws-database-migration/legacy/applications/TravelBuddy/build
     c9 open src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml
     ```
 
-    ![HotelSpecials 서비스 데이터베이스 변경](../../images/hotelspecials-database-change-new.png)
+    * `40번째 줄` 근처에 주석처리된 ```MySQL``` 드라이버 사용 구문을 주석 해제합니다. (사용)
+    * `그 다음 줄`에 ```Oracle``` 드라이버 사용 구문을 주석 처리합니다. (미사용)
+    * `50번째 줄`의 ```select 1 from dual``` 쿼리를 ```select 1```로 변경합니다.
+    * `66, 67번째 줄` 주석 처리 각각 스위치: ```MySQL``` Dialect 주석 해제, ```Hibernate```의 ```Oracle``` Dialect 주석 처리.
 
+    ![HotelSpecials 서비스 데이터베이스 변경](../../images/hotelspecials-database-change-new.png)
 
 2. ```Cloud9``` 상에서 ```HotelSpecials``` 서비스의 소스 코드를 푸시하고 빌드 파이프라인을 실행합니다.
 
@@ -191,3 +194,11 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
 > 우리가 아직 데이터 마이그레이션을 수행하지 않았으므로 데이터베이스에 데이터가 없기 때문입니다.
 
 ---
+
+## **다음 단계**
+
+> 📕 **현재 상황 정리**<br>
+> * 호텔 프로모션 서비스의 기능이 클라우드에서 동작하기 시작하였습니다.
+> * 하지만 이 서비스는 `TravelBuddy`의 전체 기능 중 일부만을 담당하므로 모든 요청 트래픽을 처리할 수 없습니다.
+> * 기존 레거시 애플리케이션이 처리해야 할 트래픽은 온프레미스 소스로 전달하는 조치가 필요하며 다음 단계에서는 이를 수행해 보도록 하겠습니다.
+

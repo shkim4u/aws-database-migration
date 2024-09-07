@@ -28,11 +28,14 @@
 
 이제 마지막 작업으로 위의 기존 운영 환경과의 병행 운영을 감안하여 (예: 기존 데이터베이스를 참조하는 `BI` 시스템) 신규 시스템에서의 데이터 변경 사항을 기존 운영 환경으로 역동기화하는 작업을 수행해 보겠습니다.
 
+> 📕 **참고**<br>
+> `SSoT`가 클라우드로 전환된 데이터베이스에 대한 변경을 역동기화하는 것은 일종의 `Dual Write` 패턴으로, 이는 데이터베이스의 변경을 두 개 이상의 데이터베이스에 동시에 적용하여 신/구 시스템간 데이터의 일관성을 유지하는 방법입니다.
+
 ---
 
 ## **2. PostgreSQL 지속적 복제 설정**
 
-현재 사용 가능한 모든 `RDS for PostgreSQL` 버전은 논리적 복제 기능을 지원하며 이를 위해서는 아래 사항을 적용하여야 합니다. `pglogical` 확장은 `PostgreSQL 버전 10`에서 도입된 기능적으로 유사한 논리적 복제 기능보다 먼저 출시되었습니다.
+현재 사용 가능한 모든 `RDS for PostgreSQL` 버전은 논리적 복제 기능을 지원하며 이를 위해서는 아래 사항을 적용하여야 합니다.
 
 1. 논리적 복제를 위한 데이터베이스 파라미터 설정 (`테라폼`으로 배포 시 이미 적용되어 있음)
    1. `shared_preload_libraries` 파라미터에 `pglogical` 포함
@@ -46,12 +49,12 @@
       SHOW wal_level;
       CREATE EXTENSION pglogical;
       ```
-3. `PostgreSQL` 데이터베이스 재부팅
+3. `PostgreSQL` 데이터베이스 재부팅 (`Cloud9`에서 수행)
    1. ```bash
       aws rds reboot-db-instance --db-instance-identifier flightspecials-test-postgres-db
       ```
 
-* 참고: [pglogical을 사용하여 인스턴스 간 데이터 동기화](https://docs.aws.amazon.com/ko_kr/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.pglogical.html)
+> Reference: [pglogical을 사용하여 인스턴스 간 데이터 동기화](https://docs.aws.amazon.com/ko_kr/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.pglogical.html)
 
 ---
 
@@ -99,7 +102,7 @@
    | **비밀번호**                    | ```dmsuser123```                                |
    | **SSL 모드**                  | ```없음```                                        | 
    | **데이터베이스 이름**               | ```dso```                                       | 
-   | **엔드포인트 연결 테스트 -> VPC**     | ```이름에 DmsVpc가 포함된 VPC ID```                    |
+   | **엔드포인트 연결 테스트 -> VPC**     | ```DMSWorkshop-Target-DmsVpc```                    |
    | **엔드포인트 연결 테스트 -> 복제 인스턴스** | ```dmsworkshop-target-dmsrepl```                |
 
    ![```FlightSpecials``` PostgreSQL 소스 엔드포인트 1](../../images/reverse-synchronization/flightspecials-postgresql-source-rsync-1.png)
@@ -110,10 +113,18 @@
 
    ![```FlightSpecials``` PostgreSQL 소스 엔드포인트 4](../../images/reverse-synchronization/flightspecials-postgresql-source-rsync-4.png)
 
-   > 📌 **참고**<br>
-   > * 사실 우리는 앞선 과정에서 이미 동일한 `PostgreSQL` 데이터베이스에 대한 엔드포인트를 생성하였습니다. `AWS DMS 마이그레이션 태스크`는 동일한 엔드포인트 설정이라면 소스와 타겟에 관계없이 엔드포인트를 재사용할 수 있으므로 엔드포인트를 새로 생성하지 않고 이전에 생성한 엔드포인트를 그대로 사용할 수 있습니다.
-   > * 하지만 소스와 타겟에 따라 `Read-only` 속성이나 `Extra Connection Attributes (ECA)` 등이 다를 수 있으므로, 그 때는 새로운 엔드포인트를 생성하여 사용하는 것이 좋습니다.
-   > * 대표적인 예가 앞서 수행했던 `PostgreSQL` 타겟 엔드포인트에서 추가 연결 속성을 지정했던 부분입니다 (`truncateTrailingZerosForPlainNumeric=true`). 
+[//]: # (   > 📌 **참고**<br>)
+
+[//]: # (   > * 사실 우리는 앞선 과정에서 이미 동일한 `PostgreSQL` 데이터베이스에 대한 엔드포인트를 생성하였습니다. `AWS DMS 마이그레이션 태스크`는 동일한 엔드포인트 설정이라면 소스와 타겟에 관계없이 엔드포인트를 재사용할 수 있으므로 엔드포인트를 새로 생성하지 않고 이전에 생성한 엔드포인트를 그대로 사용할 수 있습니다.)
+
+[//]: # (   > * 하지만 소스와 타겟에 따라 `Read-only` 속성이나 `Extra Connection Attributes &#40;ECA&#41;` 등이 다를 수 있으므로, 그 때는 새로운 엔드포인트를 생성하여 사용하는 것이 좋습니다.)
+
+[//]: # (   > * 대표적인 예가 앞서 수행했던 `PostgreSQL` 타겟 엔드포인트에서 추가 연결 속성을 지정했던 부분입니다 &#40;`truncateTrailingZerosForPlainNumeric=true`&#41;. )
+
+3. 레거시 오러클 데이터베이스는 더 이상 `CUD (Create, Update, Delete)` 작업이 수행되지 않으며, `ID` 채번을 위한 시퀀스와 트리거는 `DMS`가 사용하는 `DPL (Direct Path Loading)` 성능이나 `CDC` 복제에 영향을 줄 수 있으므로 해당 트리거를 비활성화 합니다.
+   * 소스 환경에서 `Oracle SQL Developer`로 접속하여 아래와 같이 수행합니다.
+
+   ![TravelBuddy FlightSpecial 테이블 트리거 비활성화](../../images/reverse-synchronization/travelbuddy-oracle-trigger-disable.png)
 
 ### **4.2. 타겟 엔드포인트 생성**
 
@@ -138,7 +149,7 @@
    | **사용자 이름**              | ```dmsuser```                                             |
    | **비밀번호**                | ```dmsuser123```                                          |
    | **SID/Service Name**    | ```XE```                                                  |   
-   | **엔드포인트 연결 테스트 -> VPC** | ```이름에 DmsVpc가 포함된 VPC ID```                              |
+   | **엔드포인트 연결 테스트 -> VPC** | ```DMSWorkshop-Target-DmsVpc```                              |
    | **엔드포인트 연결 테스트 -> 복제 인스턴스**             | ```dmsworkshop-target-dmsrepl```                          |
 
    ![```TravelBuddy``` 오라클 타겟 엔드포인트 1](../../images/reverse-synchronization/travelbuddy-oracle-target-endpoint1.png)
@@ -174,57 +185,51 @@
    | **태스크 로그 / CloudWatch 로그 켜기**    | ```CloudWatch 로그 켜기 체크``` (기본값 아님)                        |
    | **로그 컨텍스트**                      | ```체크된 상태로 로깅의 기본 수준 사용```                                |
 
-3. ```테이블 매핑``` 섹션을 확장하고 편집 모드로 ```JSON 편집기```를 선택하고 아래 JSON 텍스트를 붙여넣습니다. 종종 많은 변환 규칙을 정의할 때는 ```JSON``` 형태로 정의된 템플릿을 사용하는 것이 편리하게 작업할 수 있으며, ```DMS```가 데이터를 변환하는 방법을 세밀하게 제어할 수 있습니다.
+3. ```테이블 매핑``` 섹션을 확장하고 편집 모드로 ```JSON 편집기```를 선택하고 아래 JSON 텍스트를 붙여넣습니다. 아래 규칙은 `flightspecials`의 항공 여정 이름(헤더)의 변경 사항을 온프레미스 오라클 데이터베이로 복제하기 위한 설정을 담고 있습니다.
 
    ```json
    {
       "rules": [
          {
-            "rule-type": "transformation",
-            "rule-id": "556134354",
-            "rule-name": "556134354",
-            "rule-target": "column",
+            "rule-type": "selection",
+            "rule-id": "1",
+            "rule-name": "SelectionRule",
             "object-locator": {
                "schema-name": "travelbuddy",
-               "table-name": "flightspecial",
-               "column-name": "expiry_date"
+               "table-name": "flightspecial"
             },
-            "rule-action": "rename",
-            "value": "EXPIRYDATE",
+            "rule-action": "include",
+            "filters": []
+         },
+         {
+            "rule-type": "transformation",
+            "rule-id": "2",
+            "rule-name": "UppercaseSchema",
+            "rule-target": "schema",
+            "object-locator": {
+               "schema-name": "travelbuddy"
+            },
+            "rule-action": "convert-uppercase",
+            "value": null,
             "old-value": null
          },
          {
             "rule-type": "transformation",
-            "rule-id": "556002807",
-            "rule-name": "556002807",
-            "rule-target": "column",
+            "rule-id": "3",
+            "rule-name": "UppercaseTable",
+            "rule-target": "table",
             "object-locator": {
                "schema-name": "travelbuddy",
-               "table-name": "flightspecial",
-               "column-name": "detination_code"
+               "table-name": "flightspecial"
             },
-            "rule-action": "rename",
-            "value": "DESTINATIONCODE",
+            "rule-action": "convert-uppercase",
+            "value": null,
             "old-value": null
          },
          {
             "rule-type": "transformation",
-            "rule-id": "555920505",
-            "rule-name": "555920505",
-            "rule-target": "column",
-            "object-locator": {
-               "schema-name": "travelbuddy",
-               "table-name": "flightspecial",
-               "column-name": "origin_code"
-            },
-            "rule-action": "rename",
-            "value": "ORIGINCODE",
-            "old-value": null
-         },
-         {
-            "rule-type": "transformation",
-            "rule-id": "555867091",
-            "rule-name": "555867091",
+            "rule-id": "4",
+            "rule-name": "UppercaseColumns",
             "rule-target": "column",
             "object-locator": {
                "schema-name": "travelbuddy",
@@ -237,39 +242,45 @@
          },
          {
             "rule-type": "transformation",
-            "rule-id": "555830387",
-            "rule-name": "555830387",
-            "rule-target": "table",
+            "rule-id": "5",
+            "rule-name": "RenameOriginCode",
+            "rule-target": "column",
             "object-locator": {
                "schema-name": "travelbuddy",
-               "table-name": "flightspecial"
+               "table-name": "flightspecial",
+               "column-name": "origin_code"
             },
-            "rule-action": "convert-uppercase",
-            "value": null,
+            "rule-action": "rename",
+            "value": "ORIGINCODE",
             "old-value": null
          },
          {
             "rule-type": "transformation",
-            "rule-id": "555805535",
-            "rule-name": "555805535",
-            "rule-target": "schema",
+            "rule-id": "6",
+            "rule-name": "RenameDestinationCode",
+            "rule-target": "column",
             "object-locator": {
-               "schema-name": "travelbuddy"
+               "schema-name": "travelbuddy",
+               "table-name": "flightspecial",
+               "column-name": "detination_code"
             },
-            "rule-action": "convert-uppercase",
-            "value": null,
+            "rule-action": "rename",
+            "value": "DESTINATIONCODE",
             "old-value": null
          },
          {
-            "rule-type": "selection",
-            "rule-id": "555776470",
-            "rule-name": "555776470",
+            "rule-type": "transformation",
+            "rule-id": "7",
+            "rule-name": "RenameExpireDate",
+            "rule-target": "column",
             "object-locator": {
                "schema-name": "travelbuddy",
-               "table-name": "flightspecial"
+               "table-name": "flightspecial",
+               "column-name": "expiry_date"
             },
-            "rule-action": "include",
-            "filters": []
+            "rule-action": "rename",
+            "value": "EXPIRYDATE",
+            "old-value": null
          }
       ]
    }
@@ -277,20 +288,17 @@
 
 4. ```태스크 생성```을 클릭합니다.
 
-   TODO: 상황에 맞는 화면 덤프
-
    * ```마이그레이션 태스크 시작 구성``` 아래 ```생성 시 자동으로 시작```이 선택되어 있는지 확인한 다음 ```태스크 생성```을 클릭합니다.
 
    * 설정된 화면은 아래와 유사합니다.
 
-   ![FlightSpecials DMS 마이그레이션 태스크 생성 화면 1](../../images/flightspecials-postgresql-target/creat-hotelspecials-dms-migration-task-parameters-1-new.png)
+   ![FlightSpecials DMS 역동기화 마이그레이션 태스크 생성 화면 1](../../images/reverse-synchronization/rsync-dms-task-1.png)
 
-   ![FlightSpecials DMS 마이그레이션 태스크 생성 화면 2](../../images/flightspecials-postgresql-target/creat-hotelspecials-dms-migration-task-parameters-2-new.png)
+   ![FlightSpecials DMS 역동기화 마이그레이션 태스크 생성 화면 2](../../images/reverse-synchronization/rsync-dms-task-2.png)
 
-   ![FlightSpecials DMS 마이그레이션 태스크 생성 화면 3](../../images/flightspecials-postgresql-target/creat-hotelspecials-dms-migration-task-parameters-3-new.png)
+   ![FlightSpecials DMS 역동기화 마이그레이션 태스크 생성 화면 3](../../images/reverse-synchronization/rsync-dms-task-3.png)
 
-   ![FlightSpecials DMS 마이그레이션 태스크 생성 화면 4](../../images/flightspecials-postgresql-target/creat-hotelspecials-dms-migration-task-parameters-4-new.png)
-
+   ![FlightSpecials DMS 역동기화 마이그레이션 태스크 생성 화면 4](../../images/reverse-synchronization/rsync-dms-task-4.png)
 
 5. ```마이그레이션 태스크``` 실행이 시작되고 소스 (`Amazon RDS PostgreSQL`) `travelbuddy` 스키마의 데이터가 온프레미스 `Oracle` 데이터베이스로 복제되기 시작합니다.
 
@@ -300,27 +308,57 @@
 
 ## **6. 데이터 변경 및 역동기화 테스트**
 
+[//]: # (아래 명령어를 `Cloud9` 터미널에서 실행하여 `FlightSpecials` 서비스의 데이터 변경을 수행하고 온프레미스 `Oracle` 데이터베이스로 역동기화가 성공적으로 수행되는지 확인합니다.)
 
-1. 우선 데이터 변경을 위한 API 엔드포인트를 설정합니다.
+[//]: # ()
+[//]: # (1. 우선 데이터 변경을 위한 API 엔드포인트를 설정합니다.)
 
-```bash
-export API_URL=http://$(kubectl get ingress/flightspecials-ingress -n flightspecials -o jsonpath='{.status.loadBalancer.ingress[*].hostname}')
-export API_URI=${API_URL}/travelbuddy/flightspecials/1/name && echo ${API_URI}
-```
+[//]: # ()
+[//]: # (   ```bash)
 
-2. 확인된 API 엔드포인트를 이용하여 데이터 변경을 수행합니다.
+[//]: # (   export API_URL=http://$&#40;kubectl get ingress/flightspecials-ingress -n flightspecials -o jsonpath='{.status.loadBalancer.ingress[*].hostname}'&#41;)
 
-```bash
-curl --location --verbose ${API_URI} --header 'Content-Type: application/json' --data '{"id": 1, "flightSpecialHeader": "London to Busan"}'
-```
+[//]: # (   export API_URI=${API_URL}/travelbuddy/flightspecials/1/header && echo ${API_URI})
 
-TODO: 이미지
+[//]: # (   ```)
 
-6. ```마이그레이션 태스크 (flightspecials-postgresql-to-oracle-rsync-task)```를 클릭하고 ```테이블 통계``` 탭으로 이동하여 테이블 통계를 보고 이동된 행 수를 확인합니다.
+[//]: # ()
+[//]: # (2. 확인된 API 엔드포인트를 이용하여 데이터 변경을 수행합니다.)
 
-TODO: 이미지 교체
+[//]: # ()
+[//]: # (   ```bash)
 
-   ![FlightSpecials DMS 마이그레이션 태스크 테이블 통계](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-task-table-stats.png)
+[//]: # (   curl --location --verbose ${API_URI} --header 'Content-Type: application/json' --data '{"id": 1, "flightSpecialHeader": "London to Busan"}')
+
+[//]: # (   ```)
+
+1. `pgAdmin4` 툴에서 `flightspecials` 테이블에 대한 데이터 변경을 수행합니다.
+
+   ```sql
+   -- ID=1인 항공 여정 이름을 변경합니다.
+   UPDATE travelbuddy.flightspecial SET header = 'London to Busan' WHERE id = 1;
+   ```
+
+   ![FlightSpecials 역동기화 데이터 변경](../../images/reverse-synchronization/flightspecials-postgresql-data-change.png)
+
+2. `Oracle SQL Developer` 툴에서 `travelbuddy` 스키마의 `flightspecial` 테이블에 대한 데이터 변경이 온프레미스 `Oracle` 데이터베이스로 성공적으로 복제되는지 확인합니다.
+
+   ![TravelBuddy 역동기화 데이터 변경 확인](../../images/reverse-synchronization/travelbuddy-oracle-data-change.png)
+
+   > 📌 **참고**<br>
+   > 변경 데이터의 복제가 수행되지 않으면 다음 사항을 확인합니다.
+   > 1. `DMS 마이그레이션 태스크` 재시작
+   > 2. `DMS 마이그레이션 태스크` 로그
+   > 3. `PostgreSQL` 데이터베이스 로그
+   > 4. `DMS Assssment Report`
+
+3. ```마이그레이션 태스크 (flightspecials-postgresql-to-oracle-rsync-task)```를 클릭하고 ```테이블 통계``` 탭으로 이동하여 테이블 통계를 보고 이동된 행 수를 확인합니다.
+
+   ![FlightSpecials DMS 역동기화 태스크 테이블 통계](../../images/flightspecials-postgresql-target/flightspecials-dms-migration-task-table-stats.png)
+
+4. 이제 레거시 `TravelBuddy` 애플리케이션을 통해 변경된 데이터가 정상적으로 조회되는지 확인합니다.
+
+   ![TravelBuddy 레거시 애플리케이션 데이터 변경 확인](../../images/reverse-synchronization/travelbuddy-legacy-application-data-change.png)
 
 ---
 

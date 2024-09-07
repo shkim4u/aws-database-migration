@@ -97,3 +97,8 @@ PostgreSQL과 MySQL은 객체 이름(예: 테이블, 컬럼, 인덱스 등)을 �
 - **MySQL**: 대소문자 구별 여부는 운영 체제와 설정에 따라 다릅니다. Unix/Linux에서는 대소문자를 구별하고, Windows에서는 구별하지 않습니다. `lower_case_table_names` 설정에 따라 동작을 조정할 수 있습니다.
 
 각 데이터베이스의 이러한 특성 때문에, 다중 DBMS를 사용하는 환경에서는 객체 이름의 대소문자 처리 방식에 유의하는 것이 중요합니다.
+
+---
+
+## **References**
+* [Oracle, MySQL, PostgreSQL의 대소문자 구분](https://docs.aws.amazon.com/ko_kr/dms/latest/userguide/CHAP_Source.Oracle.html#CHAP_Source.Oracle.CaseSensitivity)

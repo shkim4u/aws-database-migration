@@ -7,6 +7,7 @@
    2. ```GitOps``` 배포 설정 (```ArgoCD```)
    3. ```FlightSpecials``` 서비스 빌드
    4. ```FlightSpecials``` 서비스 배포 확인
+3. 다음 단계
 
 ---
 
@@ -118,7 +119,7 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
     * **Destination 섹션 > Cluster URL**: ```https://kubernetes.default.svc```
     * **Destination 섹션 > Namespace**: ```flightspecials```를 입력하고 상단의 Create를 클릭합니다.
 
-  ![ArgoCD HotelSpecials App](../../images/argocd-app-hotelspecials.png)
+  ![ArgoCD FlightSpecials App](../../images/argocd-app-hotelspecials.png)
 
   > (참고)<br>
   > Application 생성 시 화면 하단에 Helm Setting 값들이 정상적으로 표시되는지 확인합니다.
@@ -152,31 +153,49 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
 
 3. ```CodeCommit``` 리포지터리에 소스 코드가 푸시되었음을 확인합니다.
 
-   ![HotelSpecials 소스 파일 푸시됨](../../images/hotelspecials-codecommit-repository-source-pushed.png)
+   ![FlightSpecials 소스 파일 푸시됨](../../images/hotelspecials-codecommit-repository-source-pushed.png)
 
 4. 또한 빌드 파이프라인도 트리거되어 실행되었음을 확인합니다. 다만, Build Spec이 없거나 정상적으로 구성되지 않은 등의 이유로 파이프라인은 실패하였을 수 있습니다. 발생한 오류를 확인하고 수정합니다.
 
-   ![HotelSpecials 빌드 파이프라인 실패](../../images/hotelspecials-codepipeline-initial-run-failed.png)
+   ![FlightSpecials 빌드 파이프라인 실패](../../images/hotelspecials-codepipeline-initial-run-failed.png)
 
 ### **2.4. ```FlightSpecials``` 서비스 배포 확인**
 
-위의 과정이 정상적으로 수행되면 ```ArgoCD```에서 ```hotelspecials``` 애플리케이션에 대한 배포가 자동으로 수행됩니다.
+위의 과정이 정상적으로 수행되면 ```ArgoCD```에서 ```flightspecials``` 애플리케이션에 대한 배포가 자동으로 수행됩니다.
 
-![HotelSpecials GitOps 배포](../../images/hotelspecials-argocd-deployed.png)
+![FlightSpecials GitOps 배포](../../images/hotelspecials-argocd-deployed.png)
 
-위 화면에서 ```hotelspecials-ingress``` 항목의 링크 열기 미니 아이콘을 클릭하여 ```HotelSpecials``` 서비스가 정상적으로 배포되었는지 확인합니다.
+위 화면에서 ```flightspecials-ingress``` 항목의 링크 열기 미니 아이콘을 클릭하여 ```FlightSpecials``` 서비스가 정상적으로 배포되었는지 확인합니다.
 
-![HotelSpecials 서비스 확인](../../images/hotelspecials-service-check.png)
+![FlightSpecials 서비스 확인](../../images/hotelspecials-service-check.png)
 
 아래와 같이 요청이 정상적으로 처리되면 브라우저에 표시됩니다.
 
-![HotelSpecials 서비스 요청 처리](../../images/hotelspecials-service-request.png)
+![FlightSpecials 서비스 요청 처리](../../images/hotelspecials-service-request.png)
 
 > 📌 **참고**<br>
 > 브라우저에서 아무 데이터가 표시되지 않는 것은 정상입니다.<br>
 > 우리가 아직 데이터 마이그레이션을 수행하지 않았으므로 데이터베이스에 데이터가 없기 때문입니다.
 
+이 상태에서 프론트엔드를 확인해 보면 아래와 같이 보이게됩니다.
+
+![FlightSpecials 서비스 전환 후 프론트엔드](../../images/flightspecials-migrated-frontend.png)
+
+> 📌 **참고**<br>
+> * 위 화면과 같은 이유로 각 서비스를 단계별로 이관할 때도 해당 서비스의 순단이 발생할 수 있습니다.
+> * 혹은 서비스 별 이관에 하나의 차원을 더해 각 엔드 유저들을 추가로 확인하여 마이그레이션이 완전히 완료된 사용자의 트래픽만 클라우드로 라우팅하는 방법도 있습니다. 하지만 이는 보다 정교한 준비와 구현이 필요합니다.
+
+> ❓ **의문점**<br>
+> * 우리가 앞선 과정에서 설정한 `/*` 경로를 온프레미스 애플리케이션 서비스로 보내는 `AWS ALB` Rule은 특별히 삭제하지 않았음에도 불구하고 해당 로드밸런서 항목에서는 삭제되어 동작하지 않습니다. 이는 왜 그런 것일까요?
+>   * ![ALB 레거시 Rule 삭제](../../images/alb-legacy-rule-deleted.png)
+> * 원인을 정확하게 이해하려면 `Kubernetes`의 `Ingress` 리소스와 이의 AWS 구현체인 `AWS Load Balancer Controller`에 대한 이해가 필요합니다.
+> * 이런 이해와 함께 `ExternalDNS`, `ClusterIP` 등을 결합하면 더 정교한 병행 운영 (Parallel Rune)을 위한 적용을 도모할 수 있습니다.
+
 ---
 
-## **3. 추가 사항**
-TODO: Flyway
+## **다음 단계**
+
+> 📕 **현재 상황 정리**<br>
+> * 항공권 여정 프로모션 서비스의 기능이 클라우드에서 동작하기 시작하였습니다.
+> * 이 서비스가 사용하는 데이터베이스를 클라우드로 마이그레이션하고 앞서 온프레미스로 라우팅 되었던 요청 트래픽을 새로 클라우드로 배포된 `FlightSpecials` 서비스로 전송하게되면 데이터베이스와 애플리케이션의 전환 과정을 끝나게 됩니다.
+> * 이제 `FlightSpecials` 서비스의 데이터를 마이그레이션하도록 하겠습니다.

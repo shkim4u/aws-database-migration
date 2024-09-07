@@ -8,9 +8,12 @@
 
     ```bash
     bash
-    
+  
     ORACLE_CONTAINER_ID=`docker ps --filter "ancestor=shkim4u/oracle:11.2.0.2-xe" --format "{{.ID}}"`
     echo "Oracle Container ID: $ORACLE_CONTAINER_ID" 
+    ```
+    
+    ```bash
     docker exec -it $ORACLE_CONTAINER_ID /bin/bash
     ```
 

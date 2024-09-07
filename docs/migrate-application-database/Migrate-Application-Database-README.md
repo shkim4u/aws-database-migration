@@ -6,6 +6,7 @@
 1. 개요
 2. 시나리오
 3. 애플리케이션 및 데이터베이스 마이그레이션 상세 단계
+4. (읽을 거리) `AWS DMS`를 활용한 데이터베이스 무중단 마이그레이션 고려 사항
 
 ---
 
@@ -56,8 +57,6 @@
   * 호텔 프로모션 조회: `Amazon Aurora (MySQL)` 
   * 항공권 프로모션 조회: `Amazon Aurora (PostgreSQL)` 
 
-다음 순서로 진행합니다.
-
 ---
 
 ## **3. 애플리케이션 및 데이터베이스 마이그레이션 상세 단계**
@@ -72,7 +71,30 @@
 
 조금은 복잡해 보일 수 있지만, 각 단계를 실행이 용이한 단위로 나누고 효과를 검증하면서 진행한다는 점에서 실질적인 도움을 줄 수 있는 전략이라고 볼 수 있습니다.
 
-### **3.1. (Optional) `AWS DMS`를 활용한 데이터베이스 무중단 마이그레이션 고려 사항**
+다음 순서로 진행합니다.
+* [(소스) 레거시 애플리케이션/데이터베이스 구성 및 실행](./Configure-and-Launch-Legacy-Application-and-Database.md)
+* [(타겟) 신규 데이터베이스 및 애플리케이션 인프라 구성](./Configure-New-Database-and-Application-Infrastructure.md)
+* [사용자 인터페이스 (프론트엔드) 분리](./Separate-Frontend.md)
+* [```HotelSpecials``` 데이터베이스 스키마 전환](./Convert-HotelSpecials-Database-Schema.md)
+* [```HotelSpecials``` 서비스 마이그레이션 및 구동](./Migrate-HotelSpecials-Service.md)
+* [```Application Load Balancer (ALB)``` 요청 라우팅 설정](./Configure-ALB-Request-Routing.md)
+* [애플리케이션 트래픽 유입 중단](./Stop-Application-Traffic-Inflow.md)
+* [```HotelSpecials``` 데이터 마이그레이션](./Migrate-HotelSpecials-Data.md)
+* [프론트엔드의 백엔드 접속 엔드포인트 (DNS)를 ALB로 변경](./Change-Frontend-Backend-ALB.md)
+* [넓은 지역으로 DNS 전파 확인](./Check-DNS-Propagation.md)
+* [프론트엔드로 트래픽 유입 재개](./Resume-Frontend-Traffic.md)
+* [```HotelSpecials``` 데이터의 SSOT 클라우드 전환 완료 선언](./Declare-HotelSpecials-SSOT-Cloud-Transition-Complete.md)
+* [```FlightSpecials``` 데이터베이스 스키마 전환](./Convert-FlightSpecials-Database-Schema.md)
+* [애플리케이션 트래픽 유입 중단](./Stop-Application-Traffic-Inflow.md)
+* [```FlightSpecials``` 서비스 마이그레이션](./Migrate-FlightSpecials-Service.md)
+* [```FlightSpecials``` 데이터 마이그레이션](./Migrate-FlightSpecials-Data.md)
+* [프론트엔드로 트래픽 유입 재개](./Resume-Frontend-Traffic.md)
+* [```FlightSpecials``` 데이터의 SSOT 클라우드 전환 완료 선언](./Declare-FlightSpecials-SSOT-Cloud-Transition-Complete.md)
+* [데이터베이스 역동기화](./Database-Reverse-Synchronization.md)
+
+---
+
+## **4. (읽을 거리) `AWS DMS`를 활용한 데이터베이스 무중단 마이그레이션 고려 사항**
 
 > 📕 **참고**<br>
 > * [[무중단 데이터베이스 마이그레이션 전략 및 고려 사항]](./Zero-Downtime-Migration-Strategy.md)

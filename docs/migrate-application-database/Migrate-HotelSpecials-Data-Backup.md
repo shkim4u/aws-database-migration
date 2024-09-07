@@ -7,8 +7,7 @@
 1. 개요
 2. 복제 인스턴스 확인
 3. 소스 및 타겟 엔드포인트 생성
-4. ```DMS 마이그레이션 태스크``` 생성 및 마이그레이션 실행
-5. 타겟 데이터베이스에서 데이터 확인
+4. ```DMS 마이그레이션 태스크``` 생성
 
 ---
 
@@ -100,7 +99,7 @@
 
 ---
 
-## **4. ```DMS 마이그레이션 태스크``` 생성 및 마이그레이션 실행**
+## **4. ```DMS 마이그레이션 태스크``` 생성**
 
 1. ```DMS > 데이터 마이그레이션 > 데이터베이스 마이그레이션 태스크```로 이동한 다음 오른쪽 상단에서 ```태스크 생성``` 버튼을 클릭합니다.
 
@@ -127,150 +126,200 @@
    > * 위에서 ```대상 테이블 준비 모드```를 ```대상에서 테이블 삭제```를 선택하십시요. 이는 ```Oracle```에서 ID 컬럼을 구현하기 위하여 적용되었던 트리거를 ```AWS SCT```에서 그대로 적용하였지만, 트리거 로직이 타겟과 부합하지 않아 데이터 적재 시 오류를 발생시키기 때문입니다.
    > * 트리거를 비활성화할 수 있지만. 좀 더 쉽게는 테이블 만을 삭제하고 (트리거도 Cascded 삭제됨) 다시 생성함으로써 ```AWS SCT```의 테이블 전환 결과를 ```DMS```가 Override하도록 할 수 있습니다. 
 
-3. ```테이블 매핑``` 섹션을 확장하고 편집 모드로 ```JSON 편집기```를 선택하고 아래 JSON 텍스트를 붙여 넣습니다.
+3. ```테이블 매핑``` 섹션을 확장하고 편집 모드로 ```JSON 편집기```를 선택합니다.
 
-   ```json
-   {
-       "rules": [
-           {
-               "rule-type": "selection",
-               "rule-id": "1",
-               "rule-name": "SelectSchemaAndTable",
-               "object-locator": {
-                   "schema-name": "TRAVELBUDDY",
-                   "table-name": "HOTELSPECIAL"
-               },
-               "rule-action": "include",
-               "filters": []
-           },
-           {
-               "rule-type": "transformation",
-               "rule-id": "2",
-               "rule-name": "RenameSchema",
-               "rule-target": "schema",
-               "object-locator": {
-                   "schema-name": "TRAVELBUDDY"
-               },
-               "rule-action": "rename",
-               "value": "m2m",
-               "old-value": null
-           },
-           {
-               "rule-type": "transformation",
-               "rule-id": "3",
-               "rule-name": "LowercaseTable",
-               "rule-target": "table",
-               "object-locator": {
-                   "schema-name": "TRAVELBUDDY",
-                   "table-name": "%"
-               },
-               "rule-action": "convert-lowercase",
-               "value": null,
-               "old-value": null
-           },
-           {
-               "rule-type": "transformation",
-               "rule-id": "4",
-               "rule-name": "LowercaseId",
-               "rule-target": "column",
-               "object-locator": {
-                   "schema-name": "TRAVELBUDDY",
-                   "table-name": "HOTELSPECIAL",
-                   "column-name": "ID"
-               },
-               "rule-action": "convert-lowercase",
-               "value": null,
-               "old-value": null
-           },
-           {
-               "rule-type": "transformation",
-               "rule-id": "5",
-               "rule-name": "LowercaseHotel",
-               "rule-target": "column",
-               "object-locator": {
-                   "schema-name": "TRAVELBUDDY",
-                   "table-name": "HOTELSPECIAL",
-                   "column-name": "HOTEL"
-               },
-               "rule-action": "convert-lowercase",
-               "value": null,
-               "old-value": null
-           },
-           {
-               "rule-type": "transformation",
-               "rule-id": "6",
-               "rule-name": "LowercaseDescription",
-               "rule-target": "column",
-               "object-locator": {
-                   "schema-name": "TRAVELBUDDY",
-                   "table-name": "HOTELSPECIAL",
-                   "column-name": "DESCRIPTION"
-               },
-               "rule-action": "convert-lowercase",
-               "value": null,
-               "old-value": null
-           },
-           {
-               "rule-type": "transformation",
-               "rule-id": "7",
-               "rule-name": "LowercaseLocation",
-               "rule-target": "column",
-               "object-locator": {
-                   "schema-name": "TRAVELBUDDY",
-                   "table-name": "HOTELSPECIAL",
-                   "column-name": "LOCATION"
-               },
-               "rule-action": "convert-lowercase",
-               "value": null,
-               "old-value": null
-           },
-           {
-               "rule-type": "transformation",
-               "rule-id": "8",
-               "rule-name": "LowercaseCost",
-               "rule-target": "column",
-               "object-locator": {
-                   "schema-name": "TRAVELBUDDY",
-                   "table-name": "HOTELSPECIAL",
-                   "column-name": "COST"
-               },
-               "rule-action": "convert-lowercase",
-               "value": null,
-               "old-value": null
-           },
-           {
-               "rule-type": "transformation",
-               "rule-id": "9",
-               "rule-name": "LowercaseExpiryDate",
-               "rule-target": "column",
-               "object-locator": {
-                   "schema-name": "TRAVELBUDDY",
-                   "table-name": "HOTELSPECIAL",
-                   "column-name": "EXPIRYDATE"
-               },
-               "rule-action": "rename",
-               "value": "expiryDate",
-               "old-value": null
-           }
-       ]
-   }
-   ```
+4. ```새 선택 규칙 추가``` 버튼을 클릭하고 양식에 다음 값을 입력합니다. (참고: 대소문자를 구분하므로 주의하세요. 또한 선택 규칙은 마이그레이션하려는 스키마와 테이블 정보를 ```DMS 복제 인스턴스```에 전달하는데 사용됩니다.
+
+   | **파라미터**   | **값**                      |
+   |------------|----------------------------|
+   | **스키마**    | ```TRAVELBUDDY``` (대소문자 유의) |
+   | **테이블 이름** | ```HOTELSPECIAL```         |
+   | **작업**     | ```포함```                   |
+
+   > ⚠️ **주의**<br>
+   > * 태스크 생성 화면에서 스키마를 인식하지 못하는 경우 엔드포인트 화면으로 돌아가서 엔드포인트를 클릭하세요. ```스키마``` 탭에서 ```새로 고침``` 버튼을 클릭하면 잠시 후 스키마들이 표시됩니다.
 
    > 📌 **참고**<br>
-   > * Oracle, MySQL, PostgreSQL은 객체 이름에 대소문자를 다루는 방식이 조금씩 다릅니다. 이에 대한 내용은 아래 보충 문서를 참고하세요.<br>
-   >   * [[Oracle, MySQL, PostgreSQL의 대소문자 구분]](./Case-Sensitivity-for-Oracle-PostgreSQL-MySQL.md) 
-   
-4. 📕 시간 여유가 있다면 이번에는 진행자의 안내를 받아 (S3 및 IAM Role 설정) ```마이그레이션 전 평가 켜기```는 활성화하여 어떤 평가 보고서가 생성되는지 살펴보는 것도 좋습니다.
+   > Oracle, MySQL, PostgreSQL은 객체 이름에 대소문자를 다루는 방식이 조금씩 다릅니다. 이에 대한 내용은 아래 보충 문서를 참고하세요.<br>
+   > [Oracle, MySQL, PostgreSQL의 대소문자 구분](https://docs.aws.amazon.com/ko_kr/dms/latest/userguide/CHAP_Source.Oracle.html#CHAP_Source.Oracle.CaseSensitivity)
+   > [TODO: 보충 설명](./Case-Sensitivity-for-Oracle-PostgreSQL-MySQL.md) 
 
-5. ```마이그레이션 태스크 시작 구성``` 아래 ```생성 시 자동으로 시작```이 선택되어 있는지 확인한 다음 ```태스크 생성```을 클릭합니다.
+[//]: # (5. 그런 다음 ```변환 규칙``` 섹션을 확장하고 다음 값을 사용하여 ```변환 규칙 추가```를 클릭합니다. &#40;참고: ```MySQL```에서는 실행 중인 운영체제에 따라 다르지만 개체 이름의 대소문자를 구분합니다. 우리는 ```TRAVELBUDDY``` 스미마를 ```m2m```으로, 그리고 ```HOTELSPECIAL``` 테이블을 ```hotelspecial```로 변환하고자 합니다&#41;)
 
-   * 설정된 화면은 아래와 유사합니다.
+[//]: # ()
+[//]: # (   - Rule 1:)
+
+[//]: # (   )
+[//]: # (   | **파라미터**   | **값**                             |)
+
+[//]: # (   |------------|-----------------------------------|)
+
+[//]: # (   | **규칙 대상**     | ```스키마```                         |)
+
+[//]: # (   | **소스 이름**     | &#40;스키마 입력을 선택한 후&#41; ```TRAVELBUDDY``` |)
+
+[//]: # (   | **작업**     | ```새 이름``` -> 값 ```m2m```         |)
+
+[//]: # ()
+[//]: # (   - Rule 2:)
+
+[//]: # ()
+[//]: # (   | **파라미터**      | **값**                             |)
+
+[//]: # (   |---------------|-----------------------------------|)
+
+[//]: # (   | **규칙 대상**     | ```테이블```                         |)
+
+[//]: # (   | **소스 이름**     | &#40;스키마 입력을 선택한 후&#41; ```TRAVELBUDDY``` |)
+
+[//]: # (   | **소스 테이블 이름** | ```%```                           |)
+
+[//]: # (   | **작업**        | ```소문자로 변경```                     |)
+
+5. ```변환 규칙```은 아래 JSON 형식을 사용하여 한번에 입력합니다.
+
+```json
+{
+    "rules": [
+        {
+            "rule-type": "transformation",
+            "rule-id": "309102835",
+            "rule-name": "308931813",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "TRAVELBUDDY",
+                "table-name": "HOTELSPECIAL",
+                "column-name": "EXPIRYDATE"
+            },
+            "rule-action": "rename",
+            "value": "expiryDate",
+            "old-value": null
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "309094874",
+            "rule-name": "308931813",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "TRAVELBUDDY",
+                "table-name": "HOTELSPECIAL",
+                "column-name": "COST"
+            },
+            "rule-action": "convert-lowercase",
+            "value": null,
+            "old-value": null
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "309088050",
+            "rule-name": "308931813",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "TRAVELBUDDY",
+                "table-name": "HOTELSPECIAL",
+                "column-name": "LOCATION"
+            },
+            "rule-action": "convert-lowercase",
+            "value": null,
+            "old-value": null
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "309070122",
+            "rule-name": "308931813",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "TRAVELBUDDY",
+                "table-name": "HOTELSPECIAL",
+                "column-name": "DESCRIPTION"
+            },
+            "rule-action": "convert-lowercase",
+            "value": null,
+            "old-value": null
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "309055587",
+            "rule-name": "308931813",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "TRAVELBUDDY",
+                "table-name": "HOTELSPECIAL",
+                "column-name": "HOTEL"
+            },
+            "rule-action": "convert-lowercase",
+            "value": null,
+            "old-value": null
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "308931813",
+            "rule-name": "308931813",
+            "rule-target": "column",
+            "object-locator": {
+                "schema-name": "TRAVELBUDDY",
+                "table-name": "HOTELSPECIAL",
+                "column-name": "ID"
+            },
+            "rule-action": "convert-lowercase",
+            "value": null,
+            "old-value": null
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "306944938",
+            "rule-name": "306944938",
+            "rule-target": "table",
+            "object-locator": {
+                "schema-name": "TRAVELBUDDY",
+                "table-name": "%"
+            },
+            "rule-action": "convert-lowercase",
+            "value": null,
+            "old-value": null
+        },
+        {
+            "rule-type": "transformation",
+            "rule-id": "302560161",
+            "rule-name": "302560161",
+            "rule-target": "schema",
+            "object-locator": {
+                "schema-name": "TRAVELBUDDY"
+            },
+            "rule-action": "rename",
+            "value": "m2m",
+            "old-value": null
+        },
+        {
+            "rule-type": "selection",
+            "rule-id": "302540423",
+            "rule-name": "302540423",
+            "object-locator": {
+                "schema-name": "TRAVELBUDDY",
+                "table-name": "HOTELSPECIAL"
+            },
+            "rule-action": "include",
+            "filters": []
+        }
+    ]
+}
+```
+
+
+   - ⚠️ 시간 여유가 있다면 이번에는 진행자의 안내를 받아 (S3 및 IAM Role 설정) ```마이그레이션 전 평가 켜기```는 활성화하여 어떤 평가 보고서가 생성되는지 살펴보는 것도 좋습니다.
+
+   - ```마이그레이션 태스크 시작 구성``` 아래 ```생성 시 자동으로 시작```이 선택되어 있는지 확인한 다음 ```태스크 생성```을 클릭합니다.
+
+   - 설정된 화면은 아래와 유사합니다.
+
 
    ![HotelSpecials DMS 마이그레이션 태스크 생성 화면 1](../../images/creat-hotelspecials-dms-migration-task-parameters-1-new.png)
 
    ![HotelSpecials DMS 마이그레이션 태스크 생성 화면 2](../../images/creat-hotelspecials-dms-migration-task-parameters-2.png)
 
-   ![HotelSpecials DMS 마이그레이션 태스크 생성 화면 3](../../images/creat-hotelspecials-dms-migration-task-parameters-3-json-mapping-rules.png)
+   ![HotelSpecials DMS 마이그레이션 태스크 생성 화면 3](../../images/creat-hotelspecials-dms-migration-task-parameters-3.png)
+
+   ![HotelSpecials DMS 마이그레이션 태스크 생성 화면 4](../../images/creat-hotelspecials-dms-migration-task-parameters-4.png)
 
    ![HotelSpecials DMS 마이그레이션 태스크 생성 화면 5](../../images/creat-hotelspecials-dms-migration-task-parameters-5.png)
 
@@ -278,27 +327,11 @@
 
    ![HotelSpecials DMS 마이그레이션 태스크 생성 및 실행 완료](../../images/hotelspecials-dms-migration-task-created-and-done.png)
 
-7. ```마이그레이션 태스크 (source-to-aupg-migration-task)```를 클릭하고 ```테이블 통계``` 탭으로 이동하여 테이블 통계를 보고 이동된 행 수를 확인합니다.
+8. ```마이그레이션 태스크 (source-to-aupg-migration-task)```를 클릭하고 ```테이블 통계``` 탭으로 이동하여 테이블 통계를 보고 이동된 행 수를 확인합니다.
 
    ![HotelSpecials DMS 마이그레이션 태스크 테이블 통계](../../images/hotelspecials-dms-migration-task-table-stats.png)
 
-8. 오류가 발생하면 상태 색상이 녹색에서 빨간색으로 변경됩니다. 디버그할 로그에 대해 로그 보기 링크를 클릭합니다.
-
----
-
-[//]: # (## **5. 프론트엔드에서 데이터 확인**)
-
-[//]: # ()
-[//]: # (1. 데이터가 정상적으로 마이그레이션 되었다면 앞서 프론트엔드에서 표시되지 않았던 호텔 프로모션 정보가 정상적으로 표시될 것입니다. 브라우저에서 페이지를 리프레스하여 데이터가 표시되는지 확인합니다.)
-
-[//]: # ()
-[//]: # (   ![HotelSpecials 데이터 마이그레이션 확인]&#40;../../images/hotelspecials-data-migration-check-frontend.png&#41;)
-
-## **5. 타겟 데이터베이스에서 데이터 확인**
-
-1. 데이터가 정상적으로 마이그레이션 되었다면 타겟 데이터베이스에서 아래와 같이 데이터가 정상 조회될 것입니다..
-
-   ![HotelSpecials 테이블 데이터 마이그레이션 확인](../../images/hotelspecials-data-migration-check-table.png)
+9. 오류가 발생하면 상태 색상이 녹색에서 빨간색으로 변경됩니다. 디버그할 로그에 대해 로그 보기 링크를 클릭합니다.
 
 ---
 

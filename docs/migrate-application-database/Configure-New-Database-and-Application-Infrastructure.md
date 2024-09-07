@@ -22,6 +22,12 @@
 export AWS_PAGER=''
 curl -fsSL https://raw.githubusercontent.com/shkim4u/m2m-travelbuddy/main/cloud9/bootstrap-v2-with-admin-user-trust.sh | bash -s -- c5.9xlarge
 ```
+
+> 📕 **참고**<br>
+> 생성된 `Cloud9` 환경은 이제 소스 측을 담당하시는 분과 공유하여 사용할 수 있습니다.<br>
+> 이를 위해 생성된 `Cloud9` 환경을 선택하고 상단 메뉴에서 ```Share```를 클릭하여 소스 측 담당자 분이 로그인하는 IAM 사용자를 초대하면 됩니다 (세부 설정 방법은 진행자에게 문의하세요).<br>
+> ![Cloud9 공유 환경](../../images/cloud9-shared-environment.png)
+
 ### 1.2. ```AWS Cloud9``` IDE 설정
 
 위에서 생성한 ```Cloud9``` 통합 개발 환경에 접속하여 필요한 사항을 사전에 구성한 쉘 스크립트 파일을 아래와 같이 실행합니다.
@@ -209,6 +215,7 @@ echo $ARGOCD_ADMIN_INITIAL_PASSWORD
    ```
    
    * 별다른 작업을 하지 않았다면 아래와 같이 접속이 되지 않을 것입니다.<br>***원인이 무엇인지 추측해 보고 조치를 취해서 다시 접속을 시도해 봅니다. (힌트: 아래 사항을 살펴봅니다)***
+     * <u>***소스 측을 맡으신 분이 타겟 측 `Cloud9` 환경을 공유받으셨으면 브라우저 창을 다중으로 열어서 동시에 두 환경에 대해 작업해 보시는 것도 좋습니다.***</u>
      * (소스 측) ```애플리케이션 서버```의 오라클 포트 방화벽 설정
      * (타겟 측) ```워크로드 VPC```의 서브넷 별 라우팅 테이블
  
@@ -220,7 +227,7 @@ echo $ARGOCD_ADMIN_INITIAL_PASSWORD
 
     > **참고**<br>
     > * 사실 새로운 타겟인 ```워크로드 VPC```에서 소스 환경으로 직접 통신이 수행될 필요는 없습니다.
-    > * ```AWS Database Migration Service```의 ```Replication Instance```가 소스 데이터베이스와 타겟 데이터베이스 간의 데이터 마이그레이션을 수행하기 때문입니다. (일종의 MITM; Machine In The Middle)
+    > * ```AWS Database Migration Service```의 ```Replication Instance```가 소스 데이터베이스와 타겟 데이터베이스 간의 데이터 마이그레이션을 수행하기 때문입니다. (일종의 `MITM; Machine In The Middle`)
     > * 이는 오직 마이그레이션 작업을 위한 일시적인 접속 테스트입니다. 이후 마이그레이션 작업은 ```DMS```를 통해 이루어집니다.
 
 ---

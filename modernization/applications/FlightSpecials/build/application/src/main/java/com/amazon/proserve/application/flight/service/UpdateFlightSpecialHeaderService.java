@@ -8,6 +8,8 @@ import com.amazon.proserve.domain.flight.vo.Id;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UpdateFlightSpecialHeaderService implements UpdateFlightSpecialHeaderUseCase {
@@ -15,8 +17,14 @@ public class UpdateFlightSpecialHeaderService implements UpdateFlightSpecialHead
 
     @Override
     public void updateFlightSpecialHeader(UpdateFlightSpecialHeaderCommand command) {
-        FlightSpecial flightSpecial = repository.findById(Id.of(Long.valueOf(command.getId())));
-        flightSpecial.updateFlightSpecialsHeader(command.getNewFlightSpecialsHeader());
-        repository.save(flightSpecial);
+        Optional<FlightSpecial> optionalFlightSpecial = repository.findById(Id.of(Long.valueOf(command.getId())));
+        if (optionalFlightSpecial.isPresent()) {
+            FlightSpecial flightSpecial = optionalFlightSpecial.get();
+            flightSpecial.updateFlightSpecialsHeader(command.getNewFlightSpecialsHeader());
+            repository.save(flightSpecial);
+        } else {
+            // Handle the case where the FlightSpecial is not found
+            throw new EntityNotFoundException("FlightSpecial not found for ID: " + command.getId());
+        }
     }
 }

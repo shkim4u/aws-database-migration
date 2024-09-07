@@ -11,11 +11,11 @@
 
 ## **1. 개요**
 
-```TravelBuddy``` 시스템의 두 가지 중요 기능 중 항공권 여정 프로모션 (```FlightSpecials```) 서비스의 데이터베이스 및 애플리케이션을 클라우드로 전환하는 작업을 시작합니다.
+이제 ```TravelBuddy``` 시스템의 두 가지 중요 기능 중 항공권 여정 프로모션 (```FlightSpecials```) 서비스의 데이터베이스 및 애플리케이션을 클라우드로 전환하는 작업을 시작합니다.
 
 우선 ```FlightSpecials``` 데이터베이스의 스키마를 전환하는 작업을 수행합니다. 실제 데이터는 해당 ```FlightSpecials``` 서비스가 클라우드로 전화되기 직전에 옮겨질 예정이므로 여기서는 스키마만을 전환하도록 하겠습니다.
 
-전환 작업은 ```Oracle``` 소스에서 ```Amazon Aurora PostgreSQL``` 타겟으로 진행합니다.
+전환 작업은 ```Oracle``` 소스에서 ```Amazon RDS for PostgreSQL``` 타겟으로 진행합니다.
 
 ![FlightSpecials 데이터베이스 스키마 전환](../../images/migrate-oracle-to-postgresql.png)
 
@@ -80,7 +80,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
 다음 단계는 설치된 ```스키마 변환 도구 (AWS Schema Conversion Tool)```를 사용하여 데이터베이스 마이그레이션 프로젝트를 생성하는 것입니다.
 
-(Optional) ```Amazon Aurora PostgreSQL```을 타겟으로 하는 프로젝트를 생성하기 위해서는 우선 ```PostgreSQL JDBC 드라이버```를 설정합니다. 다음 단계를 따라 진행하세요.
+(Optional) ```Amazon RDS for PostgreSQL```을 타겟으로 하는 프로젝트를 생성하기 위해서는 우선 ```PostgreSQL JDBC 드라이버```를 설정합니다. 다음 단계를 따라 진행하세요.
 
 1. (Optional) ```AWS SCT```를 실행한 후 ```Settings > Global Settings```를 선택합니다.
 
@@ -133,13 +133,15 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    ![SCT 오라클 권한 오류](../../images/SCT-oracle-privilege-error.png)
 
-    > 📕 **수행 과제 (이미 진행하였다면 건너뛰십시요!)**<br>
+    > 📕 **수행 과제**<br>
     > * <u>***소스 측을 담당하는 분께서는 위의 오류를 해결하고 다시 연결 테스트를 수행해 보도록 합니다.***</u>
     > * 타겟 측을 담당하시는 분과 긴밀하게 협력하여 진행해 주시면 감사하겠습니다.
     > * 힌트<br>
     >   * ```애플리케이션 서버 (OnPremAppServer-DMSWorkshop-Source)```에 AWS 콘솔의 ```Session Manager```로 접속합니다.
     >   * ```Oracle``` 데이터베이스 컨테이너로 직접 접속합니다 (docker exec -it <Oracle 컨테이너 ID> /bin/bash).
     >   * 이후에는 오라클 서버를 관린하는 옛날(?) 기억을 되살려 ```SQLPlus```를 사용하여 ```DMS_USER``` 사용자를 생성하고 필요한 권한을 부여합니다.
+    > * 아래 가이드 문서를 참고하여 진행해 보세요.
+       >   * [[`AWS DMS`를 위한 Oracle 데이베이스 사용자 설정]](./(Challenge-Commentary)-Create-DMS-SCT-Database-User.md)
 
    * 소스 측에서 위 작업을 완료하면 타겟 측의 ```AWS SCT```로 돌아와 다음과 같이 값을 다시 설정하고 연결 테스트를 수행합니다.
 
@@ -170,7 +172,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    > 📕 **참고**<br>
    > ```다음```을 누르고 메타데이터를 로드한 후 다음과 같은 경고 메시지가 나타날 수 있습니다. **Metadata loading was interrupted because of data fetching issues.** 이 메시지는 워크샵 진행에 영향을 주지 않으므로 무시해도 됩니다. ```SCT```가 데이터베이스 개체를 분석하는 데 몇 분 정도 걸립니다.
 
-6. ```데이터베이스 마이그레이션 평가 보고서```의 요약 페이지를 검토한 다음 ```Amazon Aurora PostgreSQL``` 변환 섹션까지 아래로 스크롤합니다 (오른쪽 스크롤 막대의 중간 조금 아래에 있습니다).
+6. ```데이터베이스 마이그레이션 평가 보고서```의 요약 페이지를 검토한 다음 ```Amazon RDS for PostgreSQL``` 변환 섹션까지 아래로 스크롤합니다 (오른쪽 스크롤 막대의 중간 조금 아래에 있습니다).
 
    ![SCT 오라클 TravelBuddy 평가 보고서](../../images/SCT-oracle-travelbuddy-assessment-report.png)
 
@@ -191,19 +193,19 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    | **서버 이름**                   | ```(진행자와 함께 타겟 환경의 RDS 콘솔에서 확인합니다)```                                        |
    | **서버 포트**                   | ```5432```                                                                   |
    | **데이터베이스**                  | ```dso```                                                                    |
-   | **사용자 이름**                  | ```postgres```                                                               |
-   | **암호**                      | ```<진행자와 함께 SecretsManager에서 확인>```                                          |
+   | **사용자 이름**                  | ```dmsuser```                                                                |
+   | **암호**                      | ```dmsuser123```                                                             |
    | **SSL 사용**                  | ```체크 해제 (미사용)```                                                            |
    | **암호 저장**                   | ```체크 (암호 저장)```                                                             |
    | **Amazon Aurora 드라이버 경로**   | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\postgresql-42.7.3.jar``` |
 
-   * 아래와 같이 접속이 실패합니다. 진행자의 안내를 받아 필요한 설정을 수행하고 다시 시도해 보세요.
+   * 아래와 같이 접속이 실패할 것입니다. 진행자의 안내를 받아 필요한 설정을 수행하고 다시 시도해 보세요.
 
    ![SCT PostgreSQL TravelBuddy 타겟 연결 실패](../../images/SCT-travelbuddy-postgresql-connect-fail.png)
 
    * 타겟 환경의 ```DmsVPC```와 ```워크로드 VPC (M2M-VPC)``` 간의 라우팅 테이블 - 각 VPC에 ```10.16.0.0/12``` 주소 대역을 ```Transit Gateway```로 라우팅하는 라우팅 테이블이 있는지 확인합니다.
-   * ```Amazon RDS PostgreSQL```의 보안 그룹 설정 - ```Inbound``` 규칙에 ```10.16.0.0/12``` 대역을 허용하는 규칙이 있는지 확인합니다.
-   * 또한 ```pgAdmin4```를 통해 ```AWS SCT``` 및 ```AWS DMS``` 작업에 사용할 ```PostgreSQL``` 데이터베이스 유저를 생성하고 (`dmsuser`) 암호를 확인하여 입력해 줍니다. (진행자의 안내를 받아 ```AWS SecretsManager```에 저장된 비밀번호를 확인하고 접속하십시요)
+   * ```Amazon RDS for PostgreSQL```의 보안 그룹 설정 - ```Inbound``` 규칙에 ```10.16.0.0/12``` 대역을 허용하는 규칙이 있는지 확인합니다.
+   * 또한 ```pgAdmin4```를 통해 ```AWS SCT``` 및 ```AWS DMS``` 작업에 사용할 ```PostgreSQL``` 데이터베이스 유저(`dmsuser`)를 생성해 줍니다. (진행자의 안내를 받아 ```AWS SecretsManager```에 저장된 비밀번호를 확인하고 접속하십시요)
 
        ```sql
        CREATE ROLE dmsuser LOGIN PASSWORD 'dmsuser123';
@@ -212,37 +214,10 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
        GRANT rds_superuser TO dmsuser; -- 필요 시 제한적 사용
        ```
 
-
-[//]: # ([Step 3: Configure Your PostgreSQL Target Database]&#40;https://docs.aws.amazon.com/dms/latest/sbs/chap-oracle2postgresql.steps.configurepostgresql.html&#41;)
-
-[//]: # ([Migrating from Oracle to Amazon RDS for PostgreSQL or Amazon Aurora PostgreSQL with AWS Schema Conversion Tool]&#40;https://docs.aws.amazon.com/SchemaConversionTool/latest/userguide/CHAP_Source.Oracle.ToPostgreSQL.html&#41;)
-
-
-[//]: # (    ```sql)
-
-[//]: # (    CREATE USER dmsuser WITH PASSWORD 'dmsuser123';)
-
-[//]: # (    ALTER USER dmsuser WITH SUPERUSER;)
-
-[//]: # (    GRANT CONNECT ON DATABASE dso TO dmsuser;)
-
-[//]: # (    GRANT USAGE ON SCHEMA schema_name TO postgresql_sct_user;)
-
-[//]: # (    GRANT SELECT ON ALL TABLES IN SCHEMA schema_name TO postgresql_sct_user;)
-
-[//]: # (    GRANT ALL ON ALL SEQUENCES IN SCHEMA schema_name TO postgresql_sct_user;)
-
-[//]: # (    ```)
-
-[//]: # (  ![PostgreSQL Workbench로 PostgreSQL 사용자 생성 및 권한 부여]&#40;../../images/mysql-workbench-create-sct-dms-user.png&#41;)
-
-[//]: # (![SCT PostgreSQL TravelBuddy 타겟 연결 실패]&#40;../../images/SCT-travelbuddy-mysql-connect-fail-dmsuser.png&#41;)
-
    ![SCT PostgreSQL 타겟 연결 성공](../../images/SCT-travelbuddy-postgresql-connect-success-dmsuser.png)
 
-
    > 📕 **참고**<br>
-   > ```다음```을 누르고 메타데이터를 로드한 후 다음과 같은 경고 메시지가 나타날 수 있습니다. **Metadata loading was interrupted because of data fetching issues.** 이 메시지는 워크샵 진행에 영향을 주지 않으므로 무시해도 됩니다. ```SCT```가 데이터베이스 개체를 분석하는 데 몇 분 정도 걸립니다.
+   > ```완료``` 버튼을 누르고 메타데이터를 로드한 후 다음과 같은 경고 메시지가 나타날 수 있습니다. **Metadata loading was interrupted because of data fetching issues.** 이 메시지는 워크샵 진행에 영향을 주지 않으므로 무시해도 됩니다. ```SCT```가 데이터베이스 개체를 분석하는 데 몇 분 정도 걸립니다.
 
 ---
 
@@ -430,21 +405,6 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    }
    ```
 
-[//]: # (6. 아래와 같이 스키마 이름을 ```m2m```으로 변경하는 매핑 규칙을 추가합니다.)
-
-[//]: # (    * **Name** : ```RenameSchema```)
-
-[//]: # (    * **For**: ```schema```)
-
-[//]: # (    * **where schema name like**: ```TRAVELBUDDY```)
-
-[//]: # (    * **Actions**: ```rename to``` ```m2m```)
-
-[//]: # (    * ```Save > Close``` 버튼 클릭)
-
-[//]: # ()
-[//]: # (   ![SCT TravelBuddy 스키마 변환 Mapping View 3]&#40;../../images/sct-travelbuddy-schema-mapping-new-rule-rename-schema.png&#41;)
-
 6. ```보기 > Data Migration View (Standard DMS)```로 전환합니다.
 
    ![SCT TravelBuddy 스키마 변환 Data Migration View](../../images/sct-travelbuddy-schema-migration-view-for-flightspecials.png)
@@ -453,7 +413,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    ![SCT TravelBuddy 스키마 변환](../../images/sct-travelbuddy-schema-conversion-for-flightspecials.png)
 
-8. 스키마가 변환되어 오른쪽 타겟 쪽에서 표시되면 아래 그림과 같이 스키마 객체를 선택하고 소스와 타겟을 비교할 수 있게 됩니다.
+8. (Main View) 스키마가 변환되어 오른쪽 타겟 쪽에서 표시되면 아래 그림과 같이 스키마 객체를 선택하고 소스와 타겟을 비교할 수 있게 됩니다.
 
     ![SCT TravelBuddy FlightSpecial 테이블 소스 타겟 비교](../../images/sct-flightspecial-source-target-comparison.png)
 
@@ -482,15 +442,17 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
    ![SCT TravelBuddy 스키마 변환 적용](../../images/sct-travelbuddy-flightspecial-schema-apply-to-database.png)
 
-9. "대상 데이터베이스에 개체가 이미 존재할 수 있습니다. 바꾸시겠습니까?"라는 대화 상자가 표시될 수 있습니다. **예**를 선택합니다.
+10. "대상 데이터베이스에 개체가 이미 존재할 수 있습니다. 바꾸시겠습니까?"라는 대화 상자가 표시될 수 있습니다. **예**를 선택합니다.
 
    ![SCT TravelBuddy 스키마 변환 개체 존재 확인](../../images/sct-travelbuddy-schema-conversion-confirm-for-flightspecials.png)
 
-   ![SCT TravelBuddy 스키마 변환 진행 완료](../../images/sct-travelbuddy-schema-conversion-done-for-flightspecials.png)
+   ![SCT TravelBuddy 스키마 변환 진행 완료](../../images/sct-travelbuddy-schema-conversion-done-for-flightspecials-sct.png)
 
-10. ```TravelBuddy``` 데이터베이스 스키마 중 `FlighSpecials` 서비스가 사용하는 테이블 (`flightspecial`)을 오라클 소스에서 ```Amazon Aurora PostgreSQL``` 타겟으로 성공적으로 변환했습니다.
+   ![SCT TravelBuddy 스키마 변환 진행 완료](../../images/sct-travelbuddy-schema-conversion-done-for-flightspecials-pgadmin.png)
 
-11. 마지막으로 `FlightSpecials` 서비스는 신규 서비스 기능을 위해 소스에는 없었던 몇몇 추가적인 테이블을 사용합닏다. 해당 테이블들을 `pgAdmin4`에서 생성해 줍니다.
+11. ```TravelBuddy``` 데이터베이스 스키마 중 `FlighSpecials` 서비스가 사용하는 테이블 (`flightspecial`)을 오라클 소스에서 ```Amazon RDS for PostgreSQL``` 타겟으로 성공적으로 변환했습니다.
+
+12. 마지막으로 `FlightSpecials` 서비스는 신규 서비스 기능을 위해 소스에는 없었던 몇몇 추가적인 테이블을 사용합니다. 해당 테이블들을 `pgAdmin4`에서 생성해 줍니다.
 
    ```sql
    create sequence if not exists travelbuddy.hibernate_sequence start 1 increment 1;

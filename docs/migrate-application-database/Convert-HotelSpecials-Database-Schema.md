@@ -13,7 +13,7 @@
 
 이제 본격적으로 ```TravelBuddy``` 시스템을 클라우드로 전환하는 작업을 시작합니다.
 
-우선 ```HotelSpecials``` 데이터베이스의 스키마를 전환하는 작업을 수행합니다. 실제 데이터는 해당 ```HotelSpecials``` 서비스가 클라우드로 전화되기 직전에 옮겨질 예정이므로 여기서는 스키마만을 전환하도록 하겠습니다.
+우선 ```HotelSpecials``` 데이터베이스의 스키마를 전환하는 작업을 수행합니다. 실제 데이터는 해당 ```HotelSpecials``` 서비스가 클라우드로 전환되기 직전에 옮겨질 예정이므로 여기서는 스키마만을 전환하도록 하겠습니다.
 
 전환 작업은 ```Oracle``` 소스에서 ```Amazon Aurora MySQL``` 타겟으로 진행합니다.
 
@@ -110,9 +110,8 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 
 4. 양식에 아래 값을 사용하여 소스 데이터베이스 구성을 지정합니다. 그런 다음 ```Test connection```을 클릭하세요. 연결 테스트가 성공적으로 완료되면 연결 성공 버튼에서 ```확인```을 클릭한 후 ```다음```을 클릭하세요.
 
-
    | **파라미터**                    | **값**                                                              |
-      |-----------------------------|--------------------------------------------------------------------|
+   |-----------------------------|--------------------------------------------------------------------|
    | **연결 이름 (Connection name)** | ```TravelBuddy Oracle Source```                                    |
    | **타입**                      | ```SID```                                                          |
    | **서버 이름**                   | ```소스 환경의 CloudFormation의 출력 탭에서 확인 AppServer Private IP 확인```     |
@@ -143,7 +142,8 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
    >   * ```애플리케이션 서버 (OnPremAppServer-DMSWorkshop-Source)```에 AWS 콘솔의 ```Session Manager```로 접속합니다.
    >   * ```Oracle``` 데이터베이스 컨테이너로 직접 접속합니다 (docker exec -it <Oracle 컨테이너 ID> /bin/bash).
    >   * 이후에는 오라클 서버를 관린하는 옛날(?) 기억을 되살려 ```SQLPlus```를 사용하여 ```DMS_USER``` 사용자를 생성하고 필요한 권한을 부여합니다.
-   > * [가이드 문서](./(Challenge-Commentary)-Create-DMS-SCT-Database-User.md)를 참고하여 진행해 보세요.
+   > * 아래 가이드 문서를 참고하여 진행해 보세요.
+   >   * [[`AWS DMS`를 위한 Oracle 데이베이스 사용자 설정]](./(Challenge-Commentary)-Create-DMS-SCT-Database-User.md)
 
    * 소스 측에서 위 작업을 완료하면 타겟 측의 ```AWS SCT```로 돌아와 다음과 같이 값을 다시 설정하고 연결 테스트를 수행합니다.
    
@@ -165,7 +165,7 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 5. ```TRAVELBUDDY``` 스키마를 선택한 다음 ```다음```을 클릭합니다.
 
    > 📒 **참고**<br>
-   > ```TRAVELBUDDY``` 스키마를 클릭하여야 ```다음``` 버튼이 활성화됩니다.
+   > ```TRAVELBUDDY``` 스키마를 선택하여야 ```다음``` 버튼이 활성화됩니다.
 
    ![SCT 오라클 TravelBuddy 스키마 선택](../../images/SCT-oracle-travelbuddy-schema.png)
 
@@ -200,9 +200,9 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
 | **암호 저장**                   | ```체크 (암호 저장)```                                                             |
 | **Amazon Aurora 드라이버 경로**   | ```C:\Users\Administrator\Desktop\DMS Workshop\JDBC\postgresql-42.7.3.jar``` |
 
-   * 아래와 같이 접속이 실패합니다. 진행자의 안내를 받아 필요한 설정을 수행하고 다시 시도해 보세요.
-   
-   ![SCT MySQL TravelBuddy 타겟 연결 실패](../../images/SCT-travelbuddy-mysql-connect-fail.png)
+   * 아래와 같이 접속이 실패할 것입니다. 진행자의 안내를 받아 필요한 설정을 수행하고 다시 시도해 보세요.
+
+   ![SCT MySQL TravelBuddy 타겟 연결 실패](../../images/SCT-travelbuddy-mysql-connect-fail-dmsuser.png)
 
   * 타겟 환경의 ```DmsVPC```와 ```워크로드 VPC (M2M-VPC)``` 간의 라우팅 테이블 - 각 VPC에 ```10.16.0.0/12``` 주소 대역을 ```Transit Gateway```로 라우팅하는 라우팅 테이블이 있는지 확인합니다.
   * ```Amazon Aurora MySQL```의 보안 그룹 설정 - ```Inbound``` 규칙에 ```10.16.0.0/12``` 대역을 허용하는 규칙이 있는지 확인합니다.
@@ -232,13 +232,9 @@ EC2 인스턴스에 ```Fleet Manager``` 혹은 ```RDP```를 통해 연결한 후
       GRANT ALL PRIVILEGES ON awsdms_control.* TO 'dmsuser';
       ```
 
-      ![MySQL Workbench로 MySQL 사용자 생성 및 권한 부여](../../images/mysql-workbench-create-sct-dms-user.png)
-
-
-   ![SCT MySQL TravelBuddy 타겟 연결 실패](../../images/SCT-travelbuddy-mysql-connect-fail-dmsuser.png)
+   ![MySQL Workbench로 MySQL 사용자 생성 및 권한 부여](../../images/mysql-workbench-create-sct-dms-user.png)
 
    ![SCT MySQL 타겟 TravelBuddy 연결 성공](../../images/SCT-travelbuddy-mysql-connect-success-dmsuser.png)
-
 
    > 📕 **참고**<br>
    > ```다음```을 누르고 메타데이터를 로드한 후 다음과 같은 경고 메시지가 나타날 수 있습니다. **Metadata loading was interrupted because of data fetching issues.** 이 메시지는 워크샵 진행에 영향을 주지 않으므로 무시해도 됩니다. ```SCT```가 데이터베이스 개체를 분석하는 데 몇 분 정도 걸립니다.
