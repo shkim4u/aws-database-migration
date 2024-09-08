@@ -12,7 +12,8 @@ resource "aws_iam_role" "m2m_admin" {
           Service: [
             "ec2.amazonaws.com",
             "dms.amazonaws.com",
-            "dms.ap-northeast-2.amazonaws.com"
+            "dms.ap-northeast-2.amazonaws.com",
+            "dms-fleet-advisor.amazonaws.com"
           ]
         }
       },
