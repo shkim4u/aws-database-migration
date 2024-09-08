@@ -229,12 +229,12 @@
          {
             "rule-type": "transformation",
             "rule-id": "4",
-            "rule-name": "UppercaseColumns",
+            "rule-name": "UppercaseId",
             "rule-target": "column",
             "object-locator": {
                "schema-name": "travelbuddy",
                "table-name": "flightspecial",
-               "column-name": "%"
+               "column-name": "id"
             },
             "rule-action": "convert-uppercase",
             "value": null,
@@ -243,6 +243,48 @@
          {
             "rule-type": "transformation",
             "rule-id": "5",
+            "rule-name": "UppercaseHeader",
+            "rule-target": "column",
+            "object-locator": {
+               "schema-name": "travelbuddy",
+               "table-name": "flightspecial",
+               "column-name": "header"
+            },
+            "rule-action": "convert-uppercase",
+            "value": null,
+            "old-value": null
+         },
+         {
+            "rule-type": "transformation",
+            "rule-id": "6",
+            "rule-name": "UppercaseBody",
+            "rule-target": "column",
+            "object-locator": {
+               "schema-name": "travelbuddy",
+               "table-name": "flightspecial",
+               "column-name": "body"
+            },
+            "rule-action": "convert-uppercase",
+            "value": null,
+            "old-value": null
+         },
+         {
+            "rule-type": "transformation",
+            "rule-id": "7",
+            "rule-name": "UppercaseOrigin",
+            "rule-target": "column",
+            "object-locator": {
+               "schema-name": "travelbuddy",
+               "table-name": "flightspecial",
+               "column-name": "origin"
+            },
+            "rule-action": "convert-uppercase",
+            "value": null,
+            "old-value": null
+         },
+         {
+            "rule-type": "transformation",
+            "rule-id": "8",
             "rule-name": "RenameOriginCode",
             "rule-target": "column",
             "object-locator": {
@@ -256,13 +298,27 @@
          },
          {
             "rule-type": "transformation",
-            "rule-id": "6",
+            "rule-id": "9",
+            "rule-name": "UppercaseDestination",
+            "rule-target": "column",
+            "object-locator": {
+               "schema-name": "travelbuddy",
+               "table-name": "flightspecial",
+               "column-name": "destination"
+            },
+            "rule-action": "convert-uppercase",
+            "value": null,
+            "old-value": null
+         },
+         {
+            "rule-type": "transformation",
+            "rule-id": "10",
             "rule-name": "RenameDestinationCode",
             "rule-target": "column",
             "object-locator": {
                "schema-name": "travelbuddy",
                "table-name": "flightspecial",
-               "column-name": "detination_code"
+               "column-name": "destination_code"
             },
             "rule-action": "rename",
             "value": "DESTINATIONCODE",
@@ -270,17 +326,29 @@
          },
          {
             "rule-type": "transformation",
-            "rule-id": "7",
-            "rule-name": "RenameExpireDate",
+            "rule-id": "11",
+            "rule-name": "UppercaseCost",
+            "rule-target": "column",
+            "object-locator": {
+               "schema-name": "travelbuddy",
+               "table-name": "flightspecial",
+               "column-name": "cost"
+            },
+            "rule-action": "convert-uppercase",
+            "value": null,
+            "old-value": null
+         },
+         {
+            "rule-type": "transformation",
+            "rule-id": "12",
+            "rule-name": "ExcludeExpiryDate",
             "rule-target": "column",
             "object-locator": {
                "schema-name": "travelbuddy",
                "table-name": "flightspecial",
                "column-name": "expiry_date"
             },
-            "rule-action": "rename",
-            "value": "EXPIRYDATE",
-            "old-value": null
+            "rule-action": "remove-column"
          }
       ]
    }

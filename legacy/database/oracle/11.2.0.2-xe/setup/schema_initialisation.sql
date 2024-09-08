@@ -22,7 +22,7 @@ CREATE TABLE travelbuddy.flightspecial (
     destination VARCHAR2(255),
     destinationCode VARCHAR2(6),
     cost NUMBER NOT NULL,
-    expiryDate NUMBER NOT NULL
+    expiryDate NUMBER DEFAULT (TRUNC((SYSDATE - TO_DATE('1970-01-01', 'YYYY-MM-DD')) * 86400 * 1000))
 );
 
 -- Create a trigger to automatically insert the next value from the sequence
@@ -200,7 +200,7 @@ CREATE TABLE travelbuddy.hotelspecial (
     description VARCHAR2(255),
     location VARCHAR2(255),
     cost NUMBER NOT NULL,
-    expiryDate NUMBER NOT NULL
+    expiryDate NUMBER DEFAULT (TRUNC((SYSDATE - TO_DATE('1970-01-01', 'YYYY-MM-DD')) * 86400 * 1000))
 );
 
 -- Create a trigger to automatically insert the next value from the sequence

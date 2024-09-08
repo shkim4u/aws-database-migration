@@ -50,12 +50,14 @@
 * **주요 서비스**: 호텔 프로모션 조회, 항공권 프로모션 조회 (모놀리스 구조)
 * **데이터베이스**: `Oracle 11gR2`
 
-목표하는 환경은 아래와 같습니다.
+목표하는 구성과 간단한 아키텍처는 다음과 같습니다.
 * **애플리케이션**: `Amazon EKS (Elastic Kubernetes Service)` (컨테이너 오케스트레이션 서비스)
 * **주요 서비스**: 항공권 프로모션 조회, 호텔 프로모션 조회 (마이크로서비스 구조)
 * **데이터베이스** (Polyglot Persistence)
   * 호텔 프로모션 조회: `Amazon Aurora (MySQL)` 
   * 항공권 프로모션 조회: `Amazon Aurora (PostgreSQL)` 
+
+![`TravelBuddy` 클라우드 전환 아키텍처](../../images/application-database-migration/travelbuddy-cloud-architecture.png)
 
 ---
 
