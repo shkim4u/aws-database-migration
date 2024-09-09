@@ -1,5 +1,5 @@
 {
   "config": {
-    "api_endpoint_url_prefix": "http://k8s-travelbuddy-6172256b0f-730912344.ap-northeast-2.elb.amazonaws.com/travelbuddy"
+    "api_endpoint_url_prefix": "http://<여기를 프론트엔드가 접속할 주소:포트 형식으로 바꿔주세요>/travelbuddy"
   }
 }
