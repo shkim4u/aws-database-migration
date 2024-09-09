@@ -44,3 +44,20 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "dms_tgw_vpc_attachment" {
     Name = "DMS-TGW-Workload-VPC-Attachment"
   }
 }
+
+# TODO: Fix this.
+# # Add a route to the public subnets' route tables
+# resource "aws_route" "dms_tgw_public_subnet_route" {
+#   count                  = length(module.vpc.public_subnets)
+#   route_table_id         = element(module.vpc.public_subnets, count.index).route_table_id
+#   destination_cidr_block = var.dms_tgw_route
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.dms_tgw.id
+# }
+#
+# # Add a route to the private subnets' route tables
+# resource "aws_route" "dms_tgw_private_subnet_route" {
+#   count                  = length(module.vpc.private_subnets)
+#   route_table_id         = element(module.vpc.private_subnets, count.index).route_table_id
+#   destination_cidr_block = var.dms_tgw_route
+#   transit_gateway_id     = data.aws_ec2_transit_gateway.dms_tgw.id
+# }

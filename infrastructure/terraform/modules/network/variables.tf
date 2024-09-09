@@ -27,3 +27,9 @@ variable "dms_tgw_name" {
   type = string
   default = "DMS-TGW"
 }
+
+variable "dms_tgw_route" {
+  description = "The CIDR block for the route to the Transit Gateway"
+  type = string
+  default = "10.0.0.0/11"
+}
