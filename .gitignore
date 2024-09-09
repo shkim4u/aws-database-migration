@@ -1,6 +1,8 @@
 target/
 .idea/
 
+node_modules
+
 # Terraform
 *.tfstate
 *.tfstate.*.backup
