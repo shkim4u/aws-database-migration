@@ -42,17 +42,19 @@
       1. ![shared_preload_libraries 파라미터 설정](../../images/reverse-synchronization/dms-replication-instance-shared-preload-libraries.png)
    2. `rds.logical_replication` 파라미터를 `1`로 설정
 2. `dso` 데이터베이스에 대한 `pglogical` 확장 생성 (`pgAdmin4` 또는 `psql` 쿼리로 수행)
-   1. ```SQL
-      -- `pglogical`이 초기화 되었는지 확인 (기대값: rdsutils,pglogical)
-      SHOW shared_preload_libraries;
-      -- 논리적 디코딩을 위한 설정 확인 (기대값: logical)
-      SHOW wal_level;
-      CREATE EXTENSION pglogical;
-      ```
+
+   ```sql
+   -- `pglogical`이 초기화 되었는지 확인 (기대값: rdsutils,pglogical)
+   SHOW shared_preload_libraries;
+   -- 논리적 디코딩을 위한 설정 확인 (기대값: logical)
+   SHOW wal_level;
+   CREATE EXTENSION pglogical;
+   ```
+
 3. `PostgreSQL` 데이터베이스 재부팅 (`Cloud9`에서 수행)
-   1. ```bash
-      aws rds reboot-db-instance --db-instance-identifier flightspecials-test-postgres-db
-      ```
+   ```bash
+   aws rds reboot-db-instance --db-instance-identifier flightspecials-test-postgres-db
+   ```
 
 > Reference: [pglogical을 사용하여 인스턴스 간 데이터 동기화](https://docs.aws.amazon.com/ko_kr/AmazonRDS/latest/UserGuide/Appendix.PostgreSQL.CommonDBATasks.pglogical.html)
 
@@ -89,7 +91,7 @@
 2. ```소스 엔드포인트```를 선택한 후 다음 정보를 입력한 후 ```연결 테스트```을 클릭합니다. 상태가 **성공**으로 바뀌면 **엔드포인트 생성**을 클릭합니다.
 
    | **파라미터**                    | **값**                                           |
-            |-----------------------------|-------------------------------------------------|
+   |-----------------------------|-------------------------------------------------|
    | **엔드포인트 유형**                | ```소스 엔드포인트```                                  |
    | **RDS DB 인스턴스 선택**          | ```체크```                                        |
    | **RDS DB 인스턴스**             | ```flightspecials-test-postgres-db```           |
@@ -137,7 +139,7 @@
 3. ```소스 엔드포인트```를 선택한 후 다음 정보를 입력한 후 ```연결 테스트```을 클릭합니다. 상태가 **성공**으로 바뀌면 **엔드포인트 생성**을 클릭합니다.
 
    | **파라미터**                | **값**                                                     |
-            |-------------------------|-----------------------------------------------------------|
+   |-------------------------|-----------------------------------------------------------|
    | **엔드포인트 유형**            | ```타겟 엔드포인트```                                            |
    | **RDS DB 인스턴스 선택**      | ```체크 해제 (선택하지 않음)```                                     |
    | **엔드포인트 식별자**           | ```travelbuddy-oracle-target```                           |
@@ -171,7 +173,7 @@
 2. ```TRAVELBUDDY``` 스키마의 마이그레이션을 위해 다음 값을 사용하여 ```데이터베이스 마이그레이션 태스크```를 생성합니다. (아래 적히지 않은 값들은 기본값을 사용합니다)
 
    | **파라미터**                         | **값**                                                     |
-         |----------------------------------|-----------------------------------------------------------|
+   |----------------------------------|-----------------------------------------------------------|
    | **태스크 식별자**                      | ```flightspecials-postgresql-to-oracle-rsync-task```      |
    | **친숙한 Amazon 리소스 이름(ARN)**       | ```비워둠```                                                 |
    | **복제 인스턴스**                      | ```dmsworkshop-target-dmsrepl``` (혹은 별도로 생성한 복제 인스턴스의 이름) |

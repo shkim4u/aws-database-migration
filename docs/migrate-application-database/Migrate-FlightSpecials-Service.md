@@ -189,7 +189,7 @@ aws iam create-service-specific-credential --user-name argocd --service-name cod
 > * 우리가 앞선 과정에서 설정한 `/*` 경로를 온프레미스 애플리케이션 서비스로 보내는 `AWS ALB` Rule은 특별히 삭제하지 않았음에도 불구하고 해당 로드밸런서 항목에서는 삭제되어 동작하지 않습니다. 이는 왜 그런 것일까요?
 >   * ![ALB 레거시 Rule 삭제](../../images/alb-legacy-rule-deleted.png)
 > * 원인을 정확하게 이해하려면 `Kubernetes`의 `Ingress` 리소스와 이의 AWS 구현체인 `AWS Load Balancer Controller`에 대한 이해가 필요합니다.
-> * 이런 이해와 함께 `ExternalDNS`, `ClusterIP` 등을 결합하면 더 정교한 병행 운영 (Parallel Rune)을 위한 적용을 도모할 수 있습니다.
+> * 이런 이해와 함께 `ExternalDNS`, `ClusterIP` 등을 결합하면 더 정교한 병행 운영 (Parallel Run)을 위한 적용을 도모할 수 있습니다.
 
 ---
 
