@@ -9,8 +9,13 @@
 3. 소스 및 타겟 엔드포인트 생성
 4. ```DMS 마이그레이션 태스크``` 생성 및 마이그레이션 실행
 5. 타겟 데이터베이스에서 데이터 확인
+6. 프론트엔드에서 데이터 확인
 
 ---
+
+[//]: # (> **참고**<br>)
+
+[//]: # (> 이후 단계를 먼저 진행하면 변경되는 모습을 확인하면서 진행할 수 있습니다.)
 
 ## **1. 개요**
 
@@ -278,7 +283,7 @@
 
    ![HotelSpecials DMS 마이그레이션 태스크 생성 및 실행 완료](../../images/hotelspecials-dms-migration-task-created-and-done.png)
 
-7. ```마이그레이션 태스크 (source-to-aupg-migration-task)```를 클릭하고 ```테이블 통계``` 탭으로 이동하여 테이블 통계를 보고 이동된 행 수를 확인합니다.
+7. ```마이그레이션 태스크 (travelbuddy-oracle-to-mysql-migration-task)```를 클릭하고 ```테이블 통계``` 탭으로 이동하여 테이블 통계를 보고 이동된 행 수를 확인합니다.
 
    ![HotelSpecials DMS 마이그레이션 태스크 테이블 통계](../../images/hotelspecials-dms-migration-task-table-stats.png)
 
@@ -286,19 +291,18 @@
 
 ---
 
-[//]: # (## **5. 프론트엔드에서 데이터 확인**)
-
-[//]: # ()
-[//]: # (1. 데이터가 정상적으로 마이그레이션 되었다면 앞서 프론트엔드에서 표시되지 않았던 호텔 프로모션 정보가 정상적으로 표시될 것입니다. 브라우저에서 페이지를 리프레스하여 데이터가 표시되는지 확인합니다.)
-
-[//]: # ()
-[//]: # (   ![HotelSpecials 데이터 마이그레이션 확인]&#40;../../images/hotelspecials-data-migration-check-frontend.png&#41;)
-
 ## **5. 타겟 데이터베이스에서 데이터 확인**
 
 1. 데이터가 정상적으로 마이그레이션 되었다면 타겟 데이터베이스에서 아래와 같이 데이터가 정상 조회될 것입니다..
 
    ![HotelSpecials 테이블 데이터 마이그레이션 확인](../../images/hotelspecials-data-migration-check-table.png)
+
+---
+## **6. 프론트엔드에서 데이터 확인**
+
+1. 데이터가 정상적으로 마이그레이션 되었다면 앞서 프론트엔드에서 표시되지 않았던 호텔 프로모션 정보가 정상적으로 표시될 것입니다. 브라우저에서 페이지를 리프레스하여 데이터가 표시되는지 확인합니다.
+
+   ![HotelSpecials 데이터 마이그레이션 확인](../../images/hotelspecials-data-migration-check-frontend.png)
 
 ---
 

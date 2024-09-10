@@ -13,7 +13,7 @@
 이제 프론트엔드의 백엔드 접속 엔드포인트 (DNS)를 ALB로 변경합니다.
 
 > 📌 **참고**<br>
-> * 대개의 실무 사례에서는 앞선 과정에서 분리된 프론트엔드 이미 최종 백엔드 DNS 이름을 가리키고 있으므로, 이 과정은 해당 DNS 이름의 ```CNAME``` 레코드를 ALB의 DNS 이름으로 변경하는 것을 의미합니다.<br>
+> * 대개의 실무 사례에서는 앞선 과정에서 분리된 프론트엔드가 이미 최종 백엔드 DNS 이름을 가리키고 있으므로, 이 과정은 해당 DNS 이름의 ```CNAME``` 레코드를 ALB의 DNS 이름으로 변경하는 것을 의미합니다.<br>
 > * 즉 아래와 유사하다고 볼 수 있습니다.
 >   * 기존: 프론트엔드 -> 백엔드 접속 DNS 주소 (예: travelbuddy.mycompany.com) CNAME -> 온프레미스 백엔드 DNS 주소 (예: travelbuddy-legacy.mycompany.com) -> 애플리케이션 서버 주소
 >   * 신규: 프론트엔드 -> 백엔드 접속 DNS 주소 (예: travelbuddy.mycompany.com) CNAME -> 온프레미스 클라우드 ALB DNS 주소 (예: k8s-travelbuddy-2157020304-1285626420.ap-northeast-2.elb.amazonaws.com) -> 신규 트래픽은 쿠버네테스 Pod로 유입, 기존 트래픽은 온프레미스로 라우팅
@@ -71,6 +71,8 @@
 7. 이제 배포 도메인을 사용하여 프론트엔드 애플리케이션이 정상적으로 표시되는지 확인합니다.
     * 웹 브라우저를 열고 ```CloudFront``` 배포 도메인을 입력하여 접속합니다.
     * 이 때 **"https:"** 가 아닌 **"http:"** 프로토콜을 사용합니다.
+
+[//]: # (   ![`HotelSpecials` 전환 프론트엔드 확인]&#40;../../images/hotelspecials-service-and-data-migrated.png&#41;)
 
    ![병행 운영 프론트엔드 확인](../../images/frontend-verify-parallel-run.png)
 
