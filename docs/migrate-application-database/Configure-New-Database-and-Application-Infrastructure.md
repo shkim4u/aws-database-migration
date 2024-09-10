@@ -26,8 +26,8 @@ curl -fsSL https://raw.githubusercontent.com/shkim4u/m2m-travelbuddy/main/cloud9
 > 📕 **참고**<br>
 > 생성된 `Cloud9` 환경은 이제 소스 측을 담당하시는 분과 공유하여 사용할 수 있습니다.<br>
 > 이를 위해 생성된 `Cloud9` 환경을 선택하고 상단 메뉴에서 ```Share```를 클릭하여 소스 측 담당자 분이 로그인하는 IAM 사용자를 초대하면 됩니다 (세부 설정 방법은 진행자에게 문의하세요).<br>
-> 
-> ![Cloud9 공유 환경](../../images/cloud9-shared-environment.png)
+
+![Cloud9 공유 환경](../../images/cloud9-shared-environment.png)
 
 ### 1.2. ```AWS Cloud9``` IDE 설정
 
